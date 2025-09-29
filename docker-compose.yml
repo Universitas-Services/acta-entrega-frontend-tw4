@@ -1,0 +1,30 @@
+### **Fase 3: Creación de `docker-compose.yml`**
+# En el archivo `docker-compose.yml`, definimos los servicios que componen nuestra aplicación.
+# Aquí, definimos un servicio llamado `frontend` que utiliza el Dockerfile para construir la imagen.
+version: '3.8'
+
+services:
+  # Nombre del servicio
+  frontend:
+    # Nombre que le daremos al contenedor para identificarlo fácilmente
+    container_name: mi-proyecto-moderno-frontend
+    
+    # Instrucciones para la construcción de la imagen
+    build:
+      # El contexto es el directorio actual (donde está el Dockerfile)
+      context: .
+      # Nombre del Dockerfile
+      dockerfile: Dockerfile
+    
+    # Mapeo de puertos: "PUERTO_EN_TU_MAQUINA:PUERTO_EN_EL_CONTENEDOR"
+    ports:
+      - "3000:3000"
+      
+    # Política de reinicio: El contenedor se reiniciará automáticamente si se detiene,
+    # a menos que lo detengas tú manualmente.
+    restart: unless-stopped
+    
+    # (Opcional) Variables de entorno que necesites pasar a tu aplicación
+    # environment:
+    #   - NODE_ENV=production
+    #   - NEXT_PUBLIC_API_URL=http://api.example.com

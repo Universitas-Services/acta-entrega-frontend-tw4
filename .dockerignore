@@ -1,0 +1,15 @@
+node_modules
+
+build
+.next
+out
+
+Dockerfile
+docker-compose.yml
+
+.git
+.github
+
+.env.local
+
+npm-debug.log

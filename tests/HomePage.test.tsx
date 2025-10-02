@@ -10,7 +10,7 @@ jest.mock('next/navigation', () => ({
 }));
 
 describe('Home Page', () => {
-  it('should redirect to the /dashboard page', () => {
+  it('should redirect to the /login page', () => {
     // --- PASO 2: PREPARACIÓN DEL MOCK (Arrange) ---
     // Creamos una función espía para el método 'replace'.
     // Esto nos permitirá comprobar si fue llamada.
@@ -32,6 +32,6 @@ describe('Home Page', () => {
     expect(mockReplace).toHaveBeenCalledTimes(1);
 
     // Verificamos que fue llamada con el argumento correcto.
-    expect(mockReplace).toHaveBeenCalledWith('/dashboard');
+    expect(mockReplace).toHaveBeenCalledWith('/login');
   });
 });

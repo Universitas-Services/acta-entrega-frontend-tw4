@@ -1,60 +1,73 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
-
-@theme {
-  --font-sans: 'Geist Sans', sans-serif;
-  --font-mono: 'Geist Mono', monospace;
-}
-
+/*
+  ==========================================================================
+   1. CAPA BASE Y DEFINICIÓN DE COLORES (LA ÚNICA FUENTE DE VERDAD)
+  ==========================================================================
+*/
 @layer base {
+  /*
+    Este es ahora el ÚNICO bloque `:root`. Define todos los colores
+    de tu tema claro usando el formato `oklch` para máxima compatibilidad
+    y consistencia.
+  */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
     --radius: 0.5rem;
-  }
 
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 0 0% 98%;
+    /* == Colores Principales del Layout == */
+    --background: oklch(0.94 0.02 257.35); /* #E8EDF2 - Fondo del Dashboard */
+    --foreground: oklch(
+      0.22 0.09 265.88
+    ); /* #001A70 - Azul oscuro para texto */
+
+    /* == Tarjetas (Card) == */
+    --card: oklch(1 0 0); /* #FFFFFF - Fondo de tarjetas */
+    --card-foreground: oklch(0.22 0.09 265.88);
+
+    /* == Componente Primario (Banner "Conócenos") == */
+    --primary: oklch(27.895% 0.14913 263.534); /* #001A70 - Azul primario */
+    --primary-foreground: oklch(
+      0.98 0.01 240
+    ); /* #F9FAFB - Blanco para texto */
+
+    /* == Componente Secundario (Botón Dorado) == */
+    --secondary: oklch(0.77 0.15 84.07); /* #E6AF01 - Dorado del botón */
+    --secondary-foreground: oklch(0.22 0.09 265.88);
+
+    /* == Colores "Muted" (Fondo de íconos en tarjetas) == */
+    --muted: oklch(0.92 0.01 257.35); /* #E2E5EB - Gris de fondo */
+    --muted-foreground: oklch(0.45 0.03 260);
+
+    /* == Acento (Hover de items) == */
+    --accent: oklch(0.96 0 0); /* #F2F2F2 - Hover sutil */
+    --accent-foreground: oklch(0.22 0.09 265.88);
+
+    /* == Otros Colores de UI == */
+    --destructive: oklch(0.65 0.22 25);
+    --destructive-foreground: oklch(0.98 0.01 240);
+    --border: oklch(0.92 0.01 257.35); /* #E1E4E8 - Borde sutil */
+    --input: oklch(0.92 0.01 257.35);
+    --ring: oklch(0.22 0.09 265.88);
+
+    /* == Variables Específicas del Sidebar (para claridad) == */
+    --sidebar: oklch(1 0 0); /* #FFFFFF - Fondo de sidebar/header */
+    --sidebar-foreground: oklch(0.22 0.09 265.88);
+    --sidebar-primary: oklch(94.374% 0.00872 248.202);
+    --sidebar-primary-foreground: oklch(0.98 0.01 240);
+    --sidebar-hover-bg: oklch(92.8% 0.006 264.531); /* - Hover en items */
+
+    /* == Insignia "Express" == */
+    --badge-express: oklch(84.6% 0.173 85.57); /* #FFC200 - Dorado */
+    --badge-express-foreground: oklch(0.22 0.09 265.88);
+
+    --fondo-icono-card-express: oklch(81.093% 0.00009 271.152);
   }
 }
 
+/* ==========================================================================
+   2. APLICACIÓN DE ESTILOS BASE Y @theme
+   ========================================================================== */
 @layer base {
   * {
     @apply border-border;
@@ -64,6 +77,11 @@
   }
 }
 
+/*
+  Este bloque @theme es necesario para que ciertos componentes de Shadcn
+  (especialmente los del sidebar) funcionen correctamente. Ahora tomará
+  los valores del ÚNICO :root que hemos definido arriba.
+*/
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -87,95 +105,20 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
+  --color-sidebar-border: var(--border);
+  --color-sidebar-hover-bg: var(--sidebar-hover-bg);
+  --color-sidebar-ring: var(--ring);
 
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  --color-badge-express: var(--badge-express);
+  --color-badge-express-foreground: var(--badge-express-foreground);
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
+  --color-fondo-icono-card-express: var(--fondo-icono-card-express);
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+  /* Mapeos que faltaban y son importantes */
+  --color-sidebar-accent: var(--accent);
+  --color-sidebar-accent-foreground: var(--accent-foreground);
 }

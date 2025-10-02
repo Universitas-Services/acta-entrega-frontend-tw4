@@ -1,19 +1,37 @@
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom'; // Tu adición es una buena práctica
-import Page from '../src/app/page'; // La ruta correcta desde 'src/tests'
+import { render } from '@testing-library/react';
+import Page from '../src/app/page';
+import { useRouter } from 'next/navigation';
+
+// --- PASO 1: MOCK (SIMULACIÓN) DE NEXT/NAVIGATION ---
+// Le decimos a Jest que intercepte cualquier importación de 'next/navigation'
+// y la reemplace con nuestra implementación falsa.
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(), // Simulamos el hook useRouter
+}));
 
 describe('Home Page', () => {
-  it('should render the introductory text', () => {
-    // 1. Arrange
+  it('should redirect to the /dashboard page', () => {
+    // --- PASO 2: PREPARACIÓN DEL MOCK (Arrange) ---
+    // Creamos una función espía para el método 'replace'.
+    // Esto nos permitirá comprobar si fue llamada.
+    const mockReplace = jest.fn();
+
+    // Hacemos que nuestro useRouter simulado devuelva un objeto
+    // que contiene nuestra función espía 'replace'.
+    (useRouter as jest.Mock).mockReturnValue({
+      replace: mockReplace,
+    });
+
+    // --- PASO 3: RENDERIZAR EL COMPONENTE (Act) ---
+    // Renderizamos el componente. Ahora, cuando llame a useRouter(),
+    // obtendrá nuestro objeto falso con el 'replace' espía.
     render(<Page />);
 
-    // 2. Act
-    // CAMBIO CLAVE: Usamos getByText en lugar de getByRole('heading').
-    // Esta consulta es más flexible y busca el texto sin importar la etiqueta.
-    const introText = screen.getByText(/Get started by editing/i);
+    // --- PASO 4: VERIFICAR EL COMPORTAMIENTO (Assert) ---
+    // Verificamos que la función de redirección fue llamada exactamente una vez.
+    expect(mockReplace).toHaveBeenCalledTimes(1);
 
-    // 3. Assert
-    // La aserción sigue siendo la misma y ahora debería pasar.
-    expect(introText).toBeInTheDocument();
+    // Verificamos que fue llamada con el argumento correcto.
+    expect(mockReplace).toHaveBeenCalledWith('/dashboard');
   });
 });

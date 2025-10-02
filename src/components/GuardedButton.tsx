@@ -1,4 +1,3 @@
-// src/components/GuardedButton.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';

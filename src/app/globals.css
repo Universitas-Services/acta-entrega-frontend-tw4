@@ -21,6 +21,9 @@
       0.22 0.09 265.88
     ); /* #001A70 - Azul oscuro para texto */
 
+    --input: oklch(1 0 0); /* #FFFFFF - Fondo de inputs */
+
+    --blanco-puro: oklch(100% 0 0); /* #FFFFFF - Blanco puro */
     /* == Tarjetas (Card) == */
     --card: oklch(1 0 0); /* #FFFFFF - Fondo de tarjetas */
     --card-foreground: oklch(0.22 0.09 265.88);
@@ -112,6 +115,8 @@
   --color-sidebar-border: var(--border);
   --color-sidebar-hover-bg: var(--sidebar-hover-bg);
   --color-sidebar-ring: var(--ring);
+
+  --color-input: var(--input);
 
   --color-badge-express: var(--badge-express);
   --color-badge-express-foreground: var(--badge-express-foreground);

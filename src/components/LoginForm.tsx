@@ -118,7 +118,7 @@ export function LoginForm() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground cursor-pointer"
                     >
                       {showPassword ? (
                         <FaEyeSlash size={20} />
@@ -142,7 +142,7 @@ export function LoginForm() {
           </div>
           <Button
             type="submit"
-            className="w-full text-lg py-6"
+            className="w-full text-lg py-6 cursor-pointer"
             disabled={isLoading}
           >
             {isLoading ? 'Iniciando...' : 'Iniciar sesión'}

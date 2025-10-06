@@ -10,9 +10,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { AiOutlineLogout } from 'react-icons/ai';
 import { useModalStore } from '@/stores/useModalStore';
+import { cn } from '@/lib/utils';
 
 export function LogoutConfirmationDialog() {
   // Obtenemos el estado y las funciones de nuestro store
@@ -28,7 +29,7 @@ export function LogoutConfirmationDialog() {
 
   return (
     <AlertDialog open={isModalOpen} onOpenChange={close}>
-      <AlertDialogContent className="max-w-sm text-center data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
+      <AlertDialogContent className="max-w-sm text-center data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 bg-white">
         <AlertDialogHeader className="flex flex-col items-center">
           <div className="mb-4 h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
             <AiOutlineLogout className="h-8 w-8 text-destructive" />
@@ -44,21 +45,21 @@ export function LogoutConfirmationDialog() {
         </AlertDialogHeader>
         <AlertDialogFooter className="flex gap-2 sm:justify-center">
           <AlertDialogCancel asChild>
-            <Button variant="outline" className="flex-1 font-bold">
+            <Button className="flex-1 font-bold bg-muted hover:bg-accent border-border text-foreground cursor-pointer">
               Cancelar
             </Button>
           </AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <Button
-              variant="destructive"
-              className="flex-1 font-bold"
-              onClick={() => {
-                payload.onConfirm?.(); // Ejecuta la acción de logout
-                close();
-              }}
-            >
-              Cerrar sesión
-            </Button>
+          <AlertDialogAction
+            className={cn(
+              buttonVariants({ variant: 'destructive' }),
+              'flex-1 font-bold cursor-pointer hover:bg-red700'
+            )}
+            onClick={() => {
+              payload.onConfirm?.();
+              close();
+            }}
+          >
+            Cerrar sesión
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

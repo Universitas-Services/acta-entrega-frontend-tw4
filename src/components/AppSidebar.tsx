@@ -1,16 +1,23 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useModalStore } from '@/stores/useModalStore';
+import { logoutUser } from '@/services/authService';
 import { useSidebarStore } from '@/stores/useSidebarStore';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { mainNav } from '@/config/sidebar-nav';
-import { cn } from '@/lib/utils';
-import { FiLogOut, FiInfo } from 'react-icons/fi';
+import { cn, getInitials } from '@/lib/utils';
+import { FiLogOut, FiInfo, FiUser } from 'react-icons/fi';
+import {
+  FaChevronDown,
+  FaChevronLeft,
+  FaChevronRight,
+  FaChevronUp,
+} from 'react-icons/fa';
 import { GuardedButton } from './GuardedButton';
-
-// --- SHADCN UI COMPONENT ---
 import {
   Sidebar,
   SidebarContent,
@@ -53,10 +60,28 @@ export default function AppSidebar() {
   } = useSidebarStore();
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const pathname = usePathname();
+  const { user, logout } = useAuthStore();
+  const { open: openModal } = useModalStore();
+  const router = useRouter();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleLogoutClick = () => {
+    openModal('logoutConfirmation', {
+      title: '¿Ya te vas?',
+      description: 'Estás a punto de cerrar tu sesión actual.',
+      onConfirm: async () => {
+        // Primero, hacemos la llamada a la API para invalidar el token en el backend
+        await logoutUser();
+        // Luego, limpiamos el estado local y el localStorage
+        logout();
+        // Finalmente, redirigimos al login
+        router.push('/login');
+      },
+    });
+  };
 
   const sidebarContent = (
     <>
-      {/* El Header ahora contiene el Trigger y el Logo */}
       <SidebarHeader className="h-16 flex items-center justify-between px-4 py-0 border-b">
         <div
           className={cn(
@@ -64,10 +89,9 @@ export default function AppSidebar() {
             isDesktopCollapsed && '!justify-center'
           )}
         >
-          {/* Botón de Trigger a la izquierda del logo */}
           <SidebarTrigger
             onClick={toggleDesktopCollapse}
-            className="hidden md:flex"
+            className="hidden md:flex cursor-pointer"
           />
           <Image
             src="/logo de universitas legal.svg"
@@ -93,7 +117,7 @@ export default function AppSidebar() {
                     href={item.href}
                     variant="ghost"
                     className={cn(
-                      'flex w-full items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 transition-colors text-sidebar-foreground hover:bg-sidebar-hover-bg bg-sidebar',
+                      'flex w-full items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 transition-colors text-sidebar-foreground hover:bg-sidebar-hover-bg bg-sidebar cursor-pointer overflow-hidden',
                       isDesktopCollapsed && 'justify-center p-2',
                       pathname === item.href && 'bg-sidebar-primary font-bold' // <-- Estilo activo
                     )}
@@ -120,14 +144,14 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-2">
+      <SidebarFooter className=" p-2">
         {/* Separando los items de acción de la información de usuario */}
         <div className="flex flex-col gap-1 space-y-1 ">
           <GuardedButton
             href="/dashboard/acerca-de"
             variant="ghost"
             className={cn(
-              'flex w-full bg-sidebar items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 text-sidebar-foreground hover:bg-sidebar-hover-bg',
+              'flex w-full bg-sidebar items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 text-sidebar-foreground hover:bg-sidebar-hover-bg cursor-pointer overflow-hidden',
               isDesktopCollapsed && 'justify-center p-2',
               pathname === '/dashboard/acerca-de' &&
                 'bg-sidebar-primary font-bold' // <-- Estilo activo
@@ -140,67 +164,108 @@ export default function AppSidebar() {
               Acerca de
             </span>
           </GuardedButton>
-          <Button
-            variant="ghost"
-            className={cn(
-              'flex w-full items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 text-destructive hover:bg-destructive/10',
-              isDesktopCollapsed && 'justify-center p-2'
-            )}
-          >
-            <FiLogOut className="h-5 w-5 shrink-0" />
-            <span
-              className={cn('grow text-left', isDesktopCollapsed && 'hidden')}
-            >
-              Cerrar Sesión
-            </span>
-          </Button>
         </div>
 
         <div className="mt-0 w-full border-t border-border pt-2">
-          <DropdownMenu>
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 className={cn(
-                  'h-auto w-full justify-start gap-3 px-3 py-2',
-                  isDesktopCollapsed && 'justify-center p-2'
+                  'h-auto w-full justify-between items-center px-3 py-2 cursor-pointer overflow-hidden',
+                  isDesktopCollapsed && 'justify-center p-2',
+                  isDropdownOpen && 'bg-sidebar-primary'
                 )}
               >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src="https://github.com/shadcn.png"
-                    alt="@shadcn"
-                  />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <div
-                  className={cn(
-                    'flex flex-col items-start',
-                    isDesktopCollapsed && 'hidden'
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8 ">
+                    {/* Si hay una imagen de perfil, se mostrará aquí */}
+                    <AvatarImage alt={user?.name || 'Usuario'} />
+                    {/* Fallback con iniciales y nuevos estilos */}
+                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                      {user ? getInitials(user.name, user.apellido) : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div
+                    className={cn(
+                      'flex flex-col items-start text-left',
+                      isDesktopCollapsed && 'hidden'
+                    )}
+                  >
+                    {/* Nombre y Apellido dinámicos */}
+                    <span className="text-sm font-medium whitespace-nowrap">
+                      {user
+                        ? `${user.name} ${user.apellido || ''}`.trim()
+                        : 'Usuario'}
+                    </span>
+                    {/* Email dinámico */}
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      {user?.email || ''}
+                    </span>
+                  </div>
+                </div>
+
+                <div className={cn('shrink-0', isDesktopCollapsed && 'hidden')}>
+                  {isDesktop ? (
+                    isDropdownOpen ? (
+                      <FaChevronLeft size={16} />
+                    ) : (
+                      <FaChevronRight size={16} />
+                    )
+                  ) : isDropdownOpen ? (
+                    <FaChevronDown size={16} />
+                  ) : (
+                    <FaChevronUp size={16} />
                   )}
-                >
-                  <span className="text-sm font-medium whitespace-nowrap">
-                    Shadcn
-                  </span>
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    m@shadcn.com
-                  </span>
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+
+            {/* Contenido del Dropdown con posición condicional */}
+            <DropdownMenuContent
+              className="w-56 bg-white"
+              align="end"
+              forceMount
+              side={isDesktop ? 'right' : 'top'}
+              sideOffset={isDesktop ? 10 : 5}
+            >
               <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Shadcn</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    m@shadcn.com
-                  </p>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-9 w-9 ">
+                    <AvatarImage alt={user?.name || 'Usuario'} />
+                    <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                      {user ? getInitials(user.name, user.apellido) : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user
+                        ? `${user.name} ${user.apellido || ''}`.trim()
+                        : 'Usuario'}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email || ''}
+                    </p>
+                  </div>
                 </div>
               </DropdownMenuLabel>
+
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Perfil</DropdownMenuItem>
+
+              <DropdownMenuItem className="cursor-pointer">
+                <FiUser className="mr-2 h-4 w-4" />
+                <span>Perfil</span>
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Cerrar Sesión</DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={handleLogoutClick}
+                className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+              >
+                <FiLogOut className="mr-2 h-4 w-4 text-destructive" />
+                <span>Cerrar Sesión</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -233,7 +298,7 @@ export default function AppSidebar() {
     <Sidebar
       collapsible="icon"
       className={cn(
-        'hidden md:flex border-r bg-sidebar text-sidebar-foreground', // <-- Colores aplicados aquí
+        'hidden md:flex border-r bg-sidebar text-sidebar-foreground',
         isDesktopCollapsed ? 'w-20' : 'w-64',
         'transition-all duration-300'
       )}

@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import './globals.css';
 
+import { Toaster } from 'sonner';
+
 const roboto = Roboto({
   weight: ['400', '500', '700'],
   subsets: ['latin'],
@@ -21,6 +23,9 @@ export default function RootLayout({
     <html lang="es">
       <body className={roboto.className}>
         {children}
+
+        <Toaster richColors position="top-right" />
+
         <div id="datepicker-portal"></div>
         <div id="timepicker-portal"></div>
       </body>

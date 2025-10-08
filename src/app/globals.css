@@ -76,8 +76,11 @@
     --g3: oklch(87.2% 0.01 258.338);
     --g4: oklch(70.7% 0.022 261.325);
     --g7: oklch(37.3% 0.034 259.733);
+    --g8: oklch(27.8% 0.033 256.848);
 
     --red700: oklch(50.5% 0.213 27.518);
+    --red6: oklch(57.7% 0.245 27.325);
+    --green6: oklch(62.7% 0.194 149.214);
   }
 }
 
@@ -147,6 +150,9 @@
   --color-g3: var(--g3);
   --color-g4: var(--g4);
   --color-g7: var(--g7);
+  --color-g8: var(--g8);
 
   --color-red700: var(--red700);
+  --color-red6: var(--red6);
+  --color-green6: var(--green6);
 }

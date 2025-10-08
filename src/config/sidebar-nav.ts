@@ -29,7 +29,7 @@ export const mainNav: NavItem[] = [
   },
   {
     title: 'Panel de Actas',
-    href: '/dashboard/actas',
+    href: '/dashboard/panel-actas',
     icon: LuLayoutDashboard,
   },
   {
@@ -39,7 +39,7 @@ export const mainNav: NavItem[] = [
   },
   {
     title: 'Asistente Virtual',
-    href: '/dashboard/asistente',
+    href: '/dashboard/asistenteia',
     icon: LiaRobotSolid,
   },
 ];

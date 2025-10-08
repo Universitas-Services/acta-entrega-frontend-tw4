@@ -34,7 +34,7 @@ export function LogoutConfirmationDialog() {
           <div className="mb-4 h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
             <AiOutlineLogout className="h-8 w-8 text-destructive" />
           </div>
-          <AlertDialogTitle className="text-2xl font-bold">
+          <AlertDialogTitle className="text-2xl font-bold text-black">
             {payload.title || '¿Ya te vas?'}
           </AlertDialogTitle>
           {payload.description && (
@@ -45,7 +45,7 @@ export function LogoutConfirmationDialog() {
         </AlertDialogHeader>
         <AlertDialogFooter className="flex gap-2 sm:justify-center">
           <AlertDialogCancel asChild>
-            <Button className="flex-1 font-bold bg-muted hover:bg-accent border-border text-foreground cursor-pointer">
+            <Button className="flex-1 font-bold bg-muted hover:bg-accent border-border text-black cursor-pointer">
               Cancelar
             </Button>
           </AlertDialogCancel>

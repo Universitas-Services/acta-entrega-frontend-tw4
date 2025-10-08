@@ -16,9 +16,11 @@
     --radius: 0.5rem;
 
     /* == Colores Principales del Layout == */
-    --background: oklch(0.94 0.02 257.35); /* #E8EDF2 - Fondo del Dashboard */
+    --background: oklch(
+      94.37% 0.009 247.92
+    ); /* #E8EDF2 - Fondo del Dashboard */
     --foreground: oklch(
-      0.22 0.09 265.88
+      27.89% 0.149 263.52
     ); /* #001A70 - Azul oscuro para texto */
 
     --input: oklch(1 0 0); /* #FFFFFF - Fondo de inputs */
@@ -66,13 +68,14 @@
 
     --button-gold: oklch(78.313% 0.16015 85.727);
 
-    --fondo-icono-card-express: oklch(81.093% 0.00009 271.152);
+    --gris-card-express: oklch(81.09% 0 0);
 
     /* Gray*/
     --g1: oklch(96.7% 0.003 264.542);
     --g2: oklch(92.8% 0.006 264.531);
     --g3: oklch(87.2% 0.01 258.338);
     --g4: oklch(70.7% 0.022 261.325);
+    --g7: oklch(37.3% 0.034 259.733);
 
     --red700: oklch(50.5% 0.213 27.518);
   }
@@ -133,7 +136,7 @@
 
   --color-button-gold: var(--button-gold);
 
-  --color-fondo-icono-card-express: var(--fondo-icono-card-express);
+  --color-gris-card-express: var(--gris-card-express);
 
   /* Mapeos que faltaban y son importantes */
   --color-sidebar-accent: var(--accent);
@@ -143,6 +146,7 @@
   --color-g2: var(--g2);
   --color-g3: var(--g3);
   --color-g4: var(--g4);
+  --color-g7: var(--g7);
 
   --color-red700: var(--red700);
 }

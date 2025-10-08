@@ -48,7 +48,7 @@ function CardComponent({
           <div
             className={cn(
               'flex h-12 w-12 items-center justify-center rounded-lg bg-muted shadow-lg',
-              gratis && 'fondo-icono-card-express', // Si es gratis, usa el color dorado
+              gratis && 'bg-gris-card-express', // Si es gratis, usa el color dorado
               pro && 'bg-primary' // Si es pro, usa el color primario
             )}
           >

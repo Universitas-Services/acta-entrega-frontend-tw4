@@ -64,6 +64,8 @@
     --badge-express: oklch(84.6% 0.173 85.57); /* #FFC200 - Dorado */
     --badge-express-foreground: oklch(0.22 0.09 265.88);
 
+    --button-gold: oklch(78.313% 0.16015 85.727);
+
     --fondo-icono-card-express: oklch(81.093% 0.00009 271.152);
 
     /* Gray*/
@@ -128,6 +130,8 @@
 
   --color-badge-express: var(--badge-express);
   --color-badge-express-foreground: var(--badge-express-foreground);
+
+  --color-button-gold: var(--button-gold);
 
   --color-fondo-icono-card-express: var(--fondo-icono-card-express);
 

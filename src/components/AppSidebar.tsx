@@ -253,9 +253,19 @@ export default function AppSidebar() {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="cursor-pointer text-black/80">
-                <FiUser className="mr-2 h-4 w-4 text-black/80" />
-                <span>Perfil</span>
+              <DropdownMenuItem
+                asChild
+                className="cursor-pointer text-black/80"
+              >
+                <GuardedButton
+                  href="/dashboard/perfil"
+                  variant="ghost"
+                  // Clases para que se comporte como un elemento de menú
+                  className="bg-white w-full h-full justify-start px-2 py-1.5 text-sm font-normal focus-visible:ring-0 focus-visible:ring-offset-0"
+                >
+                  <FiUser className="mr-2 h-4 w-4 text-black/80" />
+                  <span>Perfil</span>
+                </GuardedButton>
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />

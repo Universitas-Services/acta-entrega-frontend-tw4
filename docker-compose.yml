@@ -1,7 +1,7 @@
 ### **Fase 3: Creación de `docker-compose.yml`**
 # En el archivo `docker-compose.yml`, definimos los servicios que componen nuestra aplicación.
 # Aquí, definimos un servicio llamado `frontend` que utiliza el Dockerfile para construir la imagen.
-version: '3.8'
+#version: '3.8'
 
 services:
   # Nombre del servicio

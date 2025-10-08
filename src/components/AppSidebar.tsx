@@ -10,13 +10,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { mainNav } from '@/config/sidebar-nav';
 import { cn, getInitials } from '@/lib/utils';
-import { FiLogOut, FiInfo, FiUser } from 'react-icons/fi';
+import { FiInfo, FiUser } from 'react-icons/fi';
 import {
   FaChevronDown,
   FaChevronLeft,
   FaChevronRight,
   FaChevronUp,
 } from 'react-icons/fa';
+import { AiOutlineLogout } from 'react-icons/ai';
 import { GuardedButton } from './GuardedButton';
 import {
   Sidebar,
@@ -252,8 +253,8 @@ export default function AppSidebar() {
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="cursor-pointer">
-                <FiUser className="mr-2 h-4 w-4" />
+              <DropdownMenuItem className="cursor-pointer text-black/80">
+                <FiUser className="mr-2 h-4 w-4 text-black/80" />
                 <span>Perfil</span>
               </DropdownMenuItem>
 
@@ -263,7 +264,7 @@ export default function AppSidebar() {
                 onClick={handleLogoutClick}
                 className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
               >
-                <FiLogOut className="mr-2 h-4 w-4 text-destructive" />
+                <AiOutlineLogout className="mr-2 h-4 w-4 text-destructive" />
                 <span>Cerrar Sesión</span>
               </DropdownMenuItem>
             </DropdownMenuContent>

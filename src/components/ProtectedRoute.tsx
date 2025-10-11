@@ -1,34 +1,39 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { token, initialize } = useAuthStore();
+  // Obtenemos los valores directamente del store para mayor claridad
+  const token = useAuthStore((state) => state.token);
+  const initialize = useAuthStore((state) => state.initialize);
+
+  // 1. Creamos un estado para saber si ya revisamos el localStorage
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Inicializa el estado desde localStorage al cargar
+    // Al cargar el componente, inicializamos el estado desde localStorage
+    // y marcamos como inicializado.
     initialize();
+    setIsInitialized(true);
   }, [initialize]);
 
   useEffect(() => {
-    // Si la inicialización ha terminado y no hay token, redirige al login
-    if (!token) {
-      // Obtenemos el token directamente de localStorage como última verificación
-      const storedToken = localStorage.getItem('authToken');
-      if (!storedToken) {
-        router.push('/login');
-      }
+    // 2. Este efecto ahora solo se ejecuta DESPUÉS de la inicialización
+    if (isInitialized && !token) {
+      // Si ya revisamos y AÚN ASÍ no hay token, entonces redirigimos.
+      router.push('/login');
     }
-  }, [token, router]);
+  }, [token, isInitialized, router]);
 
-  // Si hay token, renderiza el contenido protegido
-  if (token) {
-    return <>{children}</>;
+  //  3. NO MOSTRAMOS NADA hasta que la inicialización haya terminado Y haya un token.
+  // Esto cierra la ventana de tiempo y previene la "condición de carrera".
+  if (!isInitialized || !token) {
+    return null; // Muestra una pantalla en blanco (o un spinner) mientras verifica
   }
 
-  // Muestra un loader o null mientras se verifica el token
-  return null;
+  // Si todo está en orden, muestra el contenido protegido.
+  return <>{children}</>;
 }

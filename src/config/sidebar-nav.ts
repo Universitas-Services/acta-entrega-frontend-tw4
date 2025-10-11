@@ -38,7 +38,7 @@ export const mainNav: NavItem[] = [
     icon: FiHelpCircle,
   },
   {
-    title: 'Asistente Virtual',
+    title: 'Consultor IA',
     href: '/dashboard/asistenteia',
     icon: LiaRobotSolid,
   },

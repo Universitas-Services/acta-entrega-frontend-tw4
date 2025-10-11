@@ -1,70 +1,140 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useHeader } from '@/context/HeaderContext';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { FaArrowRight } from 'react-icons/fa';
+import { Input } from '@/components/ui/input';
+import { IoSend, IoLogoWhatsapp } from 'react-icons/io5';
+import apiClient from '@/lib/axios';
+import { useHeader } from '@/context/HeaderContext';
+import { cn } from '@/lib/utils';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
-export default function CompliancePage() {
+interface Message {
+  text: string;
+  isUser: boolean;
+}
+
+export default function AsistenteVirtualPage() {
   const { setTitle } = useHeader();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Actualiza el título del Header al cargar la página
   useEffect(() => {
-    setTitle('Asistente Virtual');
+    setTitle('Consultor IA');
+    // Carga inicial desde localStorage
+    try {
+      const savedMessages = localStorage.getItem('chatMessages');
+      const savedSessionId = localStorage.getItem('chatSessionId');
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages));
+      } else {
+        setMessages([
+          {
+            text: '¡Hola! Soy tu experto de actas de entregas. ¿En qué puedo ayudarte hoy?',
+            isUser: false,
+          },
+        ]);
+      }
+      if (savedSessionId) setSessionId(savedSessionId);
+    } catch (error) {
+      console.error('No se pudo acceder a localStorage:', error);
+      setMessages([
+        {
+          text: '¡Hola! Soy tu asistente de actas de entregas. ¿En qué puedo ayudarte hoy?',
+          isUser: false,
+        },
+      ]);
+    }
   }, [setTitle]);
 
-  return (
-    // Contenedor principal para centrar la tarjeta
-    <div className="flex justify-center items-start pt-4 md:pt-10">
-      <div className="w-full max-w-4xl rounded-xl bg-primary text-primary-foreground p-6 md:p-8 shadow-lg">
-        {/* Contenedor principal responsivo */}
-        <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-6">
-          {/* Título y descripción principal */}
-          <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold mb-4">
-              Tu Asesor IA, experto en experto en Actas de Entrega. Disponible
-              al instante.
-            </h2>
-            <p className="text-base text-primary-foreground/80">
-              {' '}
-              {/* Texto con opacidad para un look más suave */}
-              Resuelve tus dudas al instante. Nuestro Asesor utiliza
-              inteligencia artificial para analizar tu caso y responder tus
-              preguntas sobre Actas de Entrega y normativas. Además, un agente
-              experto revisará la consulta para entregarte un reporte con
-              observaciones profesionales.
-            </p>
-          </div>
+  useEffect(() => {
+    // Guardado en localStorage
+    if (messages.length > 1)
+      localStorage.setItem('chatMessages', JSON.stringify(messages));
+    if (sessionId) localStorage.setItem('chatSessionId', sessionId);
+  }, [messages, sessionId]);
 
-          <Button
-            asChild
-            className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold whitespace-nowrap w-full md:w-auto"
-          >
-            <a
-              href="https://api.whatsapp.com/send?phone=+584125253023&text=Hola,%20quiero%20adquirir%20Actas%20de%20Entregas%20PRO"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center" // Asegura que el ícono esté alineado
-            >
-              Adquirir versión PRO
-              <FaArrowRight className="ml-2 h-4 w-4" />
-            </a>
-          </Button>
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  return (
+    <div className="h-full flex justify-center">
+      <div className="flex flex-col h-full w-full max-w-4xl bg-slate-50 border rounded-lg shadow-xl">
+        <div className="flex items-center p-4 border-b bg-white rounded-t-lg">
+          <Avatar className="h-10 w-10 mr-4">
+            <AvatarImage src="/ia/julioAI.jpg" alt="AsesorIA" />
+            <AvatarFallback>IA</AvatarFallback>
+          </Avatar>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Consultor IA - Actas de Entrega
+          </h2>
         </div>
 
-        <div className="h-px w-full bg-primary-foreground/20 my-6" />
+        <div className="flex-1 p-6 overflow-y-auto space-y-6">
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={cn(
+                'flex items-start gap-4',
+                msg.isUser ? 'justify-end' : 'justify-start'
+              )}
+            >
+              {!msg.isUser && (
+                // ▼▼▼ 2. IMAGEN EN LOS MENSAJES DEL BOT ▼▼▼
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="/ia/julioAI.jpg" alt="AsesorIA" />
+                  <AvatarFallback className="bg-primary-blue text-white">
+                    IA
+                  </AvatarFallback>
+                </Avatar>
+              )}
+              <div
+                className={cn(
+                  'max-w-md p-3 rounded-lg shadow-sm',
+                  msg.isUser
+                    ? 'bg-primary-blue text-white rounded-br-none'
+                    : 'bg-white text-gray-800 rounded-bl-none'
+                )}
+              >
+                <p className="text-sm">{msg.text}</p>
+              </div>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex items-start gap-4 justify-start">
+              {/* ▼▼▼ 3. IMAGEN EN EL INDICADOR "ESCRIBIENDO..." ▼▼▼ */}
+              <Avatar className="h-8 w-8 animate-pulse">
+                <AvatarImage src="/ia/julioAI.jpg" alt="AsesorIA" />
+                <AvatarFallback className="bg-primary-blue text-white">
+                  IA
+                </AvatarFallback>
+              </Avatar>
+              <div className="max-w-md p-3 rounded-lg bg-white text-gray-800 rounded-bl-none shadow-sm">
+                <p className="text-sm italic text-gray-500">Escribiendo...</p>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
 
-        {/* Lista de características */}
-        <div>
-          <p className="text-base font-semibold">Con el Asesor IA podrás:</p>
-          <ul className="list-disc list-inside mt-2 space-y-1 text-base text-primary-foreground/80">
-            <li>Consultar 24/7 sobre normativas y procedimientos.</li>
-            <li>Recibir respuestas aplicadas directamente a tu caso.</li>
-            <li>
-              Obtener un reporte de observaciones validado por un experto.
-            </li>
-            <li>Aclarar dudas complejas de forma rápida y segura.</li>
-          </ul>
+        <div className="p-4 border-t bg-white rounded-b-lg">
+          <Button
+            asChild
+            className="w-full h-12 bg-button-gold hover:bg-button-gold/90 text-primary font-semibold"
+          >
+            <a
+              href="https://api.whatsapp.com/send?phone=+584125253023&text=Hola,%20quiero%20adquirir%20la%20versión%20PRO%20para%20activar%20el%20Consultor%20IA."
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IoLogoWhatsapp className="mr-2 h-6 w-6" />
+              Activa el Consultor IA con la versión PRO
+            </a>
+          </Button>
         </div>
       </div>
     </div>

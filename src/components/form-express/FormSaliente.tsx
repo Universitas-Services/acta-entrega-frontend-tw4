@@ -34,8 +34,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { createActaSalientePaga } from '@/services/actasService';
 import { InputCompuesto } from '../InputCompuesto';
 import { LocationSelector } from '../LocationSelector';
-import { CustomDatePicker } from '../DatePicker';
-import { CustomTimePicker } from '../TimePicker';
+import { ShadcnDatePicker } from '../DatePicker';
+import { ShadcnTimePicker } from '../TimePicker';
 import { SiNoQuestion } from '../SiNoQuestion';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
 import { actaSalienteSchema } from '@/lib/schemas';
@@ -51,6 +51,8 @@ import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { useFormState } from 'react-hook-form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FormFieldWithExtras } from '../FormFieldWithExtras';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 type FormData = z.infer<typeof actaSalienteSchema>;
 type DynamicStepKey = keyof DynamicContent;
@@ -228,7 +230,37 @@ export function ActaSalienteForm() {
       }
     }
 
-    const isValid = await form.trigger(fieldsToValidate);
+    // Se dispara la validación, pero le decimos que no haga focus automáticamente
+    const isValid = await form.trigger(fieldsToValidate, {
+      shouldFocus: false,
+    });
+
+    // --- LÓGICA DE SCROLL AUTO - De campos faltantes ---
+    if (!isValid) {
+      const errors = form.formState.errors;
+      // 'fieldsToValidate' ya nos da el orden correcto de los campos en la pantalla.
+      // Buscamos el primer campo en ese array que también exista en el objeto de errores.
+      const firstErrorField = fieldsToValidate.find((field) => errors[field]);
+
+      if (firstErrorField) {
+        // Buscamos el elemento del input/select por su atributo 'name'
+        const element = document.querySelector(`[name="${firstErrorField}"]`);
+
+        // A partir de ahí, buscamos el contenedor 'FormItem' más cercano
+        const formItem = element?.closest('[data-slot="form-item"]');
+
+        if (formItem) {
+          // Hacemos el scroll suave hacia el contenedor completo
+          formItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          // Para buena experiencia de usuario, se muestra
+          // un toast para que el usuario sepa qué revisar
+          toast.warning('Por favor, revisa los campos marcados en rojo.');
+        }
+      }
+      // Si la validación no es válida, la función termina aquí.
+      return;
+    }
 
     if (isValid) {
       if (currentStep === 8 && getValues('Anexo_VII') === 'NO APLICA') {
@@ -248,12 +280,6 @@ export function ActaSalienteForm() {
       setCurrentStep((prev) => prev - 1);
     }
   };
-
-  const navButtonStyleGray =
-    'bg-white text-black border-gray-300 shadow-md hover:bg-gray-100 active:bg-slate-200 active:shadow-inner active:border-gray-400 transition-all duration-150';
-
-  const navButtonStyleBlue =
-    'bg-primary-blue text-white border-blue-800 shadow-md hover:bg-primary-blue-dark active:bg-blue-800 active:shadow-inner active:border-blue-900 transition-all duration-150';
 
   return (
     <Card className="w-full bg-white">
@@ -349,7 +375,6 @@ export function ActaSalienteForm() {
                       label="Nombre del órgano, entidad, oficina o dependencia de la Administración Pública"
                       subtitle="Ej: Instituto Nacional de Transporte Terrestre (INTT)"
                       maxLength={50}
-                      validationType="textOnly"
                     />
                   </div>
                 </div>
@@ -377,26 +402,12 @@ export function ActaSalienteForm() {
                       control={form.control}
                       name="horaSuscripcion"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col justify-end">
+                        <FormItem className="flex flex-col">
                           <FormLabel>Hora de suscripción del acta</FormLabel>
-                          <FormControl>
-                            <CustomTimePicker
-                              // react-datepicker usa objetos Date, así que convertimos el valor
-                              value={
-                                field.value
-                                  ? new Date(`1970-01-01T${field.value}`)
-                                  : null
-                              }
-                              onChange={(date) => {
-                                // Guardamos la hora en formato HH:mm
-                                field.onChange(
-                                  date
-                                    ? `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
-                                    : ''
-                                );
-                              }}
-                            />
-                          </FormControl>
+                          <ShadcnTimePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -406,20 +417,21 @@ export function ActaSalienteForm() {
                       control={form.control}
                       name="fechaSuscripcion"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col justify-end">
+                        <FormItem className="flex flex-col">
                           <FormLabel>Fecha de la suscripción</FormLabel>
-                          <FormControl>
-                            <CustomDatePicker
-                              // react-datepicker usa objetos Date, así que convertimos el valor
-                              value={field.value ? new Date(field.value) : null}
-                              onChange={(date) => {
-                                // Guardamos la fecha en formato YYYY-MM-DD
-                                field.onChange(
-                                  date ? date.toISOString().split('T')[0] : ''
-                                );
-                              }}
-                            />
-                          </FormControl>
+                          <ShadcnDatePicker
+                            // 'T00:00:00' para que la fecha se interprete en la zona horaria local y no en UTC.
+                            value={
+                              field.value
+                                ? new Date(`${field.value}T00:00:00`)
+                                : undefined
+                            }
+                            onChange={(date) => {
+                              if (date) {
+                                field.onChange(format(date, 'yyyy-MM-dd'));
+                              }
+                            }}
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -449,13 +461,13 @@ export function ActaSalienteForm() {
                               disabled={isLoading}
                             >
                               <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="cursor-pointer">
                                   <SelectValue placeholder="Seleccione un motivo" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent
                                 position="popper"
-                                className="bg-white z-50 max-h-60 overflow-y-auto"
+                                className="bg-white z-50 max-h-60 overflow-y-auto text-black"
                               >
                                 <SelectItem value="Renuncia">
                                   Renuncia
@@ -810,7 +822,7 @@ export function ActaSalienteForm() {
                         disabled={isLoading}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="cursor-pointer">
                             <SelectValue placeholder="Seleccione un anexo a detallar" />
                           </SelectTrigger>
                         </FormControl>
@@ -932,7 +944,7 @@ export function ActaSalienteForm() {
                     variant="outline"
                     onClick={prevStep}
                     disabled={isLoading}
-                    className={navButtonStyleGray}
+                    className="cursor-pointer shadow-md active:shadow-inner transition-all"
                   >
                     Anterior
                   </Button>
@@ -941,7 +953,7 @@ export function ActaSalienteForm() {
 
               {/* Columna Central (para el indicador de Pasos) */}
               <div className="flex w-1/3 justify-center">
-                <div className="bg-icon-gray-bg px-4 py-2 rounded-lg shadow-sm">
+                <div className="bg-pasos-gris px-4 py-2 rounded-lg shadow-sm">
                   <p className="text-sm font-bold text-gray-700">
                     Paso {currentStep + 1} de {steps.length}
                   </p>
@@ -955,7 +967,8 @@ export function ActaSalienteForm() {
                     type="button"
                     onClick={nextStep}
                     disabled={isLoading}
-                    className={navButtonStyleBlue}
+                    variant="default"
+                    className="cursor-pointer shadow-md active:bg-primary/80 active:translate-y-px transition-all"
                   >
                     Siguiente
                   </Button>
@@ -964,7 +977,8 @@ export function ActaSalienteForm() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className={navButtonStyleBlue}
+                    variant="default"
+                    className="cursor-pointer shadow-md active:bg-primary/80 active:translate-y-px transition-all"
                   >
                     {isLoading ? 'Creando Acta...' : 'Crear acta'}
                   </Button>

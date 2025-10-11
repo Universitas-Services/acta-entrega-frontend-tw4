@@ -443,6 +443,7 @@ export function ActaMaximaAutoridadForm() {
                         </FormItem>
                       )}
                     />
+
                     <div className="md:col-span-2">
                       <FormFieldWithExtras
                         name="direccionOrgano"

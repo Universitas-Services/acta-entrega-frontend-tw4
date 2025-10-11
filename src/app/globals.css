@@ -72,6 +72,9 @@
 
     --pasos-gris: oklch(96.7% 0.003 264.54);
 
+    --yellow100: oklch(97.3% 0.071 103.193);
+    --yellow600: oklch(68.1% 0.162 75.834);
+
     /* Gray*/
     --g1: oklch(96.7% 0.003 264.542);
     --g2: oklch(92.8% 0.006 264.531);
@@ -155,6 +158,9 @@
   --color-g8: var(--g8);
 
   --color-pasos-gris: var(--pasos-gris);
+
+  --color-yellow100: var(--yellow100);
+  --color-yellow600: var(--yellow600);
 
   --color-red700: var(--red700);
   --color-red6: var(--red6);

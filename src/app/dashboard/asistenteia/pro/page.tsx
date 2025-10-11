@@ -1,4 +1,3 @@
-// src/app/dashboard/asistenteia/page.tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -24,7 +23,7 @@ export default function AsistenteVirtualPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setTitle('Asistente Virtual');
+    setTitle('Consultor IA');
     // Carga inicial desde localStorage
     try {
       const savedMessages = localStorage.getItem('chatMessages');
@@ -34,7 +33,7 @@ export default function AsistenteVirtualPage() {
       } else {
         setMessages([
           {
-            text: '¡Hola! Soy tu asistente de actas de entregas. ¿En qué puedo ayudarte hoy?',
+            text: '¡Hola! Soy tu experto de actas de entregas. ¿En qué puedo ayudarte hoy?',
             isUser: false,
           },
         ]);
@@ -103,7 +102,7 @@ export default function AsistenteVirtualPage() {
             <AvatarFallback>IA</AvatarFallback>
           </Avatar>
           <h2 className="text-xl font-semibold text-gray-800">
-            AsesorIA Actas de Entrega
+            Consultor IA - Actas de Entrega
           </h2>
         </div>
 

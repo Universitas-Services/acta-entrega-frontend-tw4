@@ -93,6 +93,11 @@
    2. APLICACIÓN DE ESTILOS BASE Y @theme
    ========================================================================== */
 @layer base {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
   * {
     @apply border-border;
   }

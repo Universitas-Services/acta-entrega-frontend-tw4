@@ -17,7 +17,7 @@ export default function DashboardLayout({
       <HeaderProvider>
         <SidebarProvider>
           {/* El `bg-body-dashboard` ya no es necesario, `bg-background` lo maneja globalmente */}
-          <div className="flex h-screen w-screen overflow-hidden text-gray-800">
+          <div className="flex h-screen w-screen overflow-hidden text-g8">
             <AppSidebar />
             <div className="flex flex-1 flex-col overflow-hidden">
               <Header />

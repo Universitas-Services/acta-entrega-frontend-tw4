@@ -431,11 +431,11 @@ export function LocationSelector<T extends FieldValues>({
     : [];
 
   // Reinicia el valor de la ciudad cuando el estado cambia
-  useEffect(() => {
+  /*useEffect(() => {
     setValue(ciudadFieldName, '' as PathValue<T, typeof ciudadFieldName>, {
       shouldValidate: false,
     });
-  }, [selectedEstado, setValue, ciudadFieldName]);
+  }, [selectedEstado, setValue, ciudadFieldName]);*/
 
   return (
     <>

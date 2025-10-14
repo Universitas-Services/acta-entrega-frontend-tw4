@@ -27,7 +27,7 @@ import {
   CardTitle,
   CardDescription as ShadcnCardDescription,
 } from '@/components/ui/card';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHeader } from '@/context/HeaderContext';
 import { Textarea } from '@/components/ui/textarea';
@@ -56,6 +56,14 @@ import { toast } from 'sonner';
 
 type FormData = z.infer<typeof actaMaximaAutoridadSchema>;
 type DynamicStepKey = keyof DynamicContent;
+
+function usePrevious<T>(value: T): T | undefined {
+  const ref = useRef<T>(undefined);
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}
 
 export function ActaMaximaAutoridadForm() {
   const router = useRouter();
@@ -169,7 +177,7 @@ export function ActaMaximaAutoridadForm() {
     },
   });
 
-  const { getValues, watch } = form;
+  const { getValues, watch, setValue } = form;
 
   const selectedAnexo = watch('Anexo_VII') as DynamicStepKey;
 
@@ -301,7 +309,7 @@ export function ActaMaximaAutoridadForm() {
       } else if (currentStep < steps.length - 1) {
         setCurrentStep((prev) => prev + 1);
       }
-    }, 100);
+    }, 100); // Delay para que el scroll ocurra antes del cambio de contenido
   };
 
   const prevStep = () => {
@@ -312,8 +320,28 @@ export function ActaMaximaAutoridadForm() {
       } else if (currentStep > 0) {
         setCurrentStep((prev) => prev - 1);
       }
-    }, 100);
+    }, 100); // Delay para que el scroll ocurra antes del cambio de contenido
   };
+
+  // Lógica para reiniciar la ciudad cuando cambia el estado
+
+  // Observamos el campo del estado para reaccionar a sus cambios.
+  const estadoSuscripcion = watch('estadoSuscripcion');
+
+  // Usamos el hook para recordar cuál fue el valor anterior del estado.
+  const previousEstado = usePrevious(estadoSuscripcion);
+
+  // Este useEffect se ejecutará cada vez que el estado cambie.
+  useEffect(() => {
+    // La condición clave: solo actuamos si hubo un estado anterior
+    // y el estado actual es diferente. Esto previene que se ejecute
+    // al cargar por primera vez o al volver a un paso.
+    if (previousEstado && estadoSuscripcion !== previousEstado) {
+      // Si la condición se cumple, significa que el usuario ha cambiado
+      // activamente el estado, por lo que reseteamos la ciudad.
+      setValue('ciudadSuscripcion', '', { shouldValidate: true });
+    }
+  }, [estadoSuscripcion, previousEstado, setValue]);
 
   return (
     <Card className="w-full bg-white">

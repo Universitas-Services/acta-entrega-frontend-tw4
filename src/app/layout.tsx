@@ -25,9 +25,6 @@ export default function RootLayout({
         {children}
 
         <Toaster richColors position="top-right" />
-
-        <div id="datepicker-portal"></div>
-        <div id="timepicker-portal"></div>
       </body>
     </html>
   );

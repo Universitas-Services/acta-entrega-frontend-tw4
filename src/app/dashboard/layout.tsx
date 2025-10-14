@@ -17,12 +17,15 @@ export default function DashboardLayout({
       <HeaderProvider>
         <SidebarProvider>
           {/* El `bg-body-dashboard` ya no es necesario, `bg-background` lo maneja globalmente */}
-          <div className="flex h-screen w-screen overflow-hidden text-gray-800">
+          <div className="flex h-screen w-screen overflow-hidden text-g8">
             <AppSidebar />
             <div className="flex flex-1 flex-col overflow-hidden">
               <Header />
               {/* El color de fondo del main ya viene de la variable --background */}
-              <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+              <main
+                id="main-content-container"
+                className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8"
+              >
                 {children}
               </main>
             </div>

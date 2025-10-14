@@ -31,11 +31,12 @@ export function SiNoQuestion<T extends FieldValues>({
 }: SiNoQuestionProps<T>) {
   const { control } = useFormContext<T>();
 
-  const unselectedStyle =
+  /*const unselectedStyle =
     'bg-white text-black border-gray-300 shadow-md hover:bg-gray-100';
-  const selectedStyle =
+  */
+  /*const selectedStyle =
     'bg-slate-200 text-slate-900 border-gray-400 shadow-inner hover:bg-slate-200';
-
+  */
   // Mapeo para mostrar el texto correctamente
   const displayTexts: { [key in Option]: string } = {
     SI: 'Sí',
@@ -54,6 +55,7 @@ export function SiNoQuestion<T extends FieldValues>({
             <div className="flex items-center space-x-4">
               {options.map((option) => (
                 <Button
+                  id={name}
                   key={option}
                   type="button"
                   onClick={() => {

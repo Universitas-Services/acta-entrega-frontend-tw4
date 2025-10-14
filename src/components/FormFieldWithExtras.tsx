@@ -59,6 +59,7 @@ export function FormFieldWithExtras<T extends FieldValues>({
             )}
             <FormControl>
               <Input
+                id={name}
                 type={type}
                 placeholder={placeholder}
                 {...field}

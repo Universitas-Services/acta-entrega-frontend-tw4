@@ -6,6 +6,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { PopupManager } from '@/components/PopupManager';
 import { LogoutConfirmationDialog } from '@/components/LogoutConfirmationDialog';
 import { SessionManager } from '@/components/SessionManager';
+import { UnsavedChangesDialog } from '@/components/UnsavedChangesDialog';
 
 export default function DashboardLayout({
   children,
@@ -31,6 +32,7 @@ export default function DashboardLayout({
             </div>
           </div>
           <LogoutConfirmationDialog />
+          <UnsavedChangesDialog />
           <PopupManager />
           <SessionManager />
         </SidebarProvider>

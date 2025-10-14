@@ -22,7 +22,10 @@ export default function DashboardLayout({
             <div className="flex flex-1 flex-col overflow-hidden">
               <Header />
               {/* El color de fondo del main ya viene de la variable --background */}
-              <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+              <main
+                id="main-content-container"
+                className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8"
+              >
                 {children}
               </main>
             </div>

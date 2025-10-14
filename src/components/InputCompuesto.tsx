@@ -24,7 +24,7 @@ export interface InputCompuestoProps
 
 const InputCompuesto = React.forwardRef<HTMLInputElement, InputCompuestoProps>(
   (
-    { className, value = '--', onChange, options, type, name, ...props },
+    { className, value = '--', onChange, options, type, name, id, ...props },
     ref
   ) => {
     const getInitialState = React.useCallback(() => {
@@ -101,6 +101,7 @@ const InputCompuesto = React.forwardRef<HTMLInputElement, InputCompuestoProps>(
             </SelectContent>
           </Select>
           <Input
+            id={id}
             ref={ref}
             name={name}
             value={number1}
@@ -141,6 +142,7 @@ const InputCompuesto = React.forwardRef<HTMLInputElement, InputCompuestoProps>(
         </Select>
         <span className="text-xl text-gray-400 font-semibold">-</span>
         <Input
+          id={id}
           ref={ref}
           name={name}
           value={number1}

@@ -215,7 +215,19 @@ export function ActaMaximaAutoridadForm() {
     }
   };
 
+  // Esta función ahora apunta al contenedor de scroll específico.
+  const scrollToTop = () => {
+    const mainContent = document.getElementById('main-content-container');
+    if (mainContent) {
+      mainContent.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   const nextStep = async () => {
+    // Obtener los campos a validar en este paso
     let fieldsToValidate: (keyof FormData)[] = steps[currentStep]
       .fields as (keyof FormData)[];
 
@@ -245,47 +257,62 @@ export function ActaMaximaAutoridadForm() {
     // --- LÓGICA DE SCROLL AUTO - De campos faltantes ---
     if (!isValid) {
       const errors = form.formState.errors;
-      // 'fieldsToValidate' ya nos da el orden correcto de los campos en la pantalla.
-      // Buscamos el primer campo en ese array que también exista en el objeto de errores.
       const firstErrorField = fieldsToValidate.find((field) => errors[field]);
 
       if (firstErrorField) {
-        // Buscamos el elemento del input/select por su atributo 'name'
-        const element = document.querySelector(`[name="${firstErrorField}"]`);
+        const mainContent = document.getElementById('main-content-container');
+        const element = document.getElementById(firstErrorField);
+        // Buscamos por FormItem, que es el contenedor visual completo del campo
+        const formItem = element?.closest<HTMLElement>(
+          '.flex.flex-col, .space-y-4.p-4.border.rounded-md, [data-slot="form-item"], FormItem'
+        );
 
-        // A partir de ahí, buscamos el contenedor 'FormItem' más cercano
-        const formItem = element?.closest('[data-slot="form-item"]');
+        // Fallback por si closest no funciona
+        const finalTarget = formItem || element;
 
-        if (formItem) {
-          // Hacemos el scroll suave hacia el contenedor completo
-          formItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (mainContent && finalTarget) {
+          const containerRect = mainContent.getBoundingClientRect();
+          const itemRect = finalTarget.getBoundingClientRect();
 
-          // Para buena experiencia de usuario, se muestra
-          // un toast para que el usuario sepa qué revisar
+          const itemTopInContainer =
+            itemRect.top - containerRect.top + mainContent.scrollTop;
+
+          const desiredScrollTop =
+            itemTopInContainer -
+            mainContent.clientHeight / 2 +
+            finalTarget.clientHeight / 2;
+
+          mainContent.scrollTo({
+            top: desiredScrollTop,
+            behavior: 'smooth',
+          });
+
           toast.warning('Por favor, revisa los campos marcados en rojo.');
         }
       }
-      // Si la validación no es válida, la función termina aquí.
       return;
     }
 
-    if (isValid) {
+    // --- Lógica de Cambio de Paso (solo se ejecuta si NO hay errores) ---
+    scrollToTop(); // Llevamos al tope ANTES de cambiar el contenido
+    setTimeout(() => {
       if (currentStep === 8 && getValues('Anexo_VII') === 'NO APLICA') {
         setCurrentStep(10);
       } else if (currentStep < steps.length - 1) {
         setCurrentStep((prev) => prev + 1);
       }
-    }
+    }, 100);
   };
 
   const prevStep = () => {
-    if (currentStep === 10 && getValues('Anexo_VII') === 'NO APLICA') {
-      setCurrentStep(8); // Salta del paso 11 al 9 (índices 10 a 8)
-      return;
-    }
-    if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
-    }
+    scrollToTop(); // Siempre subimos al cambiar de paso
+    setTimeout(() => {
+      if (currentStep === 10 && getValues('Anexo_VII') === 'NO APLICA') {
+        setCurrentStep(8);
+      } else if (currentStep > 0) {
+        setCurrentStep((prev) => prev - 1);
+      }
+    }, 100);
   };
 
   return (
@@ -359,6 +386,7 @@ export function ActaMaximaAutoridadForm() {
                           </FormDescription>
                           <FormControl>
                             <InputCompuesto
+                              id={field.name}
                               type="rif"
                               options={['G', 'J', 'E']} // Opciones para el desplegable
                               placeholder=""
@@ -559,6 +587,7 @@ export function ActaMaximaAutoridadForm() {
                         </FormDescription>
                         <FormControl>
                           <InputCompuesto
+                            id={field.name}
                             type="cedula"
                             options={['V', 'E']} // Opciones para el desplegable
                             placeholder=""
@@ -604,6 +633,7 @@ export function ActaMaximaAutoridadForm() {
                         </FormDescription>
                         <FormControl>
                           <InputCompuesto
+                            id={field.name}
                             type="cedula"
                             options={['V', 'E']} // Opciones para el desplegable
                             placeholder=""
@@ -647,6 +677,7 @@ export function ActaMaximaAutoridadForm() {
                           </FormDescription>
                           <FormControl>
                             <InputCompuesto
+                              id={field.name}
                               type="cedula"
                               options={['V', 'E']} // Opciones para el desplegable
                               placeholder=""
@@ -686,6 +717,7 @@ export function ActaMaximaAutoridadForm() {
                           </FormDescription>
                           <FormControl>
                             <InputCompuesto
+                              id={field.name}
                               type="cedula"
                               options={['V', 'E']} // Opciones para el desplegable
                               placeholder=""
@@ -728,6 +760,7 @@ export function ActaMaximaAutoridadForm() {
                         </FormDescription>
                         <FormControl>
                           <InputCompuesto
+                            id={field.name}
                             type="cedula"
                             options={['V', 'E']} // Opciones para el desplegable
                             placeholder=""
@@ -961,7 +994,7 @@ export function ActaMaximaAutoridadForm() {
                             <SelectValue placeholder="Seleccione un anexo a detallar" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white z-50 max-h-60 overflow-y-auto">
+                        <SelectContent className="text-black bg-white z-50 max-h-60 overflow-y-auto">
                           {anexosAdicionalesTitulos.map((anexo) => (
                             <SelectItem
                               key={anexo.longTitle}

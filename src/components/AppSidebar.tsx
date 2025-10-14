@@ -81,6 +81,14 @@ export default function AppSidebar() {
     });
   };
 
+  const handleNavigation = () => {
+    // Si no estamos en un escritorio (es decir, es móvil o tablet),
+    // cerramos el menú.
+    if (!isDesktop) {
+      toggleMobileMenu();
+    }
+  };
+
   const sidebarContent = (
     <>
       <SidebarHeader className="h-16 flex items-center justify-between px-4 py-0 border-b">
@@ -116,6 +124,7 @@ export default function AppSidebar() {
                 <TooltipTrigger asChild>
                   <GuardedButton
                     href={item.href}
+                    onClick={handleNavigation}
                     variant="ghost"
                     className={cn(
                       'flex w-full items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 transition-colors text-sidebar-foreground hover:bg-sidebar-hover-bg bg-sidebar cursor-pointer overflow-hidden',
@@ -150,6 +159,7 @@ export default function AppSidebar() {
         <div className="flex flex-col gap-1 space-y-1 ">
           <GuardedButton
             href="/dashboard/acerca-de"
+            onClick={handleNavigation}
             variant="ghost"
             className={cn(
               'flex w-full bg-sidebar items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 text-sidebar-foreground hover:bg-sidebar-hover-bg cursor-pointer overflow-hidden',
@@ -255,18 +265,11 @@ export default function AppSidebar() {
 
               <DropdownMenuItem
                 asChild
-                // onSelect se dispara cuando un ítem es seleccionado.
-                /*onSelect={(e) => {
-                  // Si el formulario tiene cambios, prevenimos la acción por defecto del menú.
-                  // La acción por defecto es CERRARSE.
-                  if (isDirty) {
-                    e.preventDefault();
-                  }
-                }}*/
                 className="cursor-pointer text-black/80"
               >
                 <GuardedButton
                   href="/dashboard/perfil"
+                  onClick={handleNavigation}
                   variant="ghost"
                   // Clases para que se comporte como un elemento de menú
                   className="bg-white w-full h-full justify-start px-2 py-1.5 text-sm font-normal focus-visible:ring-0 focus-visible:ring-offset-0"

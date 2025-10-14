@@ -255,6 +255,14 @@ export default function AppSidebar() {
 
               <DropdownMenuItem
                 asChild
+                // onSelect se dispara cuando un ítem es seleccionado.
+                /*onSelect={(e) => {
+                  // Si el formulario tiene cambios, prevenimos la acción por defecto del menú.
+                  // La acción por defecto es CERRARSE.
+                  if (isDirty) {
+                    e.preventDefault();
+                  }
+                }}*/
                 className="cursor-pointer text-black/80"
               >
                 <GuardedButton

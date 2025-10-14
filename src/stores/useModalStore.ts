@@ -4,7 +4,8 @@ import { ReactNode } from 'react';
 export type ModalType =
   | 'logoutConfirmation'
   | 'userProfileOptions'
-  | 'sessionExpiration';
+  | 'sessionExpiration'
+  | 'unsavedChanges';
 
 interface ModalPayload {
   title: string;

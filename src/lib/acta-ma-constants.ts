@@ -197,7 +197,7 @@ export const anexosAdicionalesTitulos = [
     longTitle: 'ALCALDÍAS, DIRECCIÓN DE HACIENDA DISTRITAL O MUNICIPAL',
   },
   {
-    shortTitle: 'Relación deInformes de Auditorías',
+    shortTitle: 'Relación de Informes de Auditorías',
     longTitle: 'RELACIÓN DE INFORMES DE AUDITORÍAS',
   },
   {

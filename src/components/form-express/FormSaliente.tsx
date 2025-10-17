@@ -984,8 +984,8 @@ export function ActaSalienteForm() {
                       revise los datos en los pasos anteriores usando el botón
                       Anterior.
                       <br />
-                      Una vez que esté seguro, presione Crear Acta para generar
-                      el documento final.
+                      Una vez que esté seguro, presione el botón{' '}
+                      <b>Crear acta</b> para generar el documento final.
                     </p>
                   </div>
                 )}

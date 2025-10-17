@@ -22,7 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { registerUser } from '@/services/authService';
 import { SuccessAlertDialog } from './SuccessAlertDialog';
@@ -63,7 +63,7 @@ const step1Schema = z
     path: ['confirmPassword'],
   });
 
-// Schema para el Paso 2: Datos Personales
+// Schema para el Paso 2: Datos Personales (solo para validación final)
 const step2Schema = z.object({
   nombre: z
     .string()
@@ -79,18 +79,21 @@ const step2Schema = z.object({
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]+$/, {
       message: 'El apellido debe ser una sola palabra y solo contener letras.',
     }),
-  prefijo: z.enum(prefijosValidos).optional().refine(Boolean, {
-    message: 'Debes seleccionar un prefijo.',
-  }),
+  prefijo: z.enum(prefijosValidos),
   numeroLocal: z.string().regex(/^\d{7}$/, {
     message: 'Debe ser un numero de 7 dígitos.',
   }),
 });
 
-// Schema completo combinado para la validación final y la inferencia de tipos
-const formSchema = step1Schema.merge(step2Schema);
+// Schema que permite campos opcionales para evitar validación prematura
+const formSchemaWithOptional = step1Schema.safeExtend({
+  nombre: z.string().optional(),
+  apellido: z.string().optional(),
+  prefijo: z.string().optional(),
+  numeroLocal: z.string().optional(),
+});
 
-type FormFields = z.infer<typeof formSchema>;
+type FormFieldsOptional = z.infer<typeof formSchemaWithOptional>;
 
 export function RegisterForm() {
   const router = useRouter();
@@ -102,22 +105,30 @@ export function RegisterForm() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<FormFields>({
-    resolver: zodResolver(formSchema), // El resolver usa el schema completo
+  const form = useForm<FormFieldsOptional>({
+    resolver: zodResolver(formSchemaWithOptional), // Usar schema con campos opcionales
     mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
+    shouldFocusError: false, // Evitar focus automático en errores
     defaultValues: {
       email: '',
       password: '',
       confirmPassword: '',
       nombre: '',
       apellido: '',
-      prefijo: undefined,
+      prefijo: '0412',
       numeroLocal: '',
     },
   });
 
-  // Lógica de transición que valida solo el schema del Paso 1 ---
+  // Efecto para limpiar errores cuando cambie el paso
+  useEffect(() => {
+    form.clearErrors();
+  }, [step, form]);
+
+  // Lógica de transición que valida solo el schema del Paso 1
   const handleNextStep = () => {
     form.clearErrors();
     // Validamos los datos actuales del formulario contra el schema del Paso 1
@@ -127,7 +138,7 @@ export function RegisterForm() {
     if (!result.success) {
       // ...iteramos sobre los errores y los aplicamos manualmente al formulario.
       result.error.issues.forEach((issue) => {
-        form.setError(issue.path[0] as keyof FormFields, {
+        form.setError(issue.path[0] as keyof FormFieldsOptional, {
           type: 'manual',
           message: issue.message,
         });
@@ -135,20 +146,44 @@ export function RegisterForm() {
       return; // Detenemos la transición
     }
 
-    // Si el paso 1 es válido, avanzamos al paso 2.
-    // Los campos del paso 2 se renderizarán sin errores gracias a `mode: 'onSubmit'`.
+    // Si el paso 1 es válido, avanzamos al paso 2
     setStep(2);
   };
 
-  async function onSubmit(values: FormFields) {
+  // Función para volver al paso anterior
+  const handlePreviousStep = () => {
+    form.clearErrors();
+    setStep(1);
+  };
+
+  async function onSubmit(values: FormFieldsOptional) {
+    // Solo procesar el envío si realmente se está enviando el formulario
+    if (!isSubmitting) {
+      return;
+    }
+
+    // Validar que todos los campos del paso 2 estén completos usando el schema
+    const step2Result = step2Schema.safeParse(values);
+    if (!step2Result.success) {
+      // Aplicar errores de validación del paso 2
+      step2Result.error.issues.forEach((issue) => {
+        form.setError(issue.path[0] as keyof FormFieldsOptional, {
+          type: 'manual',
+          message: issue.message,
+        });
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
     setIsLoading(true);
     setApiError(null);
     try {
       const dataToSend = {
         email: values.email,
         password: values.password,
-        name: values.nombre,
-        apellido: values.apellido,
+        name: values.nombre!,
+        apellido: values.apellido!,
         telefono: `${values.prefijo}${values.numeroLocal}`,
       };
       await registerUser(dataToSend);
@@ -161,6 +196,7 @@ export function RegisterForm() {
       }
     } finally {
       setIsLoading(false);
+      setIsSubmitting(false);
     }
   }
 
@@ -169,7 +205,8 @@ export function RegisterForm() {
       <div className="w-full max-w-md">
         {step === 2 && (
           <button
-            onClick={() => setStep(1)}
+            type="button"
+            onClick={handlePreviousStep}
             // Estilos actualizados con variables de tema
             className="flex items-center text-muted-foreground hover:text-foreground mb-4"
           >
@@ -369,7 +406,7 @@ export function RegisterForm() {
                         <FormItem className="w-[120px]">
                           <Select
                             onValueChange={field.onChange}
-                            defaultValue={field.value}
+                            value={field.value || ''}
                             disabled={isLoading}
                           >
                             <FormControl>
@@ -448,6 +485,7 @@ export function RegisterForm() {
                 type="submit"
                 className="w-full text-lg py-6 cursor-pointer"
                 disabled={isLoading}
+                onClick={() => setIsSubmitting(true)}
               >
                 {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
               </Button>

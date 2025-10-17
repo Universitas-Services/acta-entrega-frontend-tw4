@@ -4,14 +4,14 @@ export function TermsContent() {
       <p className="text-sm text-muted-foreground">
         <strong>Última actualización: Septiembre de 2025</strong>
       </p>
-      <p>
+      <p className="text-black/90">
         Bienvenido a &quot;Actas de entrega&quot;. Lea atentamente los
         siguientes términos y condiciones (&quot;términos&quot;) antes de
         utilizar la aplicación web y/o móvil (&quot;aplicación&quot; o
         &quot;servicio&quot;) operada por Universitas Services C.A. (&quot;el
         proveedor&quot;, &quot;nosotros&quot;).
       </p>
-      <p>
+      <p className="text-black/90">
         Al registrarse y utilizar la aplicación, usted (&quot;usuario&quot;)
         acepta y se compromete a cumplir con estos términos. Si no está de
         acuerdo con alguna parte de los mismos, no podrá acceder al servicio.

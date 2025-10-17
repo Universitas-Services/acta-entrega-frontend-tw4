@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Roboto } from 'next/font/google';
 import './globals.css';
 
@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   title: 'Actas de Entrega',
   description: 'Gestión simplificada de Actas de Entrega',
 };
+
+export function generateViewport(): Viewport {
+  return {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover', // Esto es clave para el safe area
+  };
+}
 
 export default function RootLayout({
   children,

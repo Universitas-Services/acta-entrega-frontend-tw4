@@ -486,7 +486,14 @@ export function ActaMaximaAutoridadForm() {
                             // 'T00:00:00' para que la fecha se interprete en la zona horaria local y no en UTC.
                             value={
                               field.value
-                                ? new Date(`${field.value}T00:00:00`)
+                                ? (() => {
+                                    // Parsea el string 'dd/MM/yyyy' manualmente
+                                    const [day, month, year] =
+                                      field.value.split('/');
+                                    return new Date(
+                                      `${year}-${month}-${day}T00:00:00`
+                                    );
+                                  })()
                                 : undefined
                             }
                             onChange={(date) => {

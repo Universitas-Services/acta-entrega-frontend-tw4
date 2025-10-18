@@ -95,7 +95,7 @@ export function ChangePasswordForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardHeader>
-              <CardTitle>Cambiar Contraseña</CardTitle>
+              <CardTitle>Cambiar contraseña</CardTitle>
               <CardDescription>
                 Para mayor seguridad, te recomendamos usar una contraseña única
                 que no utilices en otros sitios.
@@ -112,7 +112,7 @@ export function ChangePasswordForm() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contraseña Actual</FormLabel>
+                      <FormLabel>Contraseña actual</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -144,7 +144,7 @@ export function ChangePasswordForm() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nueva Contraseña</FormLabel>
+                      <FormLabel>Nueva contraseña</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -174,7 +174,7 @@ export function ChangePasswordForm() {
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirmar Nueva Contraseña</FormLabel>
+                      <FormLabel>Confirmar nueva contraseña</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -208,7 +208,7 @@ export function ChangePasswordForm() {
                 className="cursor-pointer"
                 disabled={isLoading}
               >
-                {isLoading ? 'Actualizando...' : 'Actualizar Contraseña'}
+                {isLoading ? 'Actualizando...' : 'Actualizar contraseña'}
               </Button>
             </CardFooter>
           </form>

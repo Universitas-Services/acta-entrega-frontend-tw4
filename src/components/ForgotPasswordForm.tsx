@@ -166,7 +166,7 @@ export function ForgotPasswordForm() {
           {[
             { num: 1, label: 'Enviar correo' },
             { num: 2, label: 'Código' },
-            { num: 3, label: 'Nueva Contraseña' },
+            { num: 3, label: 'Nueva contraseña' },
           ].map(({ num, label }) => (
             <div
               key={num}

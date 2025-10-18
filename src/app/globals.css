@@ -170,4 +170,8 @@
   --color-red700: var(--red700);
   --color-red6: var(--red6);
   --color-green6: var(--green6);
+
+  --shadow-blue-soft:
+    0 10px 15px -3px rgba(59, 130, 246, 0.3),
+    0 4px 6px -2px rgba(59, 130, 246, 0.15);
 }

@@ -31,14 +31,14 @@ const cardData = [
     description:
       'Impulsa la transparencia y eficiencia institucional con la Biblioteca Legal de Universitas. Accede a un compendio normativo completo, doctrina administrativa y jurisprudencia esencial para fortalecer el control fiscal en todos los niveles del sector público.',
     buttonText: 'Ingrese aquí',
-    linkHref: 'https://universitas.legal/control-fiscal/',
+    linkHref: 'https://universitas.legal/control-fiscal-biblioteca/ ',
   },
   {
     imageUrl: '/repositorio/biblioteca-contrataciones.png',
     description:
       'Optimiza tus procesos de contratación estatal con la Biblioteca Legal de Universitas. Accede a normativa especializada, doctrina administrativa y jurisprudencia clave para garantizar contrataciones públicas sostenibles, transparentes y ajustadas al interés general.',
     buttonText: 'Ingrese aquí',
-    linkHref: 'https://universitas.legal/contrataciones-publicas/',
+    linkHref: 'https://universitas.legal/biblioteca-contratacion-publica/',
   },
   {
     imageUrl: '/repositorio/biblioteca-ordenanzas.png',

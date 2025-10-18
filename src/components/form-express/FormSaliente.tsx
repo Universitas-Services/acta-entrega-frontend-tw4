@@ -484,7 +484,7 @@ export function ActaSalienteForm() {
                             }
                             onChange={(date) => {
                               if (date) {
-                                field.onChange(format(date, 'yyyy-MM-dd'));
+                                field.onChange(format(date, 'dd/MM/yyyy'));
                               }
                             }}
                           />

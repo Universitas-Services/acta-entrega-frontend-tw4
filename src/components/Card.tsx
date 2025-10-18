@@ -39,7 +39,7 @@ function CardComponent({
 
   // Clases actualizadas para usar variables de tema
   const cardClasses =
-    'bg-card rounded-2xl border hover:shadow-lg hover:scale-[1.03] transition-all duration-300 cursor-pointer w-full max-w-sm h-64 flex flex-col';
+    'bg-card rounded-2xl border hover:shadow-blue-soft hover:scale-[1.03] transition-all duration-300 cursor-pointer w-full max-w-sm h-64 flex flex-col';
 
   return (
     <ShadcnCard className={cardClasses} onClick={handleNavigation}>

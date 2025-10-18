@@ -142,7 +142,7 @@ export function ProfileForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
-            <CardTitle>Información del Perfil</CardTitle>
+            <CardTitle>Información del perfil</CardTitle>
             <CardDescription>
               Actualiza los datos de tu cuenta. El correo no puede ser
               modificado.
@@ -156,7 +156,7 @@ export function ProfileForm() {
             <div className="space-y-6">
               {/* Campo de Correo (solo lectura) */}
               <FormItem>
-                <FormLabel>Correo Electrónico</FormLabel>
+                <FormLabel>Correo electrónico</FormLabel>
                 <FormControl>
                   <Input value={user?.email || ''} disabled readOnly />
                 </FormControl>
@@ -265,7 +265,7 @@ export function ProfileForm() {
                 onClick={() => setIsEditing(true)}
                 className="cursor-pointer"
               >
-                Editar Perfil
+                Editar perfil
               </Button>
             )}
           </CardFooter>

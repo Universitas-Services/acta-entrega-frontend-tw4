@@ -50,7 +50,7 @@ export default function PerfilPage() {
     <div className="flex justify-center">
       <Card className="w-full max-w-6xl">
         <CardHeader>
-          <CardTitle className="text-2xl">Configuración de tu Perfil</CardTitle>
+          <CardTitle className="text-2xl">Configuración de tu perfil</CardTitle>
           <CardDescription>
             Gestiona la información de tu cuenta y tu configuración de
             seguridad.

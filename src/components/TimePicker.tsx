@@ -27,7 +27,7 @@ const generateTimeSlots = () => {
       const date = new Date();
       date.setHours(hour, minute, 0, 0);
       slots.push({
-        value: format(date, 'HH:mm'),
+        value: format(date, 'hh:mm a'),
         label: format(date, 'hh:mm a'),
       });
     }

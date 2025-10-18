@@ -94,7 +94,7 @@ export default function DashboardPage() {
           <h3 className="text-xl md:text-2xl font-bold">Síguenos en:</h3>
           <div className="flex items-center gap-4">
             <a
-              href="https://www.facebook.com/contratacionespublicas"
+              href="https://www.facebook.com/ContratarVe/"
               target="_blank"
               rel="noopener noreferrer"
               className="p-1 rounded-full hover:bg-primary-foreground/20 transition-colors"

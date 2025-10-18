@@ -83,7 +83,7 @@ export function DeleteAccountSection() {
       {/* Usamos un borde destructivo para señalar una zona de peligro */}
       <Card className="border-destructive overflow-hidden p-0 gap-0">
         <CardHeader className="p-6">
-          <CardTitle>Eliminar Cuenta</CardTitle>
+          <CardTitle>Eliminar cuenta</CardTitle>
           <CardDescription>
             Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor,
             asegúrate de que realmente quieres hacerlo. Toda tu información y

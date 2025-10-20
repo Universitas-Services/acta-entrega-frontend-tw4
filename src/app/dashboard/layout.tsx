@@ -19,11 +19,11 @@ export default function DashboardLayout({
         <SidebarProvider>
           <div className="flex h-screen w-screen text-g8">
             <AppSidebar />
-            <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex flex-1 flex-col">
               <Header />
               <main
                 id="main-content-container"
-                className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 pb-[calc(1rem+env(safe-area-inset-bottom))]"
+                className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 pb-[calc(4rem+env(safe-area-inset-bottom))]"
               >
                 {children}
               </main>

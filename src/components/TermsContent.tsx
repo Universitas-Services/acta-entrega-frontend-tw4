@@ -20,7 +20,7 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         1. Objeto del servicio
       </h3>
-      <p>
+      <p className="text-black/90">
         &quot;Actas de entrega&quot; es una herramienta digital diseñada para
         asistir a los servidores públicos venezolanos en la elaboración y
         gestión de actas de entrega de cargos, bienes y recursos. La aplicación
@@ -31,7 +31,7 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         2. Cuentas de usuario
       </h3>
-      <p>
+      <p className="text-black/90">
         Para utilizar el servicio, debe registrarse y crear una cuenta,
         proporcionando información veraz y completa. Usted es responsable de
         salvaguardar la contraseña que utiliza para acceder al servicio y de
@@ -43,7 +43,7 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         3. Comunicaciones y marketing
       </h3>
-      <p>
+      <p className="text-black/90">
         Al crear una cuenta y aceptar estos términos, usted acepta recibir
         comunicaciones transaccionales y de marketing de nuestra parte. Estas
         comunicaciones podrán ser enviadas a su correo electrónico registrado o
@@ -56,8 +56,8 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         4. Descripción de los servicios
       </h3>
-      <p>La aplicación ofrece dos modalidades:</p>
-      <ul className="list-disc list-inside space-y-2 pl-4">
+      <p className="text-black/90">La aplicación ofrece dos modalidades:</p>
+      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
         <li>
           <strong>Versión express (gratuita):</strong> Permite generar un (1)
           acta por cada rol (saliente, entrante, máxima autoridad). El documento
@@ -78,7 +78,7 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         5. Pagos y adquisición de la versión pro
       </h3>
-      <p>
+      <p className="text-black/90">
         Para adquirir la versión pro, el usuario debe contactar a un asesor a
         través de WhatsApp, quien le guiará en el proceso. Los pagos se procesan
         a través de la plataforma de comercio electrónico WooCommerce, que
@@ -94,12 +94,12 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         6. Política de reembolso
       </h3>
-      <p>
+      <p className="text-black/90">
         Se ofrece un reembolso parcial del cincuenta por ciento (50%) del pago
         único de la versión pro, únicamente si se cumplen las siguientes dos (2)
         condiciones de manera simultánea:
       </p>
-      <ol className="list-decimal list-inside space-y-2 pl-4">
+      <ol className="list-decimal list-inside space-y-2 pl-4 text-black/90">
         <li>
           La solicitud de reembolso debe ser enviada por escrito a
           contacto@universitas.legal dentro de las veinticuatro (24) horas
@@ -111,12 +111,14 @@ export function TermsContent() {
           acta por rol.
         </li>
       </ol>
-      <p>No se realizarán reembolsos bajo ninguna otra circunstancia.</p>
+      <p className="text-black/90">
+        No se realizarán reembolsos bajo ninguna otra circunstancia.
+      </p>
 
       <h3 className="font-bold text-lg text-primary pt-2">
         7. Contenido del usuario y propiedad intelectual
       </h3>
-      <p>
+      <p className="text-black/90">
         Usted conserva la propiedad de todo el contenido que introduce en la
         aplicación (&quot;contenido del usuario&quot;). Al usar el servicio, nos
         otorga una licencia limitada y no exclusiva para procesar dicho
@@ -129,8 +131,10 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         8. Usos prohibidos
       </h3>
-      <p>Usted se compromete a no utilizar la aplicación para:</p>
-      <ul className="list-disc list-inside space-y-2 pl-4">
+      <p className="text-black/90">
+        Usted se compromete a no utilizar la aplicación para:
+      </p>
+      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
         <li>
           Realizar ingeniería inversa, descompilar o intentar derivar el código
           fuente.
@@ -154,7 +158,7 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         9. Suspensión y terminación de la cuenta
       </h3>
-      <p>
+      <p className="text-black/90">
         Nos reservamos el derecho de suspender o terminar su acceso a la
         aplicación de forma inmediata y sin previo aviso si determinamos que ha
         incumplido estos términos. La notificación de dicha decisión se
@@ -164,7 +168,7 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         10. Eliminación de la cuenta
       </h3>
-      <p>
+      <p className="text-black/90">
         El usuario puede solicitar la eliminación de su cuenta en la aplicación
         a través del enlace &quot;Eliminar cuenta&quot;. Este proceso es
         parcial: se eliminará la cuenta y el acceso a la plataforma, pero no se
@@ -177,7 +181,7 @@ export function TermsContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         11. Exclusión de garantías y limitación de responsabilidad
       </h3>
-      <p>
+      <p className="text-black/90">
         El servicio se proporciona &quot;tal cual&quot;. El proveedor no
         garantiza que la aplicación esté libre de errores. La aplicación es una
         herramienta de apoyo y no proporciona asesoría legal. El soporte técnico
@@ -189,13 +193,13 @@ export function TermsContent() {
       </p>
 
       <h3 className="font-bold text-lg text-primary pt-2">12. Ley aplicable</h3>
-      <p>
+      <p className="text-black/90">
         Estos términos se regirán por las leyes de la República Bolivariana de
         Venezuela.
       </p>
 
       <h3 className="font-bold text-lg text-primary pt-2">13. Contacto</h3>
-      <p>
+      <p className="text-black/90">
         Si tiene alguna pregunta, puede contactarnos en:
         contacto@universitas.legal
       </p>

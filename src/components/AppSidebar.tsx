@@ -218,7 +218,7 @@ export default function AppSidebar() {
                             // Aplica el 'rounded-lg' si el menú está abierto O si está en hover (solo en modo colapsado).
                             isDesktopCollapsed &&
                               (isDropdownOpen
-                                ? 'hover:rounded-lg hover:bg-primary'
+                                ? 'rounded-lg bg-primary'
                                 : 'hover:bg-primary hover:rounded-lg')
                           )}
                         >

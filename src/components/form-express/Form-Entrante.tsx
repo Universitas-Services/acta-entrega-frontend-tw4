@@ -79,7 +79,7 @@ export function ActaEntranteForm() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
-    setTitle('Acta Entrante');
+    setTitle('Acta de Entrega - Servidor Público Entrante');
   }, [setTitle]);
 
   const form = useForm<FormData>({

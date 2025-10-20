@@ -79,7 +79,7 @@ export function ActaMaximaAutoridadForm() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
-    setTitle('Acta de Máxima Autoridad');
+    setTitle('Acta de de Entrega - Servidor Público Máxima Autoridad');
   }, [setTitle]);
 
   const form = useForm<FormData>({

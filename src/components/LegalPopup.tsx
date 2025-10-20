@@ -32,7 +32,7 @@ export function LegalPopup({
         </DialogHeader>
         <div className="max-h-[60vh] overflow-y-auto pr-4">{children}</div>
         <DialogClose asChild>
-          <Button variant="outline" className="mt-4 cursor-pointer">
+          <Button variant="outline" className="mt-4 cursor-pointer text-black">
             Cerrar
           </Button>
         </DialogClose>

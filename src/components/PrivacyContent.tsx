@@ -4,7 +4,7 @@ export function PrivacyContent() {
       <p className="text-sm text-muted-foreground">
         <strong>Última actualización: 16 de septiembre de 2025</strong>
       </p>
-      <p>
+      <p className="text-black/90">
         Universitas Services C.A. (&quot;nosotros&quot;) se compromete a
         proteger su privacidad. Esta política de privacidad explica cómo
         gestionamos su información personal cuando utiliza nuestra aplicación
@@ -14,7 +14,7 @@ export function PrivacyContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         1. Información que recopilamos
       </h3>
-      <ul className="list-disc list-inside space-y-2 pl-4">
+      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
         <li>
           <strong>Información de registro:</strong> Nombre, apellido, correo
           electrónico y número de teléfono.
@@ -36,7 +36,7 @@ export function PrivacyContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         2. Cómo utilizamos su información
       </h3>
-      <ul className="list-disc list-inside space-y-2 pl-4">
+      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
         <li>
           <strong>Para proveer el servicio:</strong> Crear su cuenta, generar
           sus actas y permitirle acceder a las funcionalidades.
@@ -61,7 +61,7 @@ export function PrivacyContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         3. Almacenamiento y seguridad de datos
       </h3>
-      <ul className="list-disc list-inside space-y-2 pl-4">
+      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
         <li>
           <strong>Usuarios express (gratuitos):</strong> La información se
           procesa para generar un enlace a un Google Docs, que se envía a su
@@ -79,11 +79,11 @@ export function PrivacyContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         4. Intercambio con terceros
       </h3>
-      <p>
+      <p className="text-black/90">
         No vendemos ni alquilamos su información personal. Podemos compartirla
         con:
       </p>
-      <ul className="list-disc list-inside space-y-2 pl-4">
+      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
         <li>
           <strong>Proveedores de pago:</strong> Para procesar pagos (Stripe,
           PayPal).
@@ -102,7 +102,7 @@ export function PrivacyContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         5. Derechos del usuario
       </h3>
-      <p>
+      <p className="text-black/90">
         Usted tiene derecho a acceder y rectificar su información. También puede
         solicitar la eliminación de su cuenta a través del enlace &quot;Eliminar
         cuenta&quot; en la aplicación. Este proceso eliminará su perfil de
@@ -113,13 +113,13 @@ export function PrivacyContent() {
       <h3 className="font-bold text-lg text-primary pt-2">
         6. Cambios a esta política
       </h3>
-      <p>
+      <p className="text-black/90">
         Nos reservamos el derecho de modificar esta política. Le notificaremos
         de cualquier cambio publicando la nueva política en esta página.
       </p>
 
       <h3 className="font-bold text-lg text-primary pt-2">7. Contacto</h3>
-      <p>
+      <p className="text-black/90">
         Si tiene preguntas sobre esta política de privacidad, contáctenos en:
         contacto@universitas.legal
       </p>

@@ -91,34 +91,34 @@ export default function AppSidebar() {
 
   const sidebarContent = (
     <>
-      <SidebarHeader className="h-16 flex items-center justify-between px-4 py-0 border-b">
-        <div
-          className={cn(
-            'flex items-center w-full h-full justify-center md:justify-between',
-            isDesktopCollapsed && '!justify-center'
-          )}
-        >
-          <SidebarTrigger
-            onClick={toggleDesktopCollapse}
-            className="hidden md:flex cursor-pointer"
-          />
-          <Image
-            src="/logo de universitas legal.svg"
-            alt="Universitas Legal Logo"
-            width={120}
-            height={48}
-            priority={true}
+      <TooltipProvider key={isDesktopCollapsed ? 'collapsed' : 'expanded'}>
+        <SidebarHeader className="h-16 flex items-center justify-between px-4 py-0 border-b">
+          <div
             className={cn(
-              'mr-8 object-contain',
-              isDesktopCollapsed && 'hidden'
+              'flex items-center w-full h-full justify-center md:justify-between',
+              isDesktopCollapsed && '!justify-center'
             )}
-          />
-        </div>
-      </SidebarHeader>
+          >
+            <SidebarTrigger
+              onClick={toggleDesktopCollapse}
+              className="hidden md:flex cursor-pointer"
+            />
+            <Image
+              src="/logo de universitas legal.svg"
+              alt="Universitas Legal Logo"
+              width={120}
+              height={48}
+              priority={true}
+              className={cn(
+                'mr-8 object-contain',
+                isDesktopCollapsed && 'hidden'
+              )}
+            />
+          </div>
+        </SidebarHeader>
 
-      <SidebarContent className="overflow-x-hidden">
-        <SidebarGroup className="flex flex-col space-y-1">
-          <TooltipProvider key={isDesktopCollapsed ? 'collapsed' : 'expanded'}>
+        <SidebarContent className="overflow-x-hidden">
+          <SidebarGroup className="flex flex-col space-y-1">
             {mainNav.map((item) => (
               <Tooltip key={item.href} delayDuration={0}>
                 <TooltipTrigger asChild>
@@ -150,14 +150,12 @@ export default function AppSidebar() {
                 )}
               </Tooltip>
             ))}
-          </TooltipProvider>
-        </SidebarGroup>
-      </SidebarContent>
+          </SidebarGroup>
+        </SidebarContent>
 
-      <SidebarFooter className=" p-2">
-        {/* Separando los items de acción de la información de usuario */}
-        <div className="flex flex-col gap-1 space-y-1 ">
-          <TooltipProvider key={isDesktopCollapsed ? 'collapsed' : 'expanded'}>
+        <SidebarFooter className=" p-2">
+          {/* Separando los items de acción de la información de usuario */}
+          <div className="flex flex-col gap-1 space-y-1 ">
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <GuardedButton
@@ -188,11 +186,9 @@ export default function AppSidebar() {
                 </TooltipContent>
               )}
             </Tooltip>
-          </TooltipProvider>
-        </div>
+          </div>
 
-        <div className="mt-0 w-full border-t border-border pt-2">
-          <TooltipProvider key={isDesktopCollapsed ? 'collapsed' : 'expanded'}>
+          <div className="mt-0 w-full border-t border-border pt-2">
             <Tooltip delayDuration={0}>
               <DropdownMenu
                 open={isDropdownOpen}
@@ -277,6 +273,8 @@ export default function AppSidebar() {
                   forceMount
                   side={isDesktop ? 'right' : 'top'}
                   sideOffset={isDesktop ? 10 : 5}
+                  // Se previene que el foco regrese al botón avatar cuando se cierre el menú.
+                  onCloseAutoFocus={(e) => e.preventDefault()}
                 >
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex items-center gap-3">
@@ -334,9 +332,9 @@ export default function AppSidebar() {
                 </TooltipContent>
               )}
             </Tooltip>
-          </TooltipProvider>
-        </div>
-      </SidebarFooter>
+          </div>
+        </SidebarFooter>
+      </TooltipProvider>
     </>
   );
 

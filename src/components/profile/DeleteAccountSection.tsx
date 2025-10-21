@@ -142,7 +142,7 @@ export function DeleteAccountSection() {
         <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle className="text-black">
-              Confirmación Final Requerida
+              Confirmación final requerida
             </DialogTitle>
             <DialogDescription>
               Para confirmar, escribe{' '}
@@ -190,7 +190,7 @@ export function DeleteAccountSection() {
               !password
             }
           >
-            {isLoading ? 'Eliminando...' : 'Eliminar Cuenta Permanentemente'}
+            {isLoading ? 'Eliminando...' : 'Eliminar cuenta permanentemente'}
           </Button>
         </DialogContent>
       </Dialog>

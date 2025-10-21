@@ -207,7 +207,7 @@ export default function AppSidebar() {
                           'bg-sidebar-primary'
                       )}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-1 items-center gap-3 min-w-0">
                         <Avatar
                           className={cn(
                             'h-8 w-8 transition-all duration-100 ease-in-out',
@@ -227,7 +227,7 @@ export default function AppSidebar() {
                         </Avatar>
                         <div
                           className={cn(
-                            'flex flex-col items-start text-left',
+                            'flex flex-col items-start text-left min-w-0',
                             isDesktopCollapsed && 'hidden'
                           )}
                         >
@@ -238,7 +238,7 @@ export default function AppSidebar() {
                               : 'Usuario'}
                           </span>
                           {/* Email dinámico */}
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          <span className="text-xs text-muted-foreground whitespace-nowrap truncate w-full">
                             {user?.email || ''}
                           </span>
                         </div>
@@ -284,13 +284,13 @@ export default function AppSidebar() {
                           {user ? getInitials(user.name, user.apellido) : 'U'}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex flex-col space-y-1">
+                      <div className="flex flex-col space-y-1 min-w-0">
                         <p className="text-sm font-medium leading-none">
                           {user
                             ? `${user.name} ${user.apellido || ''}`.trim()
                             : 'Usuario'}
                         </p>
-                        <p className="text-xs leading-none text-muted-foreground">
+                        <p className="text-xs leading-none text-muted-foreground truncate w-full">
                           {user?.email || ''}
                         </p>
                       </div>

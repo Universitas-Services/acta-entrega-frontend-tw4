@@ -256,7 +256,7 @@ export function ProfileForm() {
                   className="cursor-pointer"
                   disabled={!form.formState.isDirty || isLoading}
                 >
-                  {isLoading ? 'Guardando...' : 'Guardar Cambios'}
+                  {isLoading ? 'Guardando...' : 'Guardar cambios'}
                 </Button>
               </>
             ) : (

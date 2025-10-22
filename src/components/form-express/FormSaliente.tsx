@@ -492,6 +492,8 @@ export function ActaSalienteForm() {
                             onChange={(date) => {
                               if (date) {
                                 field.onChange(format(date, 'dd/MM/yyyy'));
+                              } else {
+                                field.onChange(''); // Asegúrate de limpiar si no hay fecha
                               }
                             }}
                           />

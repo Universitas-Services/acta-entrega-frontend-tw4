@@ -4,6 +4,7 @@ import { AiOutlineBook, AiOutlineFileSearch } from 'react-icons/ai';
 import { LuLayoutDashboard } from 'react-icons/lu';
 import { FiHelpCircle } from 'react-icons/fi';
 import { LiaRobotSolid } from 'react-icons/lia';
+import { FaWpforms } from 'react-icons/fa';
 
 export interface NavItem {
   title: string;
@@ -41,5 +42,10 @@ export const mainNav: NavItem[] = [
     title: 'Consultor IA',
     href: '/dashboard/asistenteia',
     icon: LiaRobotSolid,
+  },
+  {
+    title: 'Complaince',
+    href: '/dashboard/actas-pro/complaince',
+    icon: FaWpforms,
   },
 ];

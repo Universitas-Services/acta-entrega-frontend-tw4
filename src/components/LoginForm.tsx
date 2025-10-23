@@ -48,7 +48,6 @@ export function LoginForm() {
 
     try {
       const response = await loginUser(values);
-      console.log('Login exitoso:', response);
 
       // Usamos setAuth para guardar el token y los datos del usuario globalmente
       setAuth(response.token, response.user);

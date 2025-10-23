@@ -44,8 +44,8 @@ export const mainNav: NavItem[] = [
     icon: LiaRobotSolid,
   },
   {
-    title: 'Complaince',
-    href: '/dashboard/actas-pro/complaince',
+    title: 'Compliance',
+    href: '/dashboard/actas-pro/compliance',
     icon: FaWpforms,
   },
 ];

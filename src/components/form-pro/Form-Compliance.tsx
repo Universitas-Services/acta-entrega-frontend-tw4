@@ -30,6 +30,7 @@ import {
   anexosAdicionalesTitulosCompliance, // Importar títulos para el dropdown
   dynamicStepContentCompliance, // Importar contenido dinámico
   ComplianceDynamicContent, // Importar tipo
+  ComplianceStepInfo,
 } from '@/lib/compliance-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -63,7 +64,6 @@ export function ComplianceForm() {
   const router = useRouter();
   const { setTitle } = useHeader();
   const [currentStep, setCurrentStep] = useState(0); // Inicia en el paso 0 (índice)
-  // const [finalStepAnswered, setFinalStepAnswered] = useState(false); // Para el último paso
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [dialogContent, setDialogContent] = useState({
     title: '',
@@ -71,6 +71,8 @@ export function ComplianceForm() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  // Estado para rastrear si se guardó
+  const [isSavedOnce, setIsSavedOnce] = useState(false);
 
   const { setIsDirty } = useFormDirtyStore();
 
@@ -195,7 +197,7 @@ export function ComplianceForm() {
     },
   });
 
-  const { watch } = form; // Necesitamos watch para reaccionar al cambio del dropdown
+  const { watch, getValues, trigger } = form; // Necesitamos watch para reaccionar al cambio del dropdown
 
   const { isDirty } = useFormState({ control: form.control });
 
@@ -307,7 +309,6 @@ export function ComplianceForm() {
 
     // Navegar si es válido
     if (currentStep < steps.length - 1) {
-      // AÑADIR LÓGICA DE SALTO
       if (currentStep === 11 && form.getValues('Anexo_VI') === 'NO APLICA') {
         setCurrentStep(12); // Saltar directamente al último paso (índice 12)
       } else {
@@ -327,21 +328,86 @@ export function ComplianceForm() {
     }
   };
 
-  // Función para ir a un paso específico (para paginación futura)
-  const goToStep = (stepIndex: number) => {
-    // Validar si el índice está dentro de los límites
-    if (stepIndex >= 0 && stepIndex < steps.length) {
-      // Podríamos añadir lógica aquí para validar pasos intermedios si fuera necesario
-      scrollToTop();
+  // Función para ir a un paso específico (paginación)
+  const goToStep = async (stepIndex: number) => {
+    if (stepIndex < 0 || stepIndex >= steps.length || stepIndex === currentStep)
+      return;
+
+    if (isSavedOnce) {
+      // Si ya se guardó, permitir salto directo
       setCurrentStep(stepIndex);
+      scrollToTop();
+    } else {
+      // Si NO se ha guardado
+      if (stepIndex < currentStep) {
+        // Permitir ir hacia atrás
+        setCurrentStep(stepIndex);
+        scrollToTop();
+      } else {
+        // Validar todos los pasos intermedios antes de saltar hacia adelante
+        let canAdvance = true;
+        for (let i = currentStep; i < stepIndex; i++) {
+          const intermediateFields = Array.isArray(steps[i]?.fields)
+            ? steps[i].fields
+            : [];
+          // Añadir validación dinámica para el paso 11 intermedio si aplica
+          let fieldsToValidateIntermediate = [...intermediateFields];
+          if (i === 11) {
+            const selectedKey = getValues('Anexo_VI');
+            if (selectedKey && selectedKey !== 'NO APLICA') {
+              const dynamicContent =
+                dynamicStepContentCompliance[
+                  selectedKey as keyof ComplianceDynamicContent
+                ];
+              if (dynamicContent?.type === 'questions') {
+                fieldsToValidateIntermediate = [
+                  ...intermediateFields,
+                  ...dynamicContent.questions.map((q) => q.name),
+                ];
+              }
+            }
+          }
+
+          const isValidIntermediate = await trigger(
+            fieldsToValidateIntermediate,
+            { shouldFocus: false }
+          );
+          if (!isValidIntermediate) {
+            canAdvance = false;
+            setCurrentStep(i); // Ir al paso que falló la validación
+            scrollToTop(); // Podría mejorarse con scroll al error específico
+            toast.warning(`Completa el Paso ${i + 1} antes de continuar.`);
+            break; // Detener validación
+          }
+        }
+        // Si todos los pasos intermedios son válidos, avanzar
+        if (canAdvance) {
+          setCurrentStep(stepIndex);
+          scrollToTop();
+        }
+      }
     }
   };
 
-  // Placeholder para la función Guardar
-  const handleSaveProgress = () => {
-    console.log('Guardando progreso...', form.getValues());
-    toast.info("Funcionalidad 'Guardar' pendiente de implementación.");
-    // Aquí iría la lógica para guardar en backend o localStorage
+  // Función de Guardar
+  const handleSaveProgress = async () => {
+    // Convertir a async si llamas a API
+    console.log('Guardando progreso...', getValues());
+    setIsLoading(true); // Indicar carga
+    // Aquí iría la lógica REAL para guardar en backend
+    // Simulamos un guardado exitoso
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular llamada a API
+      toast.success('Progreso guardado exitosamente.');
+      setIsSavedOnce(true); // <-- Marcar como guardado
+      // Opcional: podrías querer resetear el estado 'isDirty' después de guardar
+      // form.reset({}, { keepValues: true }); // Resetea 'isDirty' manteniendo valores
+      // setIsDirty(false); // O forzarlo manualmente
+    } catch (error) {
+      toast.error('Error al guardar el progreso.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // --- Lógica para renderizar los números de página ---
@@ -352,77 +418,74 @@ export function ComplianceForm() {
   // Muestra: 1 ... (actual-1) (actual) (actual+1) ... Total
   const renderPaginationItems = () => {
     const items = [];
-    const maxVisiblePages = 1; // Cuántas páginas mostrar alrededor de la actual
+    const maxVisiblePages = 1; // Ajusta según necesites
 
-    // Botón Primera Página (siempre visible)
-    items.push(
-      <PaginationItem key={1}>
-        <PaginationLink
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            goToStep(0);
-          }}
-          isActive={currentPage === 1}
-          className={cn('cursor-pointer', currentPage === 1 && 'font-bold')}
-        >
-          1
-        </PaginationLink>
-      </PaginationItem>
-    );
+    // --- Lógica de renderizado de números ---
+    const pageNumbers: number[] = [];
+    // Siempre añadir página 1
+    pageNumbers.push(1);
 
-    // Ellipsis inicial si es necesario
-    if (currentPage > maxVisiblePages + 2) {
-      items.push(<PaginationEllipsis key="start-ellipsis" />);
+    // Ellipsis inicial y páginas cercanas
+    const startEllipsisThreshold = maxVisiblePages + 3; // (1 + max + ellipsis + num)
+    if (currentPage > startEllipsisThreshold) {
+      pageNumbers.push(-1); // Usar -1 para representar ellipsis
+    }
+    const rangeStart = Math.max(2, currentPage - maxVisiblePages);
+    const rangeEnd = Math.min(totalSteps - 1, currentPage + maxVisiblePages);
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+      pageNumbers.push(i);
     }
 
-    // Páginas alrededor de la actual
-    const startPage = Math.max(2, currentPage - maxVisiblePages);
-    const endPage = Math.min(totalSteps - 1, currentPage + maxVisiblePages);
-
-    for (let i = startPage; i <= endPage; i++) {
-      items.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              goToStep(i - 1);
-            }}
-            isActive={currentPage === i}
-            className={cn('cursor-pointer', currentPage === i && 'font-bold')}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
+    // Ellipsis final y última página
+    const endEllipsisThreshold = totalSteps - maxVisiblePages - 2; // (total - max - ellipsis - num)
+    if (currentPage < endEllipsisThreshold) {
+      pageNumbers.push(-1); // Usar -1 para representar ellipsis
     }
-
-    // Ellipsis final si es necesario
-    if (currentPage < totalSteps - maxVisiblePages - 1) {
-      items.push(<PaginationEllipsis key="end-ellipsis" />);
-    }
-
-    // Botón Última Página (siempre visible, si hay más de 1 página)
+    // Siempre añadir última página (si es diferente de 1)
     if (totalSteps > 1) {
-      items.push(
-        <PaginationItem key={totalSteps}>
-          <PaginationLink
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              goToStep(totalSteps - 1);
-            }}
-            isActive={currentPage === totalSteps}
-            className={cn(
-              'cursor-pointer',
-              currentPage === totalSteps && 'font-bold'
-            )}
-          >
-            {totalSteps}
-          </PaginationLink>
-        </PaginationItem>
-      );
+      pageNumbers.push(totalSteps);
+    }
+
+    // --- Generar componentes ---
+    let lastPushed = 0;
+    for (const pageNum of pageNumbers) {
+      if (pageNum === -1) {
+        // Asegurarse de no añadir ellipsis duplicados
+        if (lastPushed !== -1) {
+          items.push(<PaginationEllipsis key={`ellipsis-${items.length}`} />);
+          lastPushed = -1;
+        }
+      } else {
+        // Lógica para deshabilitar visualmente
+        const isDisabled = !isSavedOnce && pageNum > currentPage;
+        items.push(
+          <PaginationItem key={pageNum}>
+            <PaginationLink
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                if (!isDisabled) {
+                  // Solo navegar si no está deshabilitado
+                  goToStep(pageNum - 1);
+                }
+              }}
+              isActive={currentPage === pageNum}
+              // Aplicar clases de deshabilitado
+              className={cn(
+                'cursor-pointer',
+                currentPage === pageNum && 'font-bold',
+                isDisabled &&
+                  'pointer-events-none opacity-50 text-muted-foreground' // Clases para deshabilitar
+              )}
+              // Aria-disabled para accesibilidad
+              aria-disabled={isDisabled}
+            >
+              {pageNum}
+            </PaginationLink>
+          </PaginationItem>
+        );
+        lastPushed = pageNum;
+      }
     }
 
     return items;
@@ -445,18 +508,23 @@ export function ComplianceForm() {
               {currentStepData?.title || 'Compliance'}
             </CardTitle>
             <ShadcnCardDescription className="text-sm text-gray-500 italic">
-              {currentStepData?.subtitle || 'Complete la autoevaluación.'}
+              {currentStepData?.subtitle}
             </ShadcnCardDescription>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSaveProgress}
-            disabled={isLoading}
-          >
-            <FiSave className="mr-2 h-4 w-4" />
-            Guardar
-          </Button>
+
+          {/* Solo muestra el botón Guardar a partir del Paso 3 (índice 2) */}
+          {currentStep >= 2 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSaveProgress}
+              disabled={isLoading}
+              className="cursor-pointer"
+            >
+              <FiSave className="mr-2 h-4 w-4" />
+              Guardar
+            </Button>
+          )}
         </div>
         {/* Subtítulos fijos para Pasos 5 y 6 (Índices 4 y 5) */}
         {currentStep === 4 && ( // PASO 5
@@ -464,7 +532,9 @@ export function ComplianceForm() {
             <p>
               <strong>Situación presupuestaria</strong>
             </p>
-            <p className="italic text-xs">{steps[4].subtitle}</p>
+            <p className="italic text-xs">
+              Artículo 11.1 Resolución CGR N.º 01-000162 de fecha 27-07-2009.
+            </p>
           </div>
         )}
         {currentStep === 5 && ( // PASO 6
@@ -472,7 +542,9 @@ export function ComplianceForm() {
             <p>
               <strong>Situación financiera y patrimonial</strong>
             </p>
-            <p className="italic text-xs">{steps[5].subtitle}</p>
+            <p className="italic text-xs">
+              Artículo 11.1 Resolución CGR N.º 01-000162 de fecha 27-07-2009.
+            </p>
           </div>
         )}
       </CardHeader>
@@ -491,7 +563,7 @@ export function ComplianceForm() {
 
             {/* PASO 1 (Índice 0) */}
             {currentStep === 0 && (
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                 <FormFieldWithExtras
                   name="email"
                   label="Dirección de correo electrónico"
@@ -527,20 +599,27 @@ export function ComplianceForm() {
                   name="nombreevaluador"
                   label="Nombre completo de la persona que revisa y/o evalúa"
                   subtitle="Ej: Pedro José Hernández Pérez"
+                  maxLength={50}
                   validationType="textOnly"
                 />
                 <FormFieldWithExtras
                   name="denominacionCargo"
                   label="Denominación del Cargo Institucional"
                   subtitle="Ej: Presidencia, Dirección, Coordinación"
+                  maxLength={50}
+                  validationType="textOnly"
                 />
                 <FormFieldWithExtras
                   name="nombreOrgano"
                   label="Nombre del órgano, entidad, oficina o dependencia"
+                  maxLength={50}
+                  validationType="textOnly"
                 />
                 <FormFieldWithExtras
                   name="nombreUnidad"
                   label="Nombre de la unidad u oficina que revisa"
+                  maxLength={50}
+                  validationType="textOnly"
                 />
                 <FormField
                   control={form.control}
@@ -1125,7 +1204,7 @@ export function ComplianceForm() {
                 prevStep();
               }}
               className={cn(
-                'cursor-pointer',
+                'text-foreground cursor-pointer shadow-md shadow-gray-500/50 active:shadow-inner transition-all bg-button-anterior hover:bg-accent',
                 currentStep === 0 && 'pointer-events-none opacity-50' // Deshabilitar si es el primer paso
               )}
             >
@@ -1154,7 +1233,7 @@ export function ComplianceForm() {
                   nextStep();
                 }}
                 className={cn(
-                  'cursor-pointer',
+                  'text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white',
                   // Podríamos añadir lógica de deshabilitación si isLoading
                   isLoading && 'pointer-events-none opacity-50'
                 )}

@@ -507,7 +507,7 @@ export function ComplianceForm() {
             <CardTitle className="text-2xl mb-1">
               {currentStepData?.title || 'Compliance'}
             </CardTitle>
-            <ShadcnCardDescription className="text-sm text-gray-500 italic">
+            <ShadcnCardDescription className="text-sm text-gray-500 italic whitespace-pre-line">
               {currentStepData?.subtitle}
             </ShadcnCardDescription>
           </div>
@@ -1139,7 +1139,7 @@ export function ComplianceForm() {
                       <h3 className="font-semibold text-lg">
                         {dynamicStepContentCompliance[selectedAnexo].title}
                       </h3>
-                      <p className="text-sm italic text-gray-500">
+                      <p className="text-sm italic text-g5 whitespace-pre-line">
                         {dynamicStepContentCompliance[selectedAnexo].subtitle}
                       </p>
                       {dynamicStepContentCompliance[

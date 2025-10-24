@@ -124,7 +124,7 @@ export const steps: ComplianceStepInfo[] = [
     id: 8, // PASO 8
     title: 'Anexo III: Inventario de Bienes - Verificación y Responsabilidad',
     subtitle:
-      'Artículo 11, numeral 3 de la Resolución CGR N° 01-00-000162. Artículos 1 y 6 de la Providencia Administrativa N° 044 (Normativas sobre el Responsable Patrimonial).',
+      'Artículo 11, numeral 3 de la Resolución CGR N° 01-00-000162. \nArtículos 1 y 6 de la Providencia Administrativa N° 044 (Normativas sobre el Responsable Patrimonial).',
     fields: [
       'anexo_inventario_bienes',
       'inventario_bienes_fecha_entrega',
@@ -139,7 +139,7 @@ export const steps: ComplianceStepInfo[] = [
     id: 9, // PASO 9
     title: 'Anexo III: Inventario de Bienes - Atributos y Detalles',
     subtitle:
-      'Artículo 11, numeral 3 de la Resolución CGR N° 01-00-000162. Artículos 3, 10, 11 y 12 de la Providencia Administrativa N° 041 (Instructivo del Sistema de Información del Registro de Bienes Públicos).',
+      'Artículo 11, numeral 3 de la Resolución CGR N° 01-00-000162. \nArtículos 3, 10, 11 y 12 de la Providencia Administrativa N° 041 (Instructivo del Sistema de Información del Registro de Bienes Públicos).',
     fields: [
       'inventario_indica_fecha_verificacion',
       'inventario_indica_numero_acta_verificacion',
@@ -201,13 +201,16 @@ export const anexosAdicionalesTitulosCompliance = [
     shortTitle: 'Órganos de Control Fiscal',
     longTitle: 'ÓRGANOS DE CONTROL FISCAL',
   },
-  { shortTitle: 'Ministerio de Finanzas', longTitle: 'MINISTERIO DE FINANZAS' },
   {
-    shortTitle: 'Gobernaciones / Hacienda Estadal',
+    shortTitle: 'Ministerio de Finanzas',
+    longTitle: 'MINISTERIO DE FINANZAS',
+  },
+  {
+    shortTitle: 'Gobernaciones, Oficinas o Dependencias de Hacienda Estadal',
     longTitle: 'GOBERNACIONES, OFICINAS O DEPENDENCIAS DE HACIENDA ESTADAL',
   },
   {
-    shortTitle: 'Alcaldías / Hacienda Municipal',
+    shortTitle: 'Alcaldías, Dirección de Hacienda Distrital o Municipal',
     longTitle: 'ALCALDÍAS, DIRECCIÓN DE HACIENDA DISTRITAL O MUNICIPAL',
   },
 ];
@@ -234,7 +237,7 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
     type: 'questions',
     title: 'Unidades Administradoras',
     subtitle:
-      'Artículo 12 de la Resolución CGR N° 01-00-000162 <br/> Artículo 53 del Reglamento N° 1 de la Ley Orgánica de la Administración Financiera del Sector Público.',
+      'Artículo 12 de la Resolución CGR N° 01-00-000162. \nArtículo 53 del Reglamento N° 1 de la Ley Orgánica de la Administración Financiera del Sector Público.',
     questions: [
       {
         name: 'incluye_relacion_montos_fondos_asignados',
@@ -282,41 +285,42 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
       {
         name: 'anexo_caucion_funcionario_admin',
         label:
-          '84. ¿El Acta de entrega tiene como anexo: Caución del funcionario encargado...?',
+          '84. ¿El Acta de entrega tiene como anexo: Caución del funcionario encargado de la Administración de los Recursos Financieros a la fecha del cese de funciones?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
     ],
   },
   'ÓRGANOS O ENTIDADES QUE MANEJAN RAMOS ESPECÍFICOS': {
     type: 'questions',
-    title: 'Anexo Adicional: Órganos o Entidades con Ramos Específicos',
-    subtitle: 'Artículo 13 Resolución CGR N.º 01-000162',
+    title: 'Órganos o Entidades con Ramos Específicos',
+    subtitle: 'Artículo 13 Resolución CGR N.º 01-000162 de fecha 27-07-2009',
     questions: [
       {
         name: 'incluye_cuadro_liquidado_recaudado',
         label:
-          '85. ¿Se incluye cuadro demostrativo del detalle de lo liquidado y recaudado...?',
+          '85. ¿Se incluye cuadro demostrativo del detalle de lo liquidado y recaudado por los rubros respectivos, y de los derechos pendientes de recaudación de años anteriores?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
     ],
   },
   'ÓRGANOS DE CONTROL FISCAL': {
     type: 'questions',
-    title: 'Anexo Adicional: Órganos de Control Fiscal',
-    subtitle: 'Artículo 14 Resolución CGR / Arts. 53 y 54 LOCGRSNCF',
+    title: 'Órganos de Control Fiscal',
+    subtitle:
+      'Artículo 14 de la Resolución CGR N° 01-00-000162. \nTítulo III (Artículos 53 y 54) de la Ley Orgánica de la Contraloría General de la República y del Sistema Nacional de Control Fiscal.',
     questions: [
       {
         name: 'incluye_relacion_expedientes_investigacion',
         label:
-          '86. ¿Se incluye relación de los expedientes abiertos por potestad de investigación...?',
+          '86. ¿Se incluye relación de los expedientes abiertos con ocasión del ejercicio de la potestad de investigación, así como de los procedimientos administrativos para la determinación de responsabilidades?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
     ],
   },
   'MINISTERIO DE FINANZAS': {
     type: 'questions',
-    title: 'Anexo Adicional: Ministerio de Finanzas',
-    subtitle: 'Artículo 15 Resolución CGR N.º 01-000162',
+    title: 'Ministerio de Finanzas',
+    subtitle: 'Artículo 15 de la Resolución CGR N° 01-00-000162.',
     questions: [
       {
         name: 'incluye_situacion_tesoro_nacional',
@@ -326,12 +330,13 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
       {
         name: 'incluye_ejecucion_presupuesto_nacional',
         label:
-          '88. ¿Se incluye información de la ejecución del presupuesto nacional...?',
+          '88. ¿Se incluye información de la ejecución del presupuesto nacional de ingresos y egresos del ejercicio presupuestario en curso y de los derechos pendientes de recaudación de años anteriores?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
         name: 'incluye_monto_deuda_publica_nacional',
-        label: '89. ¿Se incluye Monto de la deuda pública nacional...?',
+        label:
+          '89. ¿Se incluye Monto de la deuda pública nacional interna y externa?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
@@ -343,8 +348,8 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
   },
   'GOBERNACIONES, OFICINAS O DEPENDENCIAS DE HACIENDA ESTADAL': {
     type: 'questions',
-    title: 'Anexo Adicional: Gobernaciones / Hacienda Estadal',
-    subtitle: 'Artículo 16 Resolución CGR N.º 01-000162',
+    title: 'Gobernaciones, Oficinas o Dependencias de Hacienda Estadal',
+    subtitle: 'Artículo 16 de la Resolución CGR N° 01-00-000162.',
     questions: [
       {
         name: 'incluye_situacion_tesoro_estadal',
@@ -354,7 +359,7 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
       {
         name: 'incluye_ejecucion_presupuesto_estadal',
         label:
-          '92. ¿Se incluye Información de la ejecución del presupuesto estadal...?',
+          '92. ¿Se incluye Información de la ejecución del presupuesto estadal de ingresos y egresos del ejercicio presupuestario en curso y de los derechos pendientes de recaudación de años anteriores?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
@@ -367,8 +372,8 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
   },
   'ALCALDÍAS, DIRECCIÓN DE HACIENDA DISTRITAL O MUNICIPAL': {
     type: 'questions',
-    title: 'Anexo Adicional: Alcaldías / Hacienda Municipal',
-    subtitle: 'Artículo 17 Resolución CGR N.º 01-000162',
+    title: 'Alcaldías, Dirección de Hacienda Distrital o Municipal',
+    subtitle: 'Artículo 17 de la Resolución CGR N° 01-00-000162.',
     questions: [
       {
         name: 'incluye_situacion_tesoro_municipal',
@@ -378,7 +383,7 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
       {
         name: 'incluye_ejecucion_presupuesto_municipal',
         label:
-          '95. ¿Se incluye Información de la ejecución del presupuesto distrital o municipal...?',
+          '95. ¿Se incluye Información de la ejecución del presupuesto distrital o municipal de ingresos y egresos del ejercicio presupuestario en curso y de los derechos pendientes de recaudación de años anteriores?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
@@ -390,13 +395,13 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
       {
         name: 'incluye_inventario_terrenos_municipales',
         label:
-          '97. ¿Se incluye Inventario detallado de los terrenos ejidos y propios...?',
+          '97. ¿Se incluye Inventario detallado de los terrenos ejidos y de los terrenos propios distritales o municipales?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
         name: 'incluye_relacion_ingresos_venta_terrenos',
         label:
-          '98. ¿Se incluye Relación de Ingresos producto de las ventas de terrenos...?',
+          '98. ¿Se incluye Relación de Ingresos producto de las ventas de terrenos ejidos o terrenos propios distritales o municipales?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
     ],

@@ -232,8 +232,9 @@ export type ComplianceDynamicContent = { [key: string]: ComplianceDynamicStep };
 export const dynamicStepContentCompliance: ComplianceDynamicContent = {
   'UNIDADES ADMINISTRADORAS': {
     type: 'questions',
-    title: 'Anexo Adicional: Unidades Administradoras',
-    subtitle: 'Artículo 12 Resolución CGR / Art. 53 Reglamento N° 1 LOAFSP',
+    title: 'Unidades Administradoras',
+    subtitle:
+      'Artículo 12 de la Resolución CGR N° 01-00-000162 <br/> Artículo 53 del Reglamento N° 1 de la Ley Orgánica de la Administración Financiera del Sector Público.',
     questions: [
       {
         name: 'incluye_relacion_montos_fondos_asignados',

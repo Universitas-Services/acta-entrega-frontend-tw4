@@ -496,7 +496,7 @@ export function ComplianceForm() {
 
   return (
     // Card principal con flex y altura completa para layout fijo
-    <Card className="w-full bg-white flex flex-col h-[calc(100vh-10rem)]">
+    <Card className="w-full bg-white flex flex-col h-[calc(100vh-10rem)] gap-0 overflow-hidden">
       {' '}
       {/* Ajusta h si es necesario */}
       <CardHeader className="border-b sticky top-0 bg-white z-10">
@@ -513,7 +513,7 @@ export function ComplianceForm() {
           </div>
 
           {/* Solo muestra el botón Guardar a partir del Paso 3 (índice 2) */}
-          {currentStep >= 2 && (
+          {currentStep >= 1 && (
             <Button
               variant="outline"
               size="sm"
@@ -549,9 +549,12 @@ export function ComplianceForm() {
         )}
       </CardHeader>
       {/* Contenedor del contenido desplazable */}
-      <div ref={contentScrollRef} className="flex-1 overflow-y-auto p-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)} // onSubmit va aquí
+          className="flex-1 flex flex-col overflow-hidden" // Gestiona espacio vertical
+        >
+          <div ref={contentScrollRef} className="flex-1 overflow-y-auto p-6">
             {/* Mensaje de error de la API */}
             {apiError && (
               <Alert variant="destructive">
@@ -611,7 +614,7 @@ export function ComplianceForm() {
                 />
                 <FormFieldWithExtras
                   name="nombreOrgano"
-                  label="Nombre del órgano, entidad, oficina o dependencia"
+                  label="Nombre del órgano, entidad, oficina o dependencia de la Administración Pública"
                   maxLength={50}
                   validationType="textOnly"
                 />
@@ -696,7 +699,7 @@ export function ComplianceForm() {
                 />
                 <SiNoQuestion
                   name="acta_contiene_relacion_anexos_normas"
-                  label="8. ¿El acta contiene una relación completa de los anexos que la acompañan y que se mencionan en los artículos 11 al 17 de las Normas...?"
+                  label="8. ¿El acta contiene una relación completa de los anexos que la acompañan y que se mencionan en los artículos 11 al 17 de las Normas que regulan la entrega de órganos, entes y oficinas de la APP?"
                   options={['SI', 'NO']}
                 />
                 <SiNoQuestion
@@ -727,12 +730,12 @@ export function ComplianceForm() {
               <div className="space-y-4">
                 <SiNoQuestion
                   name="anexos_con_fecha_corte_al_cese"
-                  label="13. ¿Los documentos anexos... presentan la información con fecha de corte al momento del cese...?"
+                  label="13. ¿Los documentos anexos del acta de entrega presentan la información con fecha de corte al momento del cese en el ejercicio del empleo, cargo o función pública del servidor público que entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="acta_deja_constancia_inexistencia_info"
-                  label="14. ¿En el acta de entrega se deja constancia de la inexistencia de información o documentos requeridos...?"
+                  label="14. ¿En el acta de entrega  se deja constancia de la  inexistencia de  información o documentos requeridos en los artículos 10 al 17 de la norma que regula la materia, según corresponda?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
@@ -747,27 +750,27 @@ export function ComplianceForm() {
                 />
                 <SiNoQuestion
                   name="incluye_autorizacion_certificar_copias"
-                  label="17. ¿Se incluye el documento que debidamente autoriza al Servidor Público a certificar las copias...?"
+                  label="17. ¿Se incluye el documento que debidamente autoriza al Servidor Público a certificar las copias del Acta de Entrega?"
                   options={['SI', 'NO']}
                 />
                 <SiNoQuestion
                   name="original_archivado_despacho_autoridad"
-                  label="18.¿El original del acta... fue archivada en el despacho de la máxima autoridad...?"
+                  label="18. ¿El original del acta de entrega y sus anexos fue archivada en el despacho de  la máxima autoridad jerárquica del órgano o entidad o en la oficina o dependencia que se entrega?"
                   options={['SI', 'NO']}
                 />
                 <SiNoQuestion
                   name="copia_certificada_entregada_a_servidor_recibe"
-                  label="19. ¿Una copia certificada... fue entregada al servidor público que recibe?"
+                  label="19. ¿Una copia certificada del acta de entrega y sus anexos fue entregada al servidor público que recibe?"
                   options={['SI', 'NO']}
                 />
                 <SiNoQuestion
                   name="copia_certificada_entregada_a_servidor_entrega"
-                  label="20. ¿Una copia certificada... fue entregada al servidor público que entrega?"
+                  label="20. ¿Una copia certificada del acta de entrega y sus anexos fue entregada al servidor público que entrega?"
                   options={['SI', 'NO']}
                 />
                 <SiNoQuestion
                   name="copia_entregada_auditoria_interna_en_plazo"
-                  label="21. ¿Se entregó una copia certificada... a la unidad de auditoría interna... dentro de los cinco (05) días hábiles...?"
+                  label="21. ¿Se entregó una copia certificada del acta de entrega y sus anexos a la unidad de auditoría interna del órgano o entidad dentro de los cinco (05) días hábiles siguientes de la fecha de suscripción de la misma?"
                   options={['SI', 'NO']}
                 />
               </div>
@@ -778,22 +781,22 @@ export function ComplianceForm() {
               <div className="space-y-4">
                 <SiNoQuestion
                   name="anexo_estado_cuentas_general"
-                  label="22. ¿El Acta de entrega tiene como anexo: Estado de las cuentas que reflejen la situación presupuestaria, financiera y patrimonial...?"
+                  label="22. ¿El Acta de entrega tiene como anexo: Estado de las cuentas que reflejen la situación presupuestaria, financiera y patrimonial, cuando sea aplicable?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_situacion_presupuestaria_detallada"
-                  label="23. ¿El Estado de Situación Presupuestaria muestra todos los momentos presupuestarios y sus detalles...?"
+                  label="23. ¿El Estado de Situación Presupuestaria  muestra todos los momentos presupuestarios y sus detalles. Incluye: Presupuesto Original, Modificaciones, Presupuesto Modificado, Compromisos, Causado, Pagado, Por Pagar y Presupuesto Disponible a la fecha de entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_gastos_comprometidos_no_causados"
-                  label="24. ¿El Acta de entrega tiene como anexo: Relación de Gastos Comprometidos, no causados...?"
+                  label="24. ¿El Acta de entrega tiene como anexo: Relación de Gastos Comprometidos, no causados a la fecha de entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_gastos_causados_no_pagados"
-                  label="25. ¿El Acta de entrega tiene como anexo: Relación de Gastos Comprometidos, causados y no pagados...?"
+                  label="25. ¿El Acta de entrega tiene como anexo: Relación de Gastos Comprometidos, causados y no pagados a la fecha de entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
@@ -819,32 +822,32 @@ export function ComplianceForm() {
                 />
                 <SiNoQuestion
                   name="anexo_balance_comprobacion_y_notas"
-                  label="29. ¿El Acta de entrega tiene como anexo: El Balance de Comprobación... y sus notas explicativas...?"
+                  label="29. ¿El Acta de entrega tiene como anexo: El Balance de Comprobación a la fecha de elaboración de los Estados Financieros y sus notas explicativas a la fecha de entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_estado_situacion_financiera_y_notas"
-                  label="30. ¿El Acta de entrega tiene como anexo: Estado de Situación Financiera / Balance General y sus notas explicativas...?"
+                  label="30. ¿El Acta de entrega tiene como anexo: Estado de Situación Financiera / Balance General y sus notas explicativas a la fecha de entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_estado_rendimiento_financiero_y_notas"
-                  label="31. ¿El Acta de entrega tiene como anexo: Estado de Rendimiento Financiero / Estado de Ganancia y Pérdidas y sus notas explicativas...?"
+                  label="31. ¿El Acta de entrega tiene como anexo: Estado de Rendimiento Financiero / Estado de Ganancia y Pérdidas y sus notas explicativas a la fecha de entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_estado_movimiento_patrimonio_y_notas"
-                  label="32. ¿El Acta de entrega tiene como anexo: Estado de Movimientos de las Cuentas de Patrimonio y sus notas explicativas...?"
+                  label="32. ¿El Acta de entrega tiene como anexo: Estado de Movimientos de las Cuentas de Patrimonio y sus notas explicativas a la fecha de entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_relacion_cuentas_por_cobrar"
-                  label="33. ¿El Acta de entrega tiene como anexo: Una Relación de Cuentas por Cobrar...?"
+                  label="33. ¿El Acta de entrega tiene como anexo: Una Relación de Cuentas por Cobrar a la fecha del Acta de Entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_relacion_cuentas_por_pagar"
-                  label="34. ¿El Acta de entrega tiene como anexo: Una Relación de Cuentas por Pagar...?"
+                  label="34. ¿El Acta de entrega tiene como anexo: Una Relación de Cuentas por Pagar a la fecha del Acta de Entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
@@ -864,7 +867,7 @@ export function ComplianceForm() {
                 />
                 <SiNoQuestion
                   name="anexo_acta_arqueo_caja_chica"
-                  label="38. ¿El Acta de entrega tiene como anexo: Acta de arqueo de las Cajas Chicas...?"
+                  label="38. ¿El Acta de entrega tiene como anexo: Acta de arqueo de las Cajas Chicas a la fecha de entrega?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
@@ -880,47 +883,47 @@ export function ComplianceForm() {
               <div className="space-y-4">
                 <SiNoQuestion
                   name="anexo_reporte_libros_contables"
-                  label="40. ¿El Acta de entrega tiene como anexo: Reportes de Libros Contables (Diario y mayores analíticos)...?"
+                  label="40. ¿El Acta de entrega tiene como anexo: Reportes de Libros Contables (Diario y mayores analíticos) a la fecha del cese de funciones?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_cuentas_bancarias"
-                  label="41. ¿El Acta de entrega tiene como anexo: Reportes de las Cuentas Bancarias (Movimientos...)? "
+                  label="41. ¿El Acta de entrega tiene como anexo: Reportes de las Cuentas Bancarias  (Movimientos a la fecha del cese de funciones)?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_conciliaciones_bancarias"
-                  label="42. ¿El Acta de entrega tiene como anexo: Reportes de las Conciliaciones Bancarias...?"
+                  label="42. ¿El Acta de entrega tiene como anexo: Reportes de las Conciliaciones Bancarias a la fecha del cese de funciones?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_retenciones_pendientes"
-                  label="43. ¿El Acta de entrega tiene como anexo: Reportes de Retenciones de pagos pendientes por enterar...?"
+                  label="43. ¿El Acta de entrega tiene como anexo: Reportes de Retenciones de pagos pendientes por enterar correspondientes a ISLR, IVA  y Retenciones por Contratos (obras, bienes y servicios)  a la fecha del cese de funciones?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_contrataciones_publicas"
-                  label="44. ¿El Acta de entrega tiene como anexo: Reporte de los Procesos de Contrataciones Públicas...?"
+                  label="44. ¿El Acta de entrega tiene como anexo: Reporte de los Procesos de Contrataciones Públicas  a la fecha del cese de funciones?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_fideicomiso_prestaciones"
-                  label="45. ¿El Acta de entrega tiene como anexo: Reporte del Fideicomiso de Prestaciones Sociales...?"
+                  label="45. ¿El Acta de entrega tiene como anexo: Reporte del Fideicomiso de Prestaciones Sociales a la fecha del cese de funciones?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_bonos_vacacionales"
-                  label="46. ¿El Acta de entrega tiene como anexo: Reporte de Bonos Vacacionales...?"
+                  label="46. ¿El Acta de entrega tiene como anexo: Reporte de Bonos Vacacionales  a la fecha del cese de funciones?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_mencion_numero_cargos_rrhh"
-                  label="47. ¿El Acta de entrega tiene como anexo: Mención del número de cargos existentes...?"
+                  label="47. ¿El Acta de entrega tiene como anexo: Mención del número de cargos existentes, con señalamiento de sí son empleados u obreros, fijos o contratados, así como el número de jubilados y pensionados, de ser el caso a la fecha del cese de funciones?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="incluye_cuadro_resumen_cargos"
-                  label="48. ¿Se Incluye un cuadro resumen indicando el número de cargos existentes...?"
+                  label="48. ¿Se Incluye un cuadro resumen indicando el número de cargos existentes, clasificados en empleados, obreros, fijos o contratados?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
@@ -930,7 +933,7 @@ export function ComplianceForm() {
                 />
                 <SiNoQuestion
                   name="anexo_reporte_nominas"
-                  label="50. ¿El Acta de entrega tiene como anexo: Reporte de Nóminas...?"
+                  label="50. ¿El Acta de entrega tiene como anexo: Reporte de Nóminas a la fecha del cese de funciones?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
               </div>
@@ -1027,7 +1030,7 @@ export function ComplianceForm() {
                 />
                 <SiNoQuestion
                   name="inventario_indica_ubicacion_bien"
-                  label="67. ¿Se indica la ubicación del bien (Administrativa y/o geográficamente)? "
+                  label="67. ¿Se indica la ubicación del bien (Administrativa y/o geográficamente)?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
@@ -1043,7 +1046,7 @@ export function ComplianceForm() {
               <div className="space-y-4">
                 <SiNoQuestion
                   name="anexo_ejecucion_poa"
-                  label="69. ¿El Acta de entrega tiene como anexo: La ejecución del Plan Operativo Anual...?"
+                  label="69. ¿El Acta de entrega tiene como anexo: La ejecución del Plan Operativo Anual de conformidad con los objetivos propuestos y las metas fijadas en el presupuesto?"
                   options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
@@ -1091,7 +1094,7 @@ export function ComplianceForm() {
                 {/* Dropdown Anexo_VI */}
                 <FormField
                   control={form.control}
-                  name="Anexo_VI" // Corregido de Anexo_VII
+                  name="Anexo_VI"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
@@ -1181,19 +1184,19 @@ export function ComplianceForm() {
                 )}
               </div>
             )}
+          </div>
 
-            {/* Botón submit oculto */}
-            <button
-              type="submit"
-              className="hidden"
-              id="compliance-submit-button"
-              onClick={form.handleSubmit(onSubmit)}
-            ></button>
-          </form>
-        </Form>
-      </div>
+          {/* Botón submit oculto */}
+          <button
+            type="submit"
+            className="hidden"
+            id="compliance-submit-button"
+            onClick={form.handleSubmit(onSubmit)}
+          ></button>
+        </form>
+      </Form>
       {/* Footer fijo con navegación */}
-      <CardFooter className="border-t sticky bottom-0 bg-white z-10 p-4">
+      <CardFooter className="border-t sticky bottom-0 bg-white z-10 ">
         <div className="flex items-center justify-between w-full">
           {/* Columna Izquierda (Anterior) */}
           <div className="w-1/4 flex justify-start">

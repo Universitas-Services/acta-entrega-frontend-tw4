@@ -12,7 +12,7 @@ export type ComplianceStepInfo = {
 export const steps: ComplianceStepInfo[] = [
   {
     id: 1, // PASO 1
-    title: 'Datos Generales del Acta',
+    title: 'Datos generales del Acta',
     fields: [
       'email',
       'rifOrgano',

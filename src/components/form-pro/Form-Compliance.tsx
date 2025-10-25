@@ -507,7 +507,7 @@ export function ComplianceForm() {
             <CardTitle className="text-2xl mb-1">
               {currentStepData?.title || 'Compliance'}
             </CardTitle>
-            <ShadcnCardDescription className="text-sm text-gray-500 italic whitespace-pre-line">
+            <ShadcnCardDescription className="text-sm text-g5 italic whitespace-pre-line">
               {currentStepData?.subtitle}
             </ShadcnCardDescription>
           </div>

@@ -48,4 +48,9 @@ export const mainNav: NavItem[] = [
     href: '/dashboard/actas-pro/compliance',
     icon: FaWpforms,
   },
+  {
+    title: 'MA - Pro',
+    href: '/dashboard/actas-pro/ma-pro',
+    icon: FaWpforms,
+  },
 ];

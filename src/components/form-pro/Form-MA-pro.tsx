@@ -63,9 +63,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
-import { Input } from '../ui/input'; // Importar Input si FFWExtras no lo cubre todo
-// Comentar la llamada real a la API por ahora
-// import { createActaMaximaAutoridad } from '@/services/actasService';
+import { CiCircleCheck } from 'react-icons/ci';
 
 // Tipado del formulario usando el schema importado
 type FormData = z.infer<typeof actaMaximaAutoridadSchema>;
@@ -93,7 +91,6 @@ export function ActaMaximaAutoridadProForm() {
     mode: 'onChange',
     resolver: zodResolver(actaMaximaAutoridadSchema),
     shouldUnregister: false,
-    // DefaultValues copiados/adaptados de Form-MA.tsx
     defaultValues: {
       email: '',
       rifOrgano: '',
@@ -233,8 +230,25 @@ export function ActaMaximaAutoridadProForm() {
     contentScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Función de Guardar
   const handleSaveProgress = async () => {
-    /* ... (igual que en Compliance) ... */
+    // Convertir a async si llamas a API
+    console.log('Guardando progreso...', getValues());
+    setIsLoading(true); // Indicar carga
+    // Aquí iría la lógica REAL para guardar en backend
+    // Simulamos un guardado exitoso
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular llamada a API
+      toast.success('Progreso guardado exitosamente.');
+      setIsSavedOnce(true); // <-- Marcar como guardado
+      // Opcional: podrías querer resetear el estado 'isDirty' después de guardar
+      // form.reset({}, { keepValues: true }); // Resetea 'isDirty' manteniendo valores
+      // setIsDirty(false); // O forzarlo manualmente
+    } catch (error) {
+      toast.error('Error al guardar el progreso.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // --- Funciones de Navegación (Adaptadas para 10 pasos y salto en Paso 9) ---
@@ -270,10 +284,42 @@ export function ActaMaximaAutoridadProForm() {
     const isValid = await trigger(fieldsToValidate, { shouldFocus: false });
 
     if (!isValid) {
-      // ... (Scroll al error sin cambios) ...
-      toast.warning(
-        'Por favor, completa todos los campos requeridos en este paso.'
-      );
+      const errors = form.formState.errors;
+      const firstErrorField = fieldsToValidate.find((field) => errors[field]);
+
+      if (firstErrorField) {
+        const mainContent = document.getElementById('main-content-container');
+        const element = document.getElementById(firstErrorField);
+        // Buscamos por FormItem, que es el contenedor visual completo del campo
+        const formItem = element?.closest<HTMLElement>(
+          '.flex.flex-col, .space-y-4.p-4.border.rounded-md, [data-slot="form-item"], FormItem'
+        );
+
+        // Fallback por si closest no funciona
+        const finalTarget = formItem || element;
+
+        if (mainContent && finalTarget) {
+          const containerRect = mainContent.getBoundingClientRect();
+          const itemRect = finalTarget.getBoundingClientRect();
+
+          const itemTopInContainer =
+            itemRect.top - containerRect.top + mainContent.scrollTop;
+
+          const desiredScrollTop =
+            itemTopInContainer -
+            mainContent.clientHeight / 2 +
+            finalTarget.clientHeight / 2;
+
+          mainContent.scrollTo({
+            top: desiredScrollTop,
+            behavior: 'smooth',
+          });
+
+          toast.warning(
+            'Por favor, completa todos los campos requeridos en este paso.'
+          );
+        }
+      }
       return;
     }
 
@@ -434,21 +480,17 @@ export function ActaMaximaAutoridadProForm() {
     | ''; // Para el paso 9
 
   return (
-    // <Form> Provider envuelve todo
-
-    <Card className="w-full bg-white flex flex-col h-[calc(100vh-10rem)] py-0 gap-0 overflow-hidden">
+    <Card className="w-full bg-white flex flex-col h-[calc(100vh-10rem)] gap-0 overflow-hidden">
       {/* Header Fijo */}
-      <CardHeader className="border-b sticky top-0 bg-white z-10 px-6 pt-6 pb-4">
+      <CardHeader className="border-b sticky top-0 bg-white z-10">
         <div className="flex justify-between items-start">
           <div>
             <CardTitle className="text-2xl mb-1">
               {currentStepData?.title || 'Acta MA PRO'}
             </CardTitle>
-            {currentStepData?.subtitle && (
-              <ShadcnCardDescription className="text-sm text-gray-500 italic font-bold">
-                {currentStepData.subtitle}
-              </ShadcnCardDescription>
-            )}
+            <ShadcnCardDescription className="text-sm font-bold text-g5 italic whitespace-pre-line">
+              {currentStepData?.subtitle}
+            </ShadcnCardDescription>
           </div>
           {/* Botón Guardar (desde paso 3 / índice 2) */}
           {currentStep >= 2 && (
@@ -457,173 +499,244 @@ export function ActaMaximaAutoridadProForm() {
               size="sm"
               onClick={handleSaveProgress}
               disabled={isLoading}
+              className="cursor-pointer"
             >
               <FiSave className="mr-2 h-4 w-4" />
               {isLoading ? 'Guardando...' : 'Guardar'}
             </Button>
           )}
         </div>
-        {/* Subtítulos fijos (No aplica para MA) */}
       </CardHeader>
       <Form {...form}>
         {/* <form> nativo */}
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex-1 flex flex-col overflow-hidden relative"
+          className="flex-1 flex flex-col overflow-hidden"
         >
           {/* Contenido desplazable */}
           <div ref={contentScrollRef} className="flex-1 overflow-y-auto p-6">
             {apiError && (
               <Alert variant="destructive">
                 <LuTriangleAlert className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>Error al Crear el Acta</AlertTitle>
                 <AlertDescription>{apiError}</AlertDescription>
               </Alert>
             )}
 
-            {/* --- Renderizado Explícito Paso por Paso (Contenido de Form-MA) --- */}
-
             {/* PASO 1 (Índice 0) */}
             {currentStep === 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 items-stretch">
-                <FormFieldWithExtras
-                  name="email"
-                  label="Dirección de correo electrónico"
-                  subtitle="Ej: ejemplo@dominio.com"
-                />
-                <FormField
-                  control={form.control}
-                  name="rifOrgano"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        RIF del órgano, entidad, oficina o dependencia de la
-                        Administración Pública
-                      </FormLabel>
-                      <FormDescription className="italic">
-                        Ej: G-00000000-0
-                      </FormDescription>
-                      <FormControl>
-                        <InputCompuesto
-                          id={field.name}
-                          type="rif"
-                          options={['G', 'J', 'E']} // Opciones para el desplegable
-                          placeholder=""
-                          {...field}
-                          onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />{' '}
-                <FormFieldWithExtras
-                  name="denominacionCargo"
-                  label="Denominación del cargo"
-                  subtitle="Ej: Presidencia..."
-                />
-                <FormFieldWithExtras
-                  name="nombreOrgano"
-                  label="Nombre del órgano..."
-                  subtitle="Ej: INTT..."
-                />
-                {/* LocationSelector necesita FormProvider */}
-                <LocationSelector
-                  control={form.control}
-                  form={form}
-                  estadoFieldName="estadoSuscripcion"
-                  ciudadFieldName="ciudadSuscripcion"
-                />{' '}
-                <FormField
-                  control={form.control}
-                  name="horaSuscripcion"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col h-full">
-                      {' '}
-                      <div>
-                        <FormLabel>Hora de suscripción...</FormLabel>
-                      </div>{' '}
-                      <FormControl className="flex-grow">
-                        <ShadcnTimePicker
-                          value={field.value}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage className="mt-auto" />{' '}
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="fechaSuscripcion"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Fecha de la suscripción</FormLabel>
-                      <ShadcnDatePicker
-                        // 'T00:00:00' para que la fecha se interprete en la zona horaria local y no en UTC.
-                        value={
-                          field.value
-                            ? (() => {
-                                // Parsea el string 'dd/MM/yyyy' manualmente
-                                const [day, month, year] =
-                                  field.value.split('/');
-                                return new Date(
-                                  `${year}-${month}-${day}T00:00:00`
-                                );
-                              })()
-                            : undefined
-                        }
-                        onChange={(date) => {
-                          if (date) {
-                            field.onChange(format(date, 'dd/MM/yyyy'));
-                          } else {
-                            field.onChange(''); // Asegúrate de limpiar si no hay fecha
-                          }
-                        }}
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />{' '}
-                {/* El campo Dirección necesita ocupar 2 columnas */}
-                <div className="md:col-span-2 h-full">
-                  <FormFieldWithExtras
-                    name="direccionOrgano"
-                    label="Dirección exacta..."
-                    subtitle="Ej: Av..."
-                  />
-                </div>
-                <div className="md:col-span-2 h-full">
-                  <FormField
-                    control={form.control}
-                    name="motivoEntrega"
-                    render={({ field }) => (
-                      <FormItem>
-                        {' '}
-                        <FormLabel>Motivo de la entrega...</FormLabel>{' '}
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value || ''}
-                        >
+              <div className="space-y-8">
+                {/* --- Primera Sección: Identificación --- */}
+                <div className="space-y-4 border rounded-lg">
+                  <div className="mb-4 p-4">
+                    <h3 className="font-bold text-lg">
+                      Identificación del cargo y organismo
+                    </h3>
+                    <p className="text-sm text-gray-500 italic font-bold">
+                      Artículo 10.2 Resolución CGR N.º 01-000162 de fecha
+                      27-07-2009
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 px-4 pb-4">
+                    <FormFieldWithExtras
+                      name="email"
+                      label="Dirección de correo electrónico"
+                      subtitle="Ej: ejemplo@dominio.com"
+                    />
+                    <FormField
+                      control={form.control}
+                      name="rifOrgano"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            RIF del órgano, entidad, oficina o dependencia de la
+                            Administración Pública
+                          </FormLabel>
+                          <FormDescription className="italic">
+                            Ej: G-00000000-0
+                          </FormDescription>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Seleccione un motivo" />
-                            </SelectTrigger>
+                            <InputCompuesto
+                              id={field.name}
+                              type="rif"
+                              options={['G', 'J', 'E']} // Opciones para el desplegable
+                              placeholder=""
+                              {...field}
+                              onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
+                            />
                           </FormControl>
-                          <SelectContent>
-                            {' '}
-                            {/* Opciones de Form-MA */}
-                            <SelectItem value="Renuncia">Renuncia</SelectItem>
-                            <SelectItem value="Jubilación">
-                              Jubilación
-                            </SelectItem>
-                            {/*...otras...*/}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />{' '}
-                      </FormItem>
-                    )}
-                  />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />{' '}
+                    <FormFieldWithExtras
+                      name="denominacionCargo"
+                      label="Denominación del cargo"
+                      subtitle="Ej: Presidencia, dirección, coordinación"
+                      maxLength={50}
+                      validationType="textOnly"
+                    />
+                    <FormFieldWithExtras
+                      name="nombreOrgano"
+                      label="Nombre del órgano, entidad, oficina o dependencia de la Administración Pública"
+                      subtitle="Ej: Instituto Nacional de Transporte Terrestre (INTT)"
+                      maxLength={50}
+                    />
+                  </div>
+                </div>
+
+                {/* --- Segunda Sección: Detalles de Suscripción --- */}
+                <div className="space-y-4 border rounded-lg">
+                  <div className="mb-4 p-4">
+                    <h3 className="font-bold text-lg">
+                      Detalles de la suscripción del acta
+                    </h3>
+                    <p className="text-sm text-gray-500 italic font-bold">
+                      Artículo 10.1 Resolución CGR N.º 01-000162 de fecha
+                      27-07-2009
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 px-4 pb-4">
+                    <LocationSelector
+                      control={form.control}
+                      form={form}
+                      estadoFieldName="estadoSuscripcion"
+                      ciudadFieldName="ciudadSuscripcion"
+                    />
+                    <FormField
+                      control={form.control}
+                      name="horaSuscripcion"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Hora de suscripción del acta</FormLabel>
+                          <ShadcnTimePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="fechaSuscripcion"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Fecha de la suscripción</FormLabel>
+                          <ShadcnDatePicker
+                            // 'T00:00:00' para que la fecha se interprete en la zona horaria local y no en UTC.
+                            value={
+                              field.value
+                                ? (() => {
+                                    // Parsea el string 'dd/MM/yyyy' manualmente
+                                    const [day, month, year] =
+                                      field.value.split('/');
+                                    return new Date(
+                                      `${year}-${month}-${day}T00:00:00`
+                                    );
+                                  })()
+                                : undefined
+                            }
+                            onChange={(date) => {
+                              if (date) {
+                                field.onChange(format(date, 'dd/MM/yyyy'));
+                              } else {
+                                field.onChange(''); // Asegúrate de limpiar si no hay fecha
+                              }
+                            }}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />{' '}
+                    {/* El campo Dirección necesita ocupar 2 columnas */}
+                    <div className="md:col-span-2">
+                      <FormFieldWithExtras
+                        name="direccionOrgano"
+                        label="Dirección exacta y completa de la ubicación del órgano, entidad, oficina o dependencia que se entrega"
+                        subtitle="Ej: Avenida 00, entre calles 00 y 00, Edif. Central, Piso 2, Despacho de la presidencia"
+                        maxLength={300}
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <FormField
+                        control={form.control}
+                        name="motivoEntrega"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Motivo de la entrega del órgano, entidad, oficina
+                              o dependencia de la Administración Pública
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              disabled={isLoading}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="cursor-pointer">
+                                  <SelectValue placeholder="Seleccione un motivo" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent
+                                position="popper"
+                                className="bg-white z-50 max-h-60 overflow-y-auto text-black"
+                              >
+                                <SelectItem value="Renuncia">
+                                  Renuncia
+                                </SelectItem>
+                                <SelectItem value="Jubilación">
+                                  Jubilación
+                                </SelectItem>
+                                <SelectItem value="Muerte">Muerte</SelectItem>
+                                <SelectItem value="Incapacidad absoluta">
+                                  Incapacidad absoluta
+                                </SelectItem>
+                                <SelectItem value="Destitución">
+                                  Destitución
+                                </SelectItem>
+                                <SelectItem value="Supresión del cargo">
+                                  {' '}
+                                  Supresión del cargo
+                                </SelectItem>
+                                <SelectItem value="Expiración del período">
+                                  {' '}
+                                  Expiración del período
+                                </SelectItem>
+                                <SelectItem value="Ascenso">Ascenso</SelectItem>
+                                <SelectItem value="Traslado">
+                                  Traslado
+                                </SelectItem>
+                                <SelectItem value="Rotación">
+                                  Rotación
+                                </SelectItem>
+                                <SelectItem value="Comisión de servicio">
+                                  Comisión de servicio
+                                </SelectItem>
+                                <SelectItem value="Licencia">
+                                  Licencia
+                                </SelectItem>
+                                <SelectItem value="Suspensión">
+                                  Suspensión
+                                </SelectItem>
+                                <SelectItem value="Inhabilitación">
+                                  Inhabilitación
+                                </SelectItem>
+                                <SelectItem value="Revocatoria del mandato">
+                                  Revocatoria del mandato
+                                </SelectItem>
+                                <SelectItem value="Declaración de abandono del cargo">
+                                  {' '}
+                                  Declaración de abandono del cargo
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -631,7 +744,6 @@ export function ActaMaximaAutoridadProForm() {
             {/* PASO 2 (Índice 1) */}
             {currentStep === 1 && (
               <div className="space-y-6">
-                {/* Servidor Entrante */}
                 <h3 className="text-lg font-semibold border-b pb-2">
                   Servidor Público Entrante
                 </h3>
@@ -639,7 +751,8 @@ export function ActaMaximaAutoridadProForm() {
                   <FormFieldWithExtras
                     name="nombreServidorEntrante"
                     label="Nombre"
-                    subtitle="Ej: Pedro..."
+                    subtitle="Ej: Pedro Jose Rodríguez Hernández"
+                    maxLength={50}
                     validationType="textOnly"
                   />
                   <FormField
@@ -664,26 +777,28 @@ export function ActaMaximaAutoridadProForm() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />{' '}
+                  />
                   <FormFieldWithExtras
                     name="profesionServidorEntrante"
                     label="Profesión"
-                    subtitle="Ej: Contador..."
+                    subtitle="Ej: Contador, Ingeniero, Abogado"
+                    maxLength={50}
                     validationType="textOnly"
                   />
                   <FormFieldWithExtras
                     name="designacionServidorEntrante"
                     label="Datos de designación"
-                    subtitle="Ej: Resolución..."
+                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-000"
+                    maxLength={150}
                   />
                 </div>
-                {/* Auditor */}
                 <h3 className="text-lg font-semibold border-b pb-2">Auditor</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <FormFieldWithExtras
                     name="nombreAuditor"
                     label="Nombre"
-                    subtitle="Ej: Pedro..."
+                    subtitle="Ej: Pedro José Rodríguez Hernández"
+                    maxLength={50}
                     validationType="textOnly"
                   />
                   <FormField
@@ -708,53 +823,303 @@ export function ActaMaximaAutoridadProForm() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />{' '}
+                  />
                   <FormFieldWithExtras
                     name="profesionAuditor"
                     label="Profesión"
-                    subtitle="Ej: Contador..."
+                    subtitle="Ej: Contador, Ingeniero, Abogado"
+                    maxLength={50}
                     validationType="textOnly"
                   />
                 </div>
-                {/* Testigos */}
                 <h3 className="text-lg font-semibold border-b pb-2">
                   Testigos
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                   <div className="space-y-4 p-4 border rounded-md">
                     <p className="font-medium">Testigo N° 1</p>
-                    {/* Campos Testigo 1 */}
+                    <FormFieldWithExtras
+                      name="nombreTestigo1"
+                      label="Nombre"
+                      subtitle="Ej: Pedro José Rodríguez Hernández"
+                      maxLength={50}
+                      validationType="textOnly"
+                    />
+                    <FormField
+                      control={form.control}
+                      name="cedulaTestigo1"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Cédula</FormLabel>
+                          <FormDescription className="italic">
+                            Ej: V-00.000.000
+                          </FormDescription>
+                          <FormControl>
+                            <InputCompuesto
+                              id={field.name}
+                              type="cedula"
+                              options={['V', 'E']} // Opciones para el desplegable
+                              placeholder=""
+                              {...field}
+                              onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormFieldWithExtras
+                      name="profesionTestigo1"
+                      label="Profesión"
+                      subtitle="Ej: Contador, Ingeniero, Abogado"
+                      maxLength={50}
+                      validationType="textOnly"
+                    />
                   </div>
                   <div className="space-y-4 p-4 border rounded-md">
                     <p className="font-medium">Testigo N° 2</p>
-                    {/* Campos Testigo 2 */}
+                    <FormFieldWithExtras
+                      name="nombreTestigo2"
+                      label="Nombre"
+                      subtitle="Ej: Pedro José Rodríguez Hernández"
+                      maxLength={50}
+                      validationType="textOnly"
+                    />
+                    <FormField
+                      control={form.control}
+                      name="cedulaTestigo2"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Cédula</FormLabel>
+                          <FormDescription className="italic">
+                            Ej: V-00.000.000
+                          </FormDescription>
+                          <FormControl>
+                            <InputCompuesto
+                              id={field.name}
+                              type="cedula"
+                              options={['V', 'E']} // Opciones para el desplegable
+                              placeholder=""
+                              {...field}
+                              onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormFieldWithExtras
+                      name="profesionTestigo2"
+                      label="Profesión"
+                      subtitle="Ej: Contador, Ingeniero, Abogado"
+                      maxLength={50}
+                      validationType="textOnly"
+                    />
                   </div>
                 </div>
-                {/* Servidor Saliente */}
                 <h3 className="text-lg font-semibold border-b pb-2">
                   Servidor Público Saliente
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Campos Servidor Saliente */}
+                  <FormFieldWithExtras
+                    name="nombreServidorSaliente"
+                    label="Nombre"
+                    subtitle="Ej: Pedro José Rodríguez Hernández"
+                    maxLength={50}
+                    validationType="textOnly"
+                  />
+                  <FormField
+                    control={form.control}
+                    name="cedulaServidorSaliente"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cédula</FormLabel>
+                        <FormDescription className="italic">
+                          Ej: V-00.000.000
+                        </FormDescription>
+                        <FormControl>
+                          <InputCompuesto
+                            id={field.name}
+                            type="cedula"
+                            options={['V', 'E']} // Opciones para el desplegable
+                            placeholder=""
+                            {...field}
+                            onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormFieldWithExtras
+                    name="designacionServidorSaliente"
+                    label="Datos de designación"
+                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-000"
+                    maxLength={150}
+                  />
                 </div>
               </div>
             )}
 
-            {/* PASOS 3 a 8 (Índices 2 a 7) - Usar SiNoQuestion */}
-            {currentStep >= 2 && currentStep <= 7 && (
+            {currentStep === 2 && (
               <div className="space-y-4">
-                {steps[currentStep].fields.map((fieldName) => (
-                  <SiNoQuestion
-                    key={fieldName}
-                    name={fieldName}
-                    // Obtener label de acta-ma-constants (puede requerir ajuste en constants)
-                    label={fieldName
-                      .replace(/([A-Z])/g, ' $1')
-                      .replace(/^./, (str) => str.toUpperCase())} // Generar label básico
-                    // Opciones fijas para MA
-                    options={['SI', 'NO']}
-                  />
-                ))}
+                <SiNoQuestion
+                  name="disponeEstadoSituacionPresupuestaria"
+                  label="¿Dispone usted del documento Estado de situación presupuestaria  que muestra todos los momentos presupuestarios y sus detalles. Incluye: presupuesto original, modificaciones, presupuesto modificado, compromisos, causado, pagado, por pagar y presupuesto disponible a la fecha de entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeRelacionGastosComprometidosNoCausados"
+                  label="¿Dispone usted del documento Relación de gastos comprometidos no causados a la fecha de entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeRelacionGastosComprometidosCausadosNoPagados"
+                  label="¿Dispone usted del documento Relación de gastos comprometidos causados y no pagados a la fecha de entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeEstadoPresupuestarioPorPartidas"
+                  label="¿Dispone usted del documento Estado presupuestario del ejercicio vigente por partidas?"
+                />
+                <SiNoQuestion
+                  name="disponeEstadoPresupuestarioDetalleCuentas"
+                  label="¿Dispone usted del documento Estado presupuestario del ejercicio con los detalles de sus cuentas?"
+                />
+              </div>
+            )}
+
+            {currentStep === 3 && (
+              <div className="space-y-4">
+                <SiNoQuestion
+                  name="disponeEstadosFinancieros"
+                  label="¿Dispone usted del documento Estados financieros a la fecha de la entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeBalanceComprobacion"
+                  label="¿Dispone usted del documento Balance de comprobación a la fecha de la elaboración de los estados financieros y sus notas explicativas a la fecha de la entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeEstadoSituacionFinanciera"
+                  label="¿Dispone usted del documento Estado de situación financiera / balance general y sus notas explicativas a la fecha de la entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeEstadoRendimientoFinanciero"
+                  label="¿Dispone usted del documento Estado de rendimiento financiero / Estado de ganancias y pérdidas y sus notas explicativas a la fecha de entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeEstadoMovimientosPatrimonio"
+                  label="¿Dispone usted del documento Estado de movimientos de las cuentas de patrimonio y sus notas explicativas a la fecha de entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeRelacionCuentasPorCobrar"
+                  label="¿Dispone usted del documento Relación de cuentas por cobrar a la fecha del Acta de Entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeRelacionCuentasPorPagar"
+                  label="¿Dispone usted del documento Relación de cuentas por pagar a la fecha del Acta de Entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeRelacionCuentasFondosTerceros"
+                  label="¿Dispone usted del documento Relación de las cuentas de los fondos de terceros?"
+                />
+                <SiNoQuestion
+                  name="disponeSituacionFondosAnticipo"
+                  label="¿Dispone usted del documento Situación de los fondos en anticipo?"
+                />
+                <SiNoQuestion
+                  name="disponeSituacionCajaChica"
+                  label="¿Dispone usted del documento Situación de la caja chica?"
+                />
+                <SiNoQuestion
+                  name="disponeActaArqueoCajasChicas"
+                  label="¿Dispone usted del documento Acta de arqueo de las cajas chicas a la fecha de entrega?"
+                />
+                <SiNoQuestion
+                  name="disponeListadoRegistroAuxiliarProveedores"
+                  label="¿Dispone usted del documento Listado del registro auxiliar de proveedores?"
+                />
+                <SiNoQuestion
+                  name="disponeReportesLibrosContables"
+                  label="¿Dispone usted del documento Reportes de libros contables (diario y mayores analíticos) a la fecha del cese de funciones?"
+                />
+                <SiNoQuestion
+                  name="disponeReportesCuentasBancarias"
+                  label="¿Dispone usted del documento Reportes de las cuentas bancarias (movimientos a la fecha del cese de funciones)?"
+                />
+                <SiNoQuestion
+                  name="disponeReportesConciliacionesBancarias"
+                  label="¿Dispone usted del documento Reportes de las conciliaciones bancarias a la fecha del cese de funciones?"
+                />
+                <SiNoQuestion
+                  name="disponeReportesRetenciones"
+                  label="¿Dispone usted del documento Reportes de retenciones de pagos pendientes por enterar correspondientes a ISLR, IVA y Retenciones por contratos (obras, bienes y servicios) a la fecha del cese de funciones?"
+                />
+                <SiNoQuestion
+                  name="disponeReporteProcesosContrataciones"
+                  label="¿Dispone usted del documento Reporte de los procesos de Contrataciones Públicas a la fecha del cese de funciones?"
+                />
+                <SiNoQuestion
+                  name="disponeReporteFideicomisoPrestaciones"
+                  label="¿Dispone usted del documento Reporte del fideicomiso de prestaciones sociales a la fecha del cese de funciones?"
+                />
+                <SiNoQuestion
+                  name="disponeReporteBonosVacacionales"
+                  label="¿Dispone usted del documento Reporte de bonos vacacionales a la fecha del cese de funciones?"
+                />
+              </div>
+            )}
+
+            {currentStep === 4 && (
+              <div className="space-y-4">
+                <SiNoQuestion
+                  name="disponeCuadroResumenCargos"
+                  label="¿Dispone usted del documento cuadro resumen indicando el número de cargos existentes, clasificados en empleados, obreros, fijos o contratados?"
+                />
+                <SiNoQuestion
+                  name="disponeCuadroResumenValidadoRRHH"
+                  label="¿Dispone usted del documento cuadro resumen validado por la Oficina de recursos humanos?"
+                />
+                <SiNoQuestion
+                  name="disponeReporteNominas"
+                  label="¿Dispone usted del documento Reporte de nóminas a la fecha del cese de funciones?"
+                />
+              </div>
+            )}
+
+            {currentStep === 5 && (
+              <div className="space-y-4">
+                <SiNoQuestion
+                  name="disponeInventarioBienes"
+                  label="¿Dispone usted del documento Inventario de bienes e inmuebles esta elaborado a la fecha de entrega. Debe contener: comprobación física, condición de los bienes, responsable patrimonial, responsable por uso, fecha de verificación, número del acta de verificación, código, descripción, marca, modelo, número del serial, estado de conservación, ubicación y valor de mercado de los bienes?"
+                />
+              </div>
+            )}
+
+            {currentStep === 6 && (
+              <div className="space-y-4">
+                <SiNoQuestion
+                  name="disponeEjecucionPlanOperativo"
+                  label="¿Dispone usted del documento Ejecución del Plan Operativo a la fecha de entrega?"
+                />
+                <SiNoQuestion
+                  name="incluyeCausasIncumplimientoMetas"
+                  label="¿Usted incluye las causas que originaron el incumplimiento de algunas metas en la ejecución del Plan Operativo?"
+                />
+                <SiNoQuestion
+                  name="disponePlanOperativoAnual"
+                  label="¿Dispone usted del documento Plan Operativo anual?"
+                />
+              </div>
+            )}
+
+            {currentStep === 7 && (
+              <div className="space-y-4">
+                <SiNoQuestion
+                  name="disponeClasificacionArchivo"
+                  label="¿Dispone usted del documento clasificación del archivo?"
+                />
+                <SiNoQuestion
+                  name="incluyeUbicacionFisicaArchivo"
+                  label="¿Usted incluye la ubicación física del archivo?"
+                />
               </div>
             )}
 
@@ -768,14 +1133,22 @@ export function ActaMaximaAutoridadProForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Cualquier otra información o documentación...
+                        Cualquier otra información o documentación que se
+                        considere necesaria indicando la fecha de corte.
                       </FormLabel>
                       <ShadcnCardDescription className="text-xs">
-                        ...
+                        Está referida a que además de los documentos requeridos
+                        de manera estándar, las partes involucradas pueden
+                        aportar datos adicionales que puedan influir en la
+                        evaluación o decisión del organismo correspondiente. La
+                        fecha de corte es crucial porque establece un límite
+                        temporal para la información presentada, asegurando que
+                        todas las partes estén en la misma página respecto a la
+                        temporalidad de los datos.
                       </ShadcnCardDescription>
                       <FormControl>
                         <Textarea
-                          placeholder="..."
+                          placeholder="Describa aquí la información adicional..."
                           {...field}
                           maxLength={500}
                         />
@@ -789,29 +1162,29 @@ export function ActaMaximaAutoridadProForm() {
                   control={form.control}
                   name="Anexo_VII"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        ANEXOS ADICIONALES (Según Tipo de Entidad)
-                      </FormLabel>
+                    <FormItem className="pt-2">
+                      <FormLabel>ANEXOS ADICIONALES</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value || ''}
                         disabled={isLoading}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="cursor-pointer">
                             <SelectValue placeholder="Seleccione un anexo..." />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="text-black bg-white z-50 max-h-60 overflow-y-auto">
                           {anexosAdicionalesTitulos.map((anexo) => (
                             <SelectItem
                               key={anexo.longTitle}
                               value={anexo.longTitle}
+                              className="whitespace-normal h-auto"
                             >
                               {anexo.shortTitle}
                             </SelectItem>
                           ))}
+                          <SelectItem value="NO APLICA">NO APLICA</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -836,8 +1209,7 @@ export function ActaMaximaAutoridadProForm() {
                             key={q.name}
                             name={q.name}
                             label={q.label}
-                            options={['SI', 'NO']}
-                          /> // MA usa SI/NO
+                          />
                         ))}
                       {dynamicStepContent[selectedAnexo].type ===
                         'textarea' && (
@@ -848,9 +1220,10 @@ export function ActaMaximaAutoridadProForm() {
                             <FormItem>
                               <FormControl>
                                 <Textarea
-                                  placeholder={`Describa aquí...`}
+                                  placeholder={`Describa aquí la información sobre el ${dynamicStepContent[selectedAnexo].title.toLowerCase()}...`}
                                   {...field}
                                   rows={8}
+                                  disabled={isLoading}
                                   maxLength={500}
                                 />
                               </FormControl>
@@ -869,26 +1242,43 @@ export function ActaMaximaAutoridadProForm() {
               <div className="space-y-4">
                 <SiNoQuestion
                   name="interesProducto"
-                  label="Nos complace que haya completado su acta..."
+                  label="Nos complace que haya completado su acta. ¿Le gustaría recibir información para obtener la versión Pro con acceso a funcionalidades avanzadas?"
                   options={['SI', 'NO']}
                 />
-                {/* Mensaje de finalización condicional (opcional) */}
+                {/* Mensaje de finalización condicional */}
+                {form.watch('interesProducto') && ( // Mostrar si ya se respondió
+                  <div className="text-center p-6 mt-8 bg-gray-50 rounded-lg border border-dashed transition-opacity duration-500">
+                    <CiCircleCheck className="mx-auto h-12 w-12 text-green5" />
+                    <h3 className="mt-4 text-xl font-semibold text-g8">
+                      ¡Ha completado el formulario!
+                    </h3>
+                    <p className="mt-2 text-sm text-gray-600">
+                      Ha llenado exitosamente el acta de entrega. Por favor,
+                      revise los datos en los pasos anteriores usando el botón
+                      Anterior.
+                      <br />
+                      Una vez que esté seguro, presione <b>Crear acta</b> para
+                      generar el documento final.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
-          </div>{' '}
+          </div>
           {/* Fin div scrollable */}
           {/* Botón submit oculto */}
           <button
             type="submit"
             className="hidden"
             id="ma-pro-submit-button"
+            onClick={form.handleSubmit(onSubmit)}
           ></button>
         </form>{' '}
         {/* Fin <form> */}
       </Form>{' '}
       {/* Fin <Form> */}
       {/* Footer Fijo con Paginación */}
-      <CardFooter className="border-t sticky bottom-0 bg-white z-10 p-4">
+      <CardFooter className="border-t sticky bottom-0 bg-white z-10">
         <div className="flex items-center justify-between w-full">
           {/* Columna Izquierda (Anterior) */}
           <div className="w-1/4 flex justify-start">
@@ -899,7 +1289,7 @@ export function ActaMaximaAutoridadProForm() {
                 prevStep();
               }}
               className={cn(
-                'cursor-pointer',
+                'text-foreground cursor-pointer shadow-md shadow-gray-500/50 active:shadow-inner transition-all bg-button-anterior hover:bg-accent',
                 currentStep === 0 && 'pointer-events-none opacity-50'
               )}
             >
@@ -919,10 +1309,10 @@ export function ActaMaximaAutoridadProForm() {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  form.handleSubmit(nextStep)();
+                  nextStep();
                 }}
                 className={cn(
-                  'cursor-pointer',
+                  'text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white',
                   isLoading && 'pointer-events-none opacity-50'
                 )}
               >

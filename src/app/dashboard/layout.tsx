@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import AppSidebar from '@/components/AppSidebar';
 import { HeaderProvider } from '@/context/HeaderContext';
@@ -13,20 +17,34 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  // Resetea el scroll del contenedor principal en cada cambio de ruta
+  // Esto previene que el header desaparezca y elimina padding indeseado
+  useEffect(() => {
+    const mainContent = document.getElementById('main-content-container');
+    if (mainContent) {
+      mainContent.scrollTop = 0;
+    }
+  }, [pathname]);
+
   return (
     <ProtectedRoute>
       <HeaderProvider>
         <SidebarProvider>
-          <div className="flex h-screen w-screen text-g8">
+          {/* Contenedor principal con scrollbar que abarca toda la pantalla */}
+          <div className="fixed inset-0 flex text-g8 overflow-y-auto overflow-x-hidden">
             <AppSidebar />
             <div className="flex flex-1 flex-col">
-              <Header />
-              <main
-                id="main-content-container"
-                className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 pb-[calc(4rem+env(safe-area-inset-bottom))]"
-              >
-                {children}
-              </main>
+              {/* Header fijo que no afecta el scrollbar */}
+              <div className="sticky top-0 z-10 bg-background">
+                <Header />
+              </div>
+              <div id="main-content-container" className="flex-1">
+                <main className="p-4 md:p-6 lg:p-8 pb-[calc(4rem+env(safe-area-inset-bottom))]">
+                  {children}
+                </main>
+              </div>
             </div>
           </div>
           <LogoutConfirmationDialog />

@@ -1,13 +1,8 @@
-// src/lib/acta-ma-pro-constants.ts
 import { z } from 'zod';
-// Asegúrate de importar el schema correcto si lo defines por separado
-// import { ActaMaximaAutoridadFormData } from './ruta/a/tu/schema';
-// Por ahora, usaremos el schema importado en Form-MA-pro.tsx
-import { actaMaximaAutoridadSchema } from './schemas'; // Asumiendo que está en schemas.ts
+import { actaMaximaAutoridadSchema } from './schemas';
 
 type FormData = z.infer<typeof actaMaximaAutoridadSchema>;
 
-// --- TIPOS COMPARTIDOS (Igual que acta-ma-constants) ---
 type QuestionsStep = {
   type: 'questions';
   title: string;
@@ -31,7 +26,7 @@ export type StepInfo = {
   fields: (keyof FormData)[];
 };
 
-// --- ESTRUCTURA DE LOS PASOS (MODIFICADA) ---
+// --- ESTRUCTURA DE LOS PASOS ---
 // Total 10 pasos
 export const steps: StepInfo[] = [
   {
@@ -78,7 +73,8 @@ export const steps: StepInfo[] = [
   {
     // PASO 3 (Índice 2)
     id: 3,
-    title: 'Anexo I: Situación Presupuestaria', // Título simplificado
+    title:
+      'Anexo I: Estado de las cuentas que reflejen la SITUACIÓN PRESUPUESTARIA, cuando sea aplicable.',
     subtitle:
       '(Artículo 11.1 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     fields: [
@@ -92,7 +88,8 @@ export const steps: StepInfo[] = [
   {
     // PASO 4 (Índice 3)
     id: 4,
-    title: 'Anexo I: Situación Financiera y Patrimonial', // Título simplificado
+    title:
+      'Anexo I: Estado de las cuentas que reflejen la SITUACIÓN FINANCIERA Y PATRIMONIAL, cuando sea aplicable.',
     subtitle:
       '(Artículo 11.1 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     fields: [
@@ -120,7 +117,8 @@ export const steps: StepInfo[] = [
   {
     // PASO 5 (Índice 4)
     id: 5,
-    title: 'Anexo II: Cargos Existentes', // Título simplificado
+    title:
+      'Anexo II.  Mención del número de cargos existentes, con señalamiento de si son empleados u obreros, fijos o contratados, así como el número de jubilados y pensionados, de ser el caso.',
     subtitle:
       '(Artículo 11.2 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     fields: [
@@ -132,7 +130,7 @@ export const steps: StepInfo[] = [
   {
     // PASO 6 (Índice 5)
     id: 6,
-    title: 'Anexo III: Inventario de Bienes', // Título simplificado
+    title: 'Anexo III.  Inventario de bienes muebles e inmuebles.',
     subtitle:
       '(Artículo 11.3 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     fields: ['disponeInventarioBienes'],
@@ -140,7 +138,8 @@ export const steps: StepInfo[] = [
   {
     // PASO 7 (Índice 6)
     id: 7,
-    title: 'Anexo IV: Ejecución Plan Operativo', // Título simplificado
+    title:
+      'Anexo IV. Situación de la ejecución del plan operativo de conformidad con los objetivos propuestos y las metas fijadas en el presupuesto correspondiente.',
     subtitle:
       '(Artículo 11.4 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     fields: [
@@ -152,7 +151,7 @@ export const steps: StepInfo[] = [
   {
     // PASO 8 (Índice 7)
     id: 8,
-    title: 'Anexo V: Índice General del Archivo', // Título simplificado
+    title: 'Anexo V. Índice general del archivo.',
     subtitle:
       '(Artículo 11.5 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     fields: ['disponeClasificacionArchivo', 'incluyeUbicacionFisicaArchivo'],
@@ -160,14 +159,14 @@ export const steps: StepInfo[] = [
   {
     // PASO 9 (Índice 8) - ANEXOS ADICIONALES (DINÁMICO)
     id: 9,
-    title: 'Anexos Adicionales',
+    title: 'Anexo VI. y Anexos Adicionales',
     subtitle:
-      '(Artículo 11.6 y Artículos 12 al 17 y 20 Resolución CGR N.º 01-000162)', // Combinando subtítulos
-    fields: ['Anexo_VI', 'Anexo_VII'], // Campos originales, el VII es el dropdown
+      '(Artículo 11.6 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
+    fields: ['Anexo_VI', 'Anexo_VII'],
   },
   {
     // PASO 10 (Índice 9) - FINALIZACIÓN
-    id: 10, // Re-numerado
+    id: 10,
     title: 'Finalización y Envío',
     subtitle: 'Último paso antes de generar su acta.',
     fields: ['interesProducto'],
@@ -175,7 +174,6 @@ export const steps: StepInfo[] = [
 ];
 
 // --- DATOS PARA EL DROPDOWN DEL PASO 9 ---
-// Copiado de acta-ma-constants
 export const anexosAdicionalesTitulos = [
   {
     shortTitle: 'Unidades Administradoras',
@@ -191,11 +189,11 @@ export const anexosAdicionalesTitulos = [
   },
   { shortTitle: 'Ministerio de Finanzas', longTitle: 'MINISTERIO DE FINANZAS' },
   {
-    shortTitle: 'Gobernaciones / Hacienda Estadal',
+    shortTitle: 'Gobernaciones, Oficinas o Dependencias de Hacienda Estadal',
     longTitle: 'GOBERNACIONES, OFICINAS O DEPENDENCIAS DE HACIENDA ESTADAL',
   },
   {
-    shortTitle: 'Alcaldías / Hacienda Municipal',
+    shortTitle: 'Alcaldías, Dirección de Hacienda Distrital o Municipal',
     longTitle: 'ALCALDÍAS, DIRECCIÓN DE HACIENDA DISTRITAL O MUNICIPAL',
   },
   {
@@ -207,16 +205,15 @@ export const anexosAdicionalesTitulos = [
     longTitle:
       'DEFICIENCIAS, ERRORES U OMISIONES DEL ACTA DE ENTREGA QUE SE ADVIRTIERON, ASÍ COMO CUALESQUIERA OTRAS SITUACIONES ESPECIALES QUE CONVENGA SEÑALAR EN EL MOMENTO DEL ACTO DE ENTREGA Y RECEPCIÓN',
   },
-  { shortTitle: 'NO APLICA', longTitle: 'NO APLICA' }, // Añadir NO APLICA
 ];
 
 // --- CONTENIDO DINÁMICO DEL PASO 9 ---
-// Copiado de acta-ma-constants y adaptado
 export const dynamicStepContent: DynamicContent = {
   'UNIDADES ADMINISTRADORAS': {
     type: 'questions',
-    title: 'Anexo VII: Unidades Administradoras', // Título de la sección dinámica
-    subtitle: '(Artículo 53 Reglamento Nº 1 LOAFSP)', // Base legal
+    title: 'Anexo VII. UNIDADES ADMINISTRADORAS',
+    subtitle:
+      '(Artículo 53 Reglamento Nº 1 de la Ley Orgánica de la Administración Financiera del Sector Público Sobre el Sistema Presupuestario.)',
     questions: [
       {
         name: 'disponeRelacionMontosFondosAsignados',
@@ -259,38 +256,39 @@ export const dynamicStepContent: DynamicContent = {
       {
         name: 'disponeCaucionFuncionario',
         label:
-          '¿Dispone usted del documento Caución del funcionario encargado...?',
+          '¿Dispone usted del documento Caución del funcionario encargado de la Administración de los recursos financieros a la fecha del cese de funciones?',
       },
     ],
   },
   'ÓRGANOS O ENTIDADES QUE MANEJAN RAMOS ESPECÍFICOS': {
     type: 'questions',
-    title: 'Anexo VIII: Órganos con Ramos Específicos',
-    subtitle: '(Artículo 13 Resolución CGR)',
+    title: 'Anexo VIII. ÓRGANOS O ENTIDADES QUE MANEJAN RAMOS ESPECÍFICOS',
+    subtitle: '(Artículo 13 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     questions: [
       {
         name: 'disponeCuadroDemostrativoRecaudado',
         label:
-          '¿Dispone usted del documento cuadro demostrativo del detalle de lo liquidado y recaudado...?',
+          '¿Dispone usted del documento cuadro demostrativo del detalle de lo liquidado y recaudado por los rubros respectivos, y de los derechos pendientes de recaudación de años anteriores?',
       },
     ],
   },
   'ÓRGANOS DE CONTROL FISCAL': {
     type: 'questions',
-    title: 'Anexo IX: Órganos de Control Fiscal',
-    subtitle: '(Artículo 14 Resolución CGR / Arts. 53-54 LOCGRSNCF)',
+    title: 'Anexo IX. ÓRGANOS DE CONTROL FISCAL',
+    subtitle:
+      '(Artículo 14 Resolución CGR N.º 01-000162 de fecha 27-07-2009 y el Título III Artículos 53 y 54 de la Ley Orgánica de la Contraloría General de la República y del Sistema Nacional de Control Fiscal, con indicación del estado en que se encuentran.)',
     questions: [
       {
         name: 'disponeRelacionExpedientesAbiertos',
         label:
-          '¿Dispone usted del documento relación de los expedientes abiertos por potestad de investigación...?',
+          '¿Dispone usted del documento relación de los expedientes abiertos con ocasión del ejercicio de la potestad de investigación, así como de los procedimientos administrativos para la determinación de responsabilidades?',
       },
     ],
   },
   'MINISTERIO DE FINANZAS': {
     type: 'questions',
-    title: 'Anexo X: Ministerio de Finanzas',
-    subtitle: '(Artículo 15 Resolución CGR)',
+    title: 'Anexo X. MINISTERIO DE FINANZAS',
+    subtitle: 'Base: Artículo 14 Resolución CGR N.º 01-000162',
     questions: [
       {
         name: 'disponeSituacionTesoroNacional',
@@ -299,12 +297,12 @@ export const dynamicStepContent: DynamicContent = {
       {
         name: 'disponeInfoEjecucionPresupuestoNacional',
         label:
-          '¿Dispone usted del documento información de la ejecución del presupuesto nacional...?',
+          '¿Dispone usted del documento información de la ejecución del presupuesto nacional de ingresos y egresos del ejercicio presupuestario en curso y de los derechos pendientes de recaudación de años anteriores?',
       },
       {
         name: 'disponeMontoDeudaPublicaNacional',
         label:
-          '¿Dispone usted del documento Monto de la deuda pública nacional...?',
+          '¿Dispone usted del documento Monto de la deuda pública nacional interna y externa?',
       },
       {
         name: 'disponeSituacionCuentasNacion',
@@ -313,10 +311,12 @@ export const dynamicStepContent: DynamicContent = {
       },
     ],
   },
+
   'GOBERNACIONES, OFICINAS O DEPENDENCIAS DE HACIENDA ESTADAL': {
     type: 'questions',
-    title: 'Anexo XI: Gobernaciones / Hacienda Estadal',
-    subtitle: '(Artículo 16 Resolución CGR)',
+    title:
+      'Anexo XI. GOBERNACIONES, OFICINAS O DEPENDENCIAS DE HACIENDA ESTADAL',
+    subtitle: '(Artículo 16 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     questions: [
       {
         name: 'disponeSituacionTesoroEstadal',
@@ -325,7 +325,7 @@ export const dynamicStepContent: DynamicContent = {
       {
         name: 'disponeInfoEjecucionPresupuestoEstadal',
         label:
-          '¿Dispone usted del documento Información de la ejecución del presupuesto estadal...?',
+          '¿Dispone usted del documento Información de la ejecución del presupuesto estadal de ingresos y egresos del ejercicio presupuestario en curso y de los derechos pendientes de recaudación de años anteriores?',
       },
       {
         name: 'disponeSituacionCuentasEstado',
@@ -336,8 +336,8 @@ export const dynamicStepContent: DynamicContent = {
   },
   'ALCALDÍAS, DIRECCIÓN DE HACIENDA DISTRITAL O MUNICIPAL': {
     type: 'questions',
-    title: 'Anexo XII: Alcaldías / Hacienda Municipal',
-    subtitle: '(Artículo 17 Resolución CGR)',
+    title: 'Anexo XII. ALCALDÍAS, DIRECCIÓN DE HACIENDA DISTRITAL O MUNICIPAL',
+    subtitle: '(Artículo 17 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     questions: [
       {
         name: 'disponeSituacionTesoroDistritalMunicipal',
@@ -347,7 +347,7 @@ export const dynamicStepContent: DynamicContent = {
       {
         name: 'disponeInfoEjecucionPresupuestoDistritalMunicipal',
         label:
-          '¿Dispone usted del documento Información de la ejecución del presupuesto distrital o municipal...?',
+          '¿Dispone usted del documento Información de la ejecución del presupuesto distrital o municipal de ingresos y egresos del ejercicio presupuestario en curso y de los derechos pendientes de recaudación de años anteriores?',
       },
       {
         name: 'disponeSituacionCuentasDistritalesMunicipales',
@@ -357,28 +357,30 @@ export const dynamicStepContent: DynamicContent = {
       {
         name: 'disponeInventarioTerrenosEjidos',
         label:
-          '¿Dispone usted del documento Inventario detallado de los terrenos ejidos y propios...?',
+          '¿Dispone usted del documento Inventario detallado de los terrenos ejidos y de los terrenos propios distritales o municipales?',
       },
       {
         name: 'disponeRelacionIngresosVentaTerrenos',
         label:
-          '¿Dispone usted del documento Relación de Ingresos producto de las ventas de terrenos...?',
+          '¿Dispone usted del documento Relación de Ingresos producto de las ventas de terrenos ejidos o terrenos propios distritales o municipales?',
       },
     ],
   },
   'RELACIÓN DE INFORMES DE AUDITORÍAS': {
     type: 'textarea',
-    title: 'Anexo XIII: Relación de Informes de Auditorías',
+    title: 'Anexo XIII. RELACIÓN DE INFORMES DE AUDITORÍAS',
     subtitle:
-      'Acciones emprendidas por el servidor saliente sobre observaciones de Auditoría Interna.',
+      'DE LAS ACCIONES EMPRENDIDAS POR EL SERVIDOR SALIENTE COMO CONSECUENCIA DE LAS OBSERVACIONES FORMULADAS POR LA UNIDAD DE AUTIRORÍA INTERNA DE LA UNIDAD ORGANIZATIVA QUE ENTREGA, PRODUCTO DE LAS ÚLTIMAS ACTUACIONES DE ESTAS.',
     fieldName: 'accionesAuditoria',
   },
+
   'DEFICIENCIAS, ERRORES U OMISIONES DEL ACTA DE ENTREGA QUE SE ADVIRTIERON, ASÍ COMO CUALESQUIERA OTRAS SITUACIONES ESPECIALES QUE CONVENGA SEÑALAR EN EL MOMENTO DEL ACTO DE ENTREGA Y RECEPCIÓN':
     {
       type: 'textarea',
-      title: 'Anexo XIV: Deficiencias, Errores u Omisiones del Acta',
-      subtitle: '(Artículo 20 Resolución CGR)',
+      title:
+        'Anexo XIV. INDICAR LAS DEFICIENCIAS, ERRORES U OMISIONES  DEL ACTA DE ENTREGA QUE SE ADVIRTIERON, ASÍ COMO CUALESQUIERA OTRAS SITUACIONES ESPECIALES QUE CONVENGA SEÑALAR EN EL MOMENTO DEL ACTO DE ENTREGA Y RECEPCIÓN DE LA ÓRGANO, ENTIDAD, DIRECCIÓN, COORDINACIÓN EN RESGUARDO DE LA DEBIDA DELIMITACIÓN DE RESPONSABILIDADES.',
+      subtitle:
+        '(Artículo 20 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
       fieldName: 'deficienciasActa',
     },
-  // 'NO APLICA' no tiene contenido dinámico asociado
 };

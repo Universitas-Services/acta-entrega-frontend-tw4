@@ -288,7 +288,7 @@ export function ActaMaximaAutoridadProForm() {
       const firstErrorField = fieldsToValidate.find((field) => errors[field]);
 
       if (firstErrorField) {
-        const mainContent = document.getElementById('main-content-container');
+        const mainContent = contentScrollRef.current;
         const element = document.getElementById(firstErrorField);
         // Buscamos por FormItem, que es el contenedor visual completo del campo
         const formItem = element?.closest<HTMLElement>(

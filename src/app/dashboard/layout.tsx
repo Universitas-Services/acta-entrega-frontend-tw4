@@ -33,14 +33,17 @@ export default function DashboardLayout({
       <HeaderProvider>
         <SidebarProvider>
           {/* Contenedor principal con scrollbar que abarca toda la pantalla */}
-          <div className="fixed inset-0 flex text-g8 overflow-y-auto overflow-x-hidden">
+          <div
+            id="main-content-container"
+            className="fixed inset-0 flex text-g8 overflow-y-auto overflow-x-hidden"
+          >
             <AppSidebar />
             <div className="flex flex-1 flex-col">
               {/* Header fijo que no afecta el scrollbar */}
               <div className="sticky top-0 z-10 bg-background">
                 <Header />
               </div>
-              <div id="main-content-container" className="flex-1">
+              <div className="flex-1">
                 <main className="p-4 md:p-6 lg:p-8 pb-[calc(4rem+env(safe-area-inset-bottom))]">
                   {children}
                 </main>

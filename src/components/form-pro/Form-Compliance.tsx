@@ -275,34 +275,32 @@ export function ComplianceForm() {
       const firstErrorField = fieldsArray.find((field) => errors[field]);
 
       if (firstErrorField) {
-        // Scroll to error logic (sin cambios)
+        // --- Lógica de scroll estandarizada ---
+        const mainContent = contentScrollRef.current;
         const element = document.getElementById(firstErrorField);
+        // Selector robusto que busca el contenedor del campo del formulario
         const formItem = element?.closest<HTMLElement>(
-          '.space-y-3, .space-y-6 > .space-y-2'
-        ); // Ajustar selector si es necesario
+          '.flex.flex-col, .space-y-4.p-4.border.rounded-md, [data-slot="form-item"], FormItem'
+        );
+        const finalTarget = formItem || element;
 
-        if (contentScrollRef.current && formItem) {
-          const containerRect =
-            contentScrollRef.current.getBoundingClientRect();
-          const itemRect = formItem.getBoundingClientRect();
+        if (mainContent && finalTarget) {
+          const containerRect = mainContent.getBoundingClientRect();
+          const itemRect = finalTarget.getBoundingClientRect();
           const itemTopInContainer =
-            itemRect.top -
-            containerRect.top +
-            contentScrollRef.current.scrollTop;
-          contentScrollRef.current.scrollTo({
-            top:
-              itemTopInContainer -
-              contentScrollRef.current.clientHeight / 2 +
-              formItem.clientHeight / 2 -
-              50,
+            itemRect.top - containerRect.top + mainContent.scrollTop;
+          const desiredScrollTop =
+            itemTopInContainer -
+            mainContent.clientHeight / 2 +
+            finalTarget.clientHeight / 2;
+          mainContent.scrollTo({
+            top: desiredScrollTop,
             behavior: 'smooth',
           });
+          toast.warning(
+            'Por favor, completa todos los campos requeridos en este paso.'
+          );
         }
-        toast.warning(
-          'Por favor, completa todos los campos requeridos en este paso.'
-        );
-      } else {
-        toast.warning('Hay errores en el formulario, por favor revisa.');
       }
       return;
     }

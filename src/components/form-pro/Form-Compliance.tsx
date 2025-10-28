@@ -17,26 +17,25 @@ import {
   CardHeader,
   CardTitle,
   CardDescription as ShadcnCardDescription,
-  CardFooter, // Import CardFooter
+  CardFooter,
 } from '@/components/ui/card';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHeader } from '@/context/HeaderContext';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
-import { complianceSchema, ComplianceFormData } from '@/lib/compliance-schema'; // Schema nuevo
+import { complianceSchema, ComplianceFormData } from '@/lib/compliance-schema';
 import { LuTriangleAlert } from 'react-icons/lu';
 import {
   steps,
-  anexosAdicionalesTitulosCompliance, // Importar títulos para el dropdown
-  dynamicStepContentCompliance, // Importar contenido dinámico
-  ComplianceDynamicContent, // Importar tipo
+  anexosAdicionalesTitulosCompliance,
+  dynamicStepContentCompliance,
+  ComplianceDynamicContent,
   ComplianceStepInfo,
 } from '@/lib/compliance-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { FiSave } from 'react-icons/fi'; // Ícono para Guardar
 import {
   Pagination,
   PaginationContent,
@@ -45,8 +44,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@/components/ui/pagination'; // <-- Importa los componentes de paginación
-import { cn } from '@/lib/utils'; // <-- Importa la función cn
+} from '@/components/ui/pagination';
+import { cn } from '@/lib/utils';
 import { SiNoQuestion } from '../SiNoQuestion';
 import { FormFieldWithExtras } from '../FormFieldWithExtras';
 import { ShadcnDatePicker } from '../DatePicker';
@@ -71,8 +70,7 @@ export function ComplianceForm() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
-  // Estado para rastrear si se guardó
-  const [isSavedOnce, setIsSavedOnce] = useState(false);
+  const [highestStepVisited, setHighestStepVisited] = useState(currentStep);
 
   const { setIsDirty } = useFormDirtyStore();
 
@@ -307,104 +305,44 @@ export function ComplianceForm() {
 
     // Navegar si es válido
     if (currentStep < steps.length - 1) {
-      if (currentStep === 11 && form.getValues('Anexo_VI') === 'NO APLICA') {
-        setCurrentStep(12); // Saltar directamente al último paso (índice 12)
-      } else {
-        setCurrentStep((prev) => prev + 1);
+      let nextStepIndex = currentStep + 1; // Calcular el siguiente índice
+      // Lógica de salto para Paso 11
+      if (currentStep === 11 && getValues('Anexo_VI') === 'NO APLICA') {
+        nextStepIndex = 12; // Saltar al último paso (índice 12)
       }
+      setCurrentStep(nextStepIndex);
+      // Actualizar highestStepVisited si es necesario
+      setHighestStepVisited(Math.max(highestStepVisited, nextStepIndex));
       scrollToTop();
     }
   };
 
   const prevStep = () => {
-    // AÑADIR LÓGICA DE SALTO al retroceder
-    if (currentStep === 12 && form.getValues('Anexo_VI') === 'NO APLICA') {
-      setCurrentStep(10); // Volver al paso ANTERIOR al dropdown (índice 10)
-    } else if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
+    let prevStepIndex = currentStep - 1; // Calcular índice anterior
+    // Lógica de salto al retroceder
+    if (currentStep === 12 && getValues('Anexo_VI') === 'NO APLICA') {
+      prevStepIndex = 10; // Volver al paso ANTERIOR al dropdown (índice 10)
+    }
+    if (prevStepIndex >= 0) {
+      setCurrentStep(prevStepIndex);
       scrollToTop();
     }
   };
 
   // Función para ir a un paso específico (paginación)
-  const goToStep = async (stepIndex: number) => {
+  const goToStep = (stepIndex: number) => {
     if (stepIndex < 0 || stepIndex >= steps.length || stepIndex === currentStep)
       return;
 
-    if (isSavedOnce) {
-      // Si ya se guardó, permitir salto directo
+    // Solo permitir ir a pasos ya visitados o anteriores
+    if (stepIndex <= highestStepVisited) {
       setCurrentStep(stepIndex);
       scrollToTop();
     } else {
-      // Si NO se ha guardado
-      if (stepIndex < currentStep) {
-        // Permitir ir hacia atrás
-        setCurrentStep(stepIndex);
-        scrollToTop();
-      } else {
-        // Validar todos los pasos intermedios antes de saltar hacia adelante
-        let canAdvance = true;
-        for (let i = currentStep; i < stepIndex; i++) {
-          const intermediateFields = Array.isArray(steps[i]?.fields)
-            ? steps[i].fields
-            : [];
-          // Añadir validación dinámica para el paso 11 intermedio si aplica
-          let fieldsToValidateIntermediate = [...intermediateFields];
-          if (i === 11) {
-            const selectedKey = getValues('Anexo_VI');
-            if (selectedKey && selectedKey !== 'NO APLICA') {
-              const dynamicContent =
-                dynamicStepContentCompliance[
-                  selectedKey as keyof ComplianceDynamicContent
-                ];
-              if (dynamicContent?.type === 'questions') {
-                fieldsToValidateIntermediate = [
-                  ...intermediateFields,
-                  ...dynamicContent.questions.map((q) => q.name),
-                ];
-              }
-            }
-          }
-
-          const isValidIntermediate = await trigger(
-            fieldsToValidateIntermediate,
-            { shouldFocus: false }
-          );
-          if (!isValidIntermediate) {
-            canAdvance = false;
-            setCurrentStep(i); // Ir al paso que falló la validación
-            scrollToTop(); // Podría mejorarse con scroll al error específico
-            toast.warning(`Completa el Paso ${i + 1} antes de continuar.`);
-            break; // Detener validación
-          }
-        }
-        // Si todos los pasos intermedios son válidos, avanzar
-        if (canAdvance) {
-          setCurrentStep(stepIndex);
-          scrollToTop();
-        }
-      }
-    }
-  };
-
-  // Función de Guardar
-  const handleSaveProgress = async () => {
-    // Convertir a async si llamas a API
-    console.log('Guardando progreso...', getValues());
-    setIsLoading(true); // Indicar carga
-    // Aquí iría la lógica REAL para guardar en backend
-    // Simulamos un guardado exitoso
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular llamada a API
-      toast.success('Progreso guardado exitosamente.');
-      setIsSavedOnce(true); // <-- Marcar como guardado
-      // Opcional: podrías querer resetear el estado 'isDirty' después de guardar
-      // form.reset({}, { keepValues: true }); // Resetea 'isDirty' manteniendo valores
-      // setIsDirty(false); // O forzarlo manualmente
-    } catch (error) {
-      toast.error('Error al guardar el progreso.');
-    } finally {
-      setIsLoading(false);
+      // Si intenta saltar a un paso futuro no visitado
+      toast.info(
+        "Por favor, completa los pasos en orden usando el botón 'Siguiente'."
+      );
     }
   };
 
@@ -412,7 +350,7 @@ export function ComplianceForm() {
   const totalSteps = steps.length;
   const currentPage = currentStep + 1; // Página actual (1-based index)
 
-  // Función para generar los items de paginación (simplificada por ahora)
+  // Función para generar los items de paginación
   // Muestra: 1 ... (actual-1) (actual) (actual+1) ... Total
   const renderPaginationItems = () => {
     const items = [];
@@ -454,16 +392,16 @@ export function ComplianceForm() {
           lastPushed = -1;
         }
       } else {
-        // Lógica para deshabilitar visualmente
-        const isDisabled = !isSavedOnce && pageNum > currentPage;
+        // Lógica para deshabilitar si el índice del paso es mayor al visitado
+        const isDisabled = pageNum - 1 > highestStepVisited; // <-- Nueva lógica de deshabilitación
         items.push(
           <PaginationItem key={pageNum}>
             <PaginationLink
               href="#"
               onClick={(e) => {
                 e.preventDefault();
+                // Solo navegar si no está deshabilitado
                 if (!isDisabled) {
-                  // Solo navegar si no está deshabilitado
                   goToStep(pageNum - 1);
                 }
               }}
@@ -473,10 +411,9 @@ export function ComplianceForm() {
                 'cursor-pointer',
                 currentPage === pageNum && 'font-bold',
                 isDisabled &&
-                  'pointer-events-none opacity-50 text-muted-foreground' // Clases para deshabilitar
+                  'pointer-events-none opacity-50 text-muted-foreground' // Clases deshabilitado
               )}
-              // Aria-disabled para accesibilidad
-              aria-disabled={isDisabled}
+              aria-disabled={isDisabled} // Accesibilidad
             >
               {pageNum}
             </PaginationLink>
@@ -509,20 +446,6 @@ export function ComplianceForm() {
               {currentStepData?.subtitle}
             </ShadcnCardDescription>
           </div>
-
-          {/* Solo muestra el botón Guardar a partir del Paso 3 (índice 2) */}
-          {currentStep >= 1 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSaveProgress}
-              disabled={isLoading}
-              className="cursor-pointer"
-            >
-              <FiSave className="mr-2 h-4 w-4" />
-              Guardar
-            </Button>
-          )}
         </div>
         {/* Subtítulos fijos para Pasos 5 y 6 (Índices 4 y 5) */}
         {currentStep === 4 && ( // PASO 5
@@ -718,7 +641,6 @@ export function ComplianceForm() {
                 <SiNoQuestion
                   name="anexa_informacion_adicional"
                   label="12. ¿Se anexa otra información o documentación que se considere necesaria?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
               </div>
             )}
@@ -729,17 +651,14 @@ export function ComplianceForm() {
                 <SiNoQuestion
                   name="anexos_con_fecha_corte_al_cese"
                   label="13. ¿Los documentos anexos del acta de entrega presentan la información con fecha de corte al momento del cese en el ejercicio del empleo, cargo o función pública del servidor público que entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="acta_deja_constancia_inexistencia_info"
                   label="14. ¿En el acta de entrega  se deja constancia de la  inexistencia de  información o documentos requeridos en los artículos 10 al 17 de la norma que regula la materia, según corresponda?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="acta_especifica_errores_omisiones"
                   label="15. ¿El acta de entrega específica errores, deficiencias u omisiones en el levantamiento de la misma?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="acta_elaborada_original_y_3_copias"
@@ -780,32 +699,26 @@ export function ComplianceForm() {
                 <SiNoQuestion
                   name="anexo_estado_cuentas_general"
                   label="22. ¿El Acta de entrega tiene como anexo: Estado de las cuentas que reflejen la situación presupuestaria, financiera y patrimonial, cuando sea aplicable?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_situacion_presupuestaria_detallada"
                   label="23. ¿El Estado de Situación Presupuestaria  muestra todos los momentos presupuestarios y sus detalles. Incluye: Presupuesto Original, Modificaciones, Presupuesto Modificado, Compromisos, Causado, Pagado, Por Pagar y Presupuesto Disponible a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_gastos_comprometidos_no_causados"
                   label="24. ¿El Acta de entrega tiene como anexo: Relación de Gastos Comprometidos, no causados a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_gastos_causados_no_pagados"
                   label="25. ¿El Acta de entrega tiene como anexo: Relación de Gastos Comprometidos, causados y no pagados a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_estado_presupuestario_por_partidas"
                   label="26. ¿El Acta de entrega tiene como anexo: El Estado Presupuestario del Ejercicio vigente por partidas?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_estado_presupuestario_por_cuentas"
                   label="27. ¿El Acta de entrega tiene como anexo: El Estado Presupuestario del Ejercicio con los detalles de sus cuentas?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
               </div>
             )}
@@ -816,62 +729,50 @@ export function ComplianceForm() {
                 <SiNoQuestion
                   name="anexo_estados_financieros"
                   label="28. ¿El Acta de entrega tiene como anexo: Estados Financieros a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_balance_comprobacion_y_notas"
                   label="29. ¿El Acta de entrega tiene como anexo: El Balance de Comprobación a la fecha de elaboración de los Estados Financieros y sus notas explicativas a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_estado_situacion_financiera_y_notas"
                   label="30. ¿El Acta de entrega tiene como anexo: Estado de Situación Financiera / Balance General y sus notas explicativas a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_estado_rendimiento_financiero_y_notas"
                   label="31. ¿El Acta de entrega tiene como anexo: Estado de Rendimiento Financiero / Estado de Ganancia y Pérdidas y sus notas explicativas a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_estado_movimiento_patrimonio_y_notas"
                   label="32. ¿El Acta de entrega tiene como anexo: Estado de Movimientos de las Cuentas de Patrimonio y sus notas explicativas a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_relacion_cuentas_por_cobrar"
                   label="33. ¿El Acta de entrega tiene como anexo: Una Relación de Cuentas por Cobrar a la fecha del Acta de Entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_relacion_cuentas_por_pagar"
                   label="34. ¿El Acta de entrega tiene como anexo: Una Relación de Cuentas por Pagar a la fecha del Acta de Entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_relacion_fondos_terceros"
                   label="35. ¿El Acta de entrega tiene como anexo: Una Relación de las Cuentas de los Fondos de Terceros?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_situacion_fondos_anticipo"
                   label="36. ¿El Acta de entrega tiene como anexo: La Situación de los Fondos en Anticipo?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_situacion_caja_chica"
                   label="37. ¿El Acta de entrega tiene como anexo: La Situación de la Caja Chica?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_acta_arqueo_caja_chica"
                   label="38. ¿El Acta de entrega tiene como anexo: Acta de arqueo de las Cajas Chicas a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_listado_registro_proveedores"
                   label="39. ¿El Acta de entrega tiene como anexo: Listado del Registro Auxiliar de Proveedores?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
               </div>
             )}
@@ -882,57 +783,46 @@ export function ComplianceForm() {
                 <SiNoQuestion
                   name="anexo_reporte_libros_contables"
                   label="40. ¿El Acta de entrega tiene como anexo: Reportes de Libros Contables (Diario y mayores analíticos) a la fecha del cese de funciones?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_cuentas_bancarias"
                   label="41. ¿El Acta de entrega tiene como anexo: Reportes de las Cuentas Bancarias  (Movimientos a la fecha del cese de funciones)?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_conciliaciones_bancarias"
                   label="42. ¿El Acta de entrega tiene como anexo: Reportes de las Conciliaciones Bancarias a la fecha del cese de funciones?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_retenciones_pendientes"
                   label="43. ¿El Acta de entrega tiene como anexo: Reportes de Retenciones de pagos pendientes por enterar correspondientes a ISLR, IVA  y Retenciones por Contratos (obras, bienes y servicios)  a la fecha del cese de funciones?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_contrataciones_publicas"
                   label="44. ¿El Acta de entrega tiene como anexo: Reporte de los Procesos de Contrataciones Públicas  a la fecha del cese de funciones?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_fideicomiso_prestaciones"
                   label="45. ¿El Acta de entrega tiene como anexo: Reporte del Fideicomiso de Prestaciones Sociales a la fecha del cese de funciones?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_bonos_vacacionales"
                   label="46. ¿El Acta de entrega tiene como anexo: Reporte de Bonos Vacacionales  a la fecha del cese de funciones?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_mencion_numero_cargos_rrhh"
                   label="47. ¿El Acta de entrega tiene como anexo: Mención del número de cargos existentes, con señalamiento de sí son empleados u obreros, fijos o contratados, así como el número de jubilados y pensionados, de ser el caso a la fecha del cese de funciones?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="incluye_cuadro_resumen_cargos"
                   label="48. ¿Se Incluye un cuadro resumen indicando el número de cargos existentes, clasificados en empleados, obreros, fijos o contratados?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="cuadro_resumen_cargos_validado_rrhh"
                   label="49. ¿El cuadro resumen está validado por la Oficina de Recursos Humanos?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="anexo_reporte_nominas"
                   label="50. ¿El Acta de entrega tiene como anexo: Reporte de Nóminas a la fecha del cese de funciones?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
               </div>
             )}
@@ -943,37 +833,30 @@ export function ComplianceForm() {
                 <SiNoQuestion
                   name="anexo_inventario_bienes"
                   label="51. ¿El Acta de entrega tiene como anexo: Inventario de los Bienes Muebles o Inmuebles?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_bienes_fecha_entrega"
                   label="52. ¿El inventario de Bienes e Inmuebles está elaborado a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_bienes_comprobado_fisicamente"
                   label="53. ¿El inventario de Bienes se comprobó físicamente?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="verificada_existencia_bienes_inventario"
                   label="54. ¿Se verificó la existencia de los bienes descritos en el inventario?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="verificada_condicion_bienes_inventario"
                   label="55. ¿Se verificó la condición de los bienes descritos en el inventario?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_responsable_patrimonial"
                   label="56. ¿Indica quién es el responsable patrimonial?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_responsable_uso"
                   label="57. ¿Indica quién es el responsable patrimonial por uso?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
               </div>
             )}
@@ -984,57 +867,46 @@ export function ComplianceForm() {
                 <SiNoQuestion
                   name="inventario_indica_fecha_verificacion"
                   label="58. ¿Indica la fecha de la verificación del inventario?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_numero_acta_verificacion"
                   label="59. ¿Indica el número del acta de verificación?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_numero_registro_bien"
                   label="60. ¿Indica el número de registro del bien?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_codigo_bien"
                   label="61. ¿Indica el código del bien?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_descripcion_bien"
                   label="62. ¿Indica la descripción del bien?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_marca_bien"
                   label="63. ¿Se indica la marca del bien?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_modelo_bien"
                   label="64. ¿Se indica el modelo del bien?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_serial_bien"
                   label="65. ¿Se indica el número de serial del bien?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_estado_conservacion_bien"
                   label="66. ¿Se indica el estado de conservación del bien para cada caso?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_ubicacion_bien"
                   label="67. ¿Se indica la ubicación del bien (Administrativa y/o geográficamente)?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="inventario_indica_valor_mercado_bien"
                   label="68. ¿Se indica el valor de mercado actualizado del bien?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
               </div>
             )}
@@ -1045,22 +917,18 @@ export function ComplianceForm() {
                 <SiNoQuestion
                   name="anexo_ejecucion_poa"
                   label="69. ¿El Acta de entrega tiene como anexo: La ejecución del Plan Operativo Anual de conformidad con los objetivos propuestos y las metas fijadas en el presupuesto?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="incluye_ejecucion_poa_fecha_entrega"
                   label="70. ¿Se incluye la ejecución del Plan Operativo a la fecha de entrega?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="incluye_causas_incumplimiento_metas_poa"
                   label="71. ¿Se incluyen detalles de las causas que originaron el incumplimiento de algunas metas?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="incluye_plan_operativo_anual"
                   label="72. ¿Se incluye el Plan Operativo Anual?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
               </div>
             )}
@@ -1071,17 +939,14 @@ export function ComplianceForm() {
                 <SiNoQuestion
                   name="anexo_indice_general_archivo"
                   label="73. ¿El Acta de entrega tiene como anexo: El Índice general del archivo?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="archivo_indica_clasificacion"
                   label="74. ¿Se indicó la clasificación del archivo?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
                 <SiNoQuestion
                   name="archivo_indica_ubicacion_fisica"
                   label="75. ¿Se indica ubicación física?"
-                  options={['SI', 'NO', 'NO APLICA']}
                 />
               </div>
             )}

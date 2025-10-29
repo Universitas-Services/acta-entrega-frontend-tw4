@@ -44,7 +44,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FormFieldWithExtras } from '../FormFieldWithExtras';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { FiSave } from 'react-icons/fi';
+import { BsSave } from 'react-icons/bs';
 import {
   Select,
   SelectContent,
@@ -715,13 +715,12 @@ export function ActaMaximaAutoridadProForm() {
             {/* Botón Guardar (desde paso 3 / índice 2) */}
             {currentStep >= 2 && (
               <Button
-                variant="outline"
                 size="sm"
                 onClick={handleSaveProgress}
                 disabled={isLoading}
-                className="cursor-pointer"
+                className="cursor-pointer shadow-xs border bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold"
               >
-                <FiSave className="mr-2 h-4 w-4" />
+                <BsSave className="mr-2 h-4 w-4" />
                 {isLoading ? 'Guardando...' : 'Guardar'}
               </Button>
             )}

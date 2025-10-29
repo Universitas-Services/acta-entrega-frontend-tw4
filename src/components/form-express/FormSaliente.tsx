@@ -632,7 +632,7 @@ export function ActaSalienteForm() {
                   <FormFieldWithExtras
                     name="designacionServidorSaliente"
                     label="Datos de designación"
-                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-000"
+                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-0000"
                     maxLength={150}
                   />
                 </div>
@@ -674,7 +674,7 @@ export function ActaSalienteForm() {
                   <FormFieldWithExtras
                     name="designacionServidorRecibe"
                     label="Datos de designación"
-                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-000"
+                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-0000"
                     maxLength={150}
                   />
                 </div>

@@ -43,6 +43,12 @@ export const mainNav: NavItem[] = [
     href: '/dashboard/asistenteia',
     icon: LiaRobotSolid,
   },
+  // Links específicos para usuarios Pro
+  {
+    title: 'Inicio',
+    href: '/dashboard/pro',
+    icon: CgHome,
+  },
   {
     title: 'Compliance',
     href: '/dashboard/actas-pro/compliance',
@@ -52,5 +58,10 @@ export const mainNav: NavItem[] = [
     title: 'MA - Pro',
     href: '/dashboard/actas-pro/ma-pro',
     icon: FaWpforms,
+  },
+  {
+    title: 'Consultor IA',
+    href: '/dashboard/consultoria',
+    icon: LiaRobotSolid,
   },
 ];

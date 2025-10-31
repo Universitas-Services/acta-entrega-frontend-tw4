@@ -113,34 +113,43 @@ export function SidebarPro() {
   }) => {
     const Icon = item.icon;
     return (
-      <GuardedButton
-        href={item.href}
-        onClick={handleNavigation}
-        variant="ghost"
-        className={cn(
-          'flex items-center gap-3 transition-colors cursor-pointer',
-          'overflow-hidden transition-all duration-300',
-          'text-primary-foreground',
-          'hover:bg-sidebar-hover-bg',
-          isDesktopCollapsed
-            ? 'justify-center rounded-none'
-            : 'w-full justify-start py-2 px-3 rounded-none',
-          pathname === item.href &&
-            'bg-sidebar-primary text-sidebar-foreground font-bold',
-          className // Permite pasar clases extra
+      <Tooltip key={item.id} delayDuration={0}>
+        <TooltipTrigger asChild>
+          <GuardedButton
+            href={item.href}
+            onClick={handleNavigation}
+            variant="ghost"
+            className={cn(
+              'flex items-center gap-3 transition-colors cursor-pointer',
+              'overflow-hidden transition-all duration-300',
+              'text-primary-foreground',
+              'hover:bg-sidebar-hover-bg',
+              isDesktopCollapsed
+                ? 'justify-center rounded-none'
+                : 'w-full justify-start py-2 px-3 rounded-none',
+              pathname === item.href &&
+                'bg-sidebar-primary text-sidebar-foreground font-bold',
+              className // Permite pasar clases extra
+            )}
+          >
+            <Icon className="h-5 w-5 shrink-0" />
+            <span
+              className={cn(
+                'grow text-left',
+                'whitespace-nowrap truncate', // --- Previene salto de línea
+                isDesktopCollapsed && 'hidden'
+              )}
+            >
+              {item.title}
+            </span>
+          </GuardedButton>
+        </TooltipTrigger>
+        {isDesktopCollapsed && (
+          <TooltipContent side="right">
+            <p>{item.title}</p>
+          </TooltipContent>
         )}
-      >
-        <Icon className="h-5 w-5 shrink-0" />
-        <span
-          className={cn(
-            'grow text-left',
-            'whitespace-nowrap truncate', // --- Previene salto de línea
-            isDesktopCollapsed && 'hidden'
-          )}
-        >
-          {item.title}
-        </span>
-      </GuardedButton>
+      </Tooltip>
     );
   };
 
@@ -203,53 +212,45 @@ export function SidebarPro() {
                 // --- Si tiene sub-items, decidimos entre Dropdown o Collapsible ---
                 isDesktopCollapsed ? (
                   // --- FIX #1: Modo Colapsado -> <DropdownMenu /> ---
-                  <Tooltip delayDuration={0} key={item.id}>
-                    <TooltipTrigger asChild>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          {/* Botón solo con icono */}
-                          <GuardedButton
-                            href="#" // No navega
-                            variant="ghost"
-                            className={cn(
-                              'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden justify-center rounded-none',
-                              'text-primary-foreground',
-                              'hover:bg-sidebar-hover-bg',
-                              openCollapsible === item.id &&
-                                'bg-primary-foreground/20 font-bold'
-                            )}
+                  <DropdownMenu key={item.id}>
+                    <DropdownMenuTrigger asChild>
+                      {/* Botón solo con icono */}
+                      <GuardedButton
+                        href="#" // No navega
+                        variant="ghost"
+                        className={cn(
+                          'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden justify-center rounded-none',
+                          'text-primary-foreground',
+                          'hover:bg-sidebar-hover-bg',
+                          openCollapsible === item.id && 'font-bold'
+                        )}
+                      >
+                        <item.icon className="h-5 w-5 shrink-0" />
+                      </GuardedButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuContent
+                        side="right"
+                        align="start"
+                        sideOffset={5}
+                        className="w-40 bg-primary text-primary-foreground border-primary-foreground/20"
+                      >
+                        <DropdownMenuLabel className="font-semibold">
+                          {item.title}
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-primary-foreground/20" />
+                        {item.subItems.map((subItem) => (
+                          <DropdownMenuItem
+                            asChild
+                            key={subItem.id}
+                            className="p-0"
                           >
-                            <item.icon className="h-5 w-5 shrink-0" />
-                          </GuardedButton>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuPortal>
-                          <DropdownMenuContent
-                            side="right"
-                            align="start"
-                            sideOffset={5}
-                            className="w-40 bg-primary text-primary-foreground border-primary-foreground/20"
-                          >
-                            <DropdownMenuLabel className="font-semibold">
-                              {item.title}
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator className="bg-primary-foreground/20" />
-                            {item.subItems.map((subItem) => (
-                              <DropdownMenuItem
-                                asChild
-                                key={subItem.id}
-                                className="p-0"
-                              >
-                                <SubNavButton item={subItem} />
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        </DropdownMenuPortal>
-                      </DropdownMenu>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p>{item.title}</p>
-                    </TooltipContent>
-                  </Tooltip>
+                            <SubNavButton item={subItem} />
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenu>
                 ) : (
                   // ---  Modo Expandido ---
                   <Collapsible
@@ -305,16 +306,7 @@ export function SidebarPro() {
                 )
               ) : (
                 // --- Si NO tiene sub-items, renderiza un botón normal ---
-                <Tooltip key={item.id} delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <NavButton item={item} />
-                  </TooltipTrigger>
-                  {isDesktopCollapsed && (
-                    <TooltipContent side="right">
-                      <p>{item.title}</p>
-                    </TooltipContent>
-                  )}
-                </Tooltip>
+                <NavButton item={item} key={item.id} />
               )
             )}
           </SidebarGroup>

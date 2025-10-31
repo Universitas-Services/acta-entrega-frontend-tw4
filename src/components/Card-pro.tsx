@@ -23,7 +23,7 @@ export function CardPro({
       <div
         className={cn(
           // --- Contenedor Principal y Posicionamiento ---
-          'relative w-full h-full p-6 border rounded-2xl shadow-sm',
+          'relative w-full h-full p-6 border rounded-3xl shadow-sm',
           'bg-card text-card-foreground',
 
           // --- LAYOUT RESPONSIVE Y ALINEACIÓN ---

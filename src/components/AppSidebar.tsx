@@ -1,12 +1,11 @@
-// src/components/AppSidebar.tsx
 'use client';
 
 import { useAuthStore } from '@/stores/useAuthStore';
 import { SidebarExpress } from '@/components/sidebar/SidebarExpress';
 import { SidebarPro } from '@/components/sidebar/SidebarPro';
-import { Skeleton } from '@/components/ui/skeleton'; // Para estado de carga
-import { useSidebarStore } from '@/stores/useSidebarStore'; // Para el esqueleto
-import { cn } from '@/lib/utils'; // Para el esqueleto
+import { Skeleton } from '@/components/ui/skeleton';
+import { useSidebarStore } from '@/stores/useSidebarStore';
+import { cn } from '@/lib/utils';
 
 export default function AppSidebar() {
   // Obtenemos el usuario del store de autenticación

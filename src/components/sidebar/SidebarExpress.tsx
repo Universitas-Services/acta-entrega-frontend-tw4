@@ -1,8 +1,5 @@
-// src/components/sidebar/SidebarExpress.tsx
 'use client';
 
-// Copiamos todo el contenido del AppSidebar.tsx original
-// (Asegúrate de que todas estas importaciones sean correctas)
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -54,7 +51,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-// Renombramos la función y la exportamos (quitamos 'default')
 export function SidebarExpress() {
   const {
     isDesktopCollapsed,
@@ -121,6 +117,7 @@ export function SidebarExpress() {
             {mainNav
               .filter(
                 (item) =>
+                  !item.href.includes('/pro') && // Oculta links a 'pro'
                   !item.href.includes('/actas-pro') && // Oculta links a actas-pro
                   !item.href.includes('/consultoria') // Oculta 'Asistente IA'
               )
@@ -335,7 +332,6 @@ export function SidebarExpress() {
       <Sheet open={isMobileMenuOpen} onOpenChange={toggleMobileMenu}>
         <SheetContent
           side="left"
-          // Mantenemos fondo blanco para Express
           className="w-72 p-0 border-r-0 flex flex-col bg-sidebar text-sidebar-foreground"
         >
           <SheetHeader className="sr-only">
@@ -355,7 +351,7 @@ export function SidebarExpress() {
       collapsible="icon"
       className={cn(
         'hidden md:flex border-r text-sidebar-foreground',
-        'bg-sidebar', // Fondo blanco para Express
+        'bg-sidebar',
         isDesktopCollapsed ? 'w-20' : 'w-64',
         'transition-all duration-300'
       )}

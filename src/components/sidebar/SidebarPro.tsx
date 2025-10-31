@@ -1,7 +1,5 @@
-// src/components/sidebar/SidebarPro.tsx
 'use client';
 
-// (Importaciones idénticas a SidebarExpress)
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -10,16 +8,15 @@ import { logoutUser } from '@/services/authService';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { usePathname, useRouter } from 'next/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { mainNav } from '@/config/sidebar-nav'; // Importamos el nav completo
+import { NavItem, NavSubItem, proNav } from '@/config/sidebar-nav';
 import { cn, getInitials } from '@/lib/utils';
-import { FiInfo, FiUser } from 'react-icons/fi';
+import { FiInfo } from 'react-icons/fi';
 import {
   FaChevronDown,
   FaChevronLeft,
   FaChevronRight,
   FaChevronUp,
 } from 'react-icons/fa';
-import { AiOutlineLogout } from 'react-icons/ai';
 import { GuardedButton } from '../GuardedButton';
 import {
   Sidebar,
@@ -44,6 +41,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import {
@@ -52,10 +50,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { BsArrowBarLeft, BsPerson } from 'react-icons/bs';
 
-// Renombramos la función
 export function SidebarPro() {
-  // (Lógica de hooks idéntica a SidebarExpress)
   const {
     isDesktopCollapsed,
     toggleDesktopCollapse,
@@ -68,6 +70,7 @@ export function SidebarPro() {
   const { open: openModal } = useModalStore();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [openCollapsible, setOpenCollapsible] = useState<string>('');
 
   const handleLogoutClick = () => {
     openModal('logoutConfirmation', {
@@ -87,23 +90,87 @@ export function SidebarPro() {
     }
   };
 
-  // --- Clases de estilo personalizadas para Pro ---
-  const proBgClass = 'bg-primary text-primary-foreground'; // Fondo azul, texto blanco
-  const proHoverClass = 'hover:bg-blue-800'; // Hover más oscuro (ejemplo)
-  const proActiveClass = 'bg-blue-700 font-bold'; // Activo más claro (ejemplo)
-  const proTextColor = 'text-primary-foreground'; // Texto blanco
-  const proBorderClass = 'border-blue-700'; // Borde más oscuro
+  // Efecto para abrir el Collapsible si estás en una sub-página
+  React.useEffect(() => {
+    for (const item of proNav) {
+      if (item.subItems) {
+        if (item.subItems.some((sub) => pathname === sub.href)) {
+          setOpenCollapsible(item.id); // Abre el item padre
+          return;
+        }
+      }
+    }
+  }, [pathname]);
+
+  // --- Componente de Botón de Navegación reutilizable ---
+  // Esto simplifica la lógica de renderizado
+  const NavButton = ({
+    item,
+    className,
+  }: {
+    item: NavItem;
+    className?: string;
+  }) => {
+    const Icon = item.icon;
+    return (
+      <GuardedButton
+        href={item.href}
+        onClick={handleNavigation}
+        variant="ghost"
+        className={cn(
+          'flex items-center gap-3 transition-colors cursor-pointer',
+          'overflow-hidden transition-all duration-300',
+          'text-primary-foreground',
+          'hover:bg-sidebar-hover-bg',
+          isDesktopCollapsed
+            ? 'justify-center rounded-none'
+            : 'w-full justify-start py-2 px-3 rounded-none',
+          pathname === item.href &&
+            'bg-sidebar-primary text-sidebar-foreground font-bold',
+          className // Permite pasar clases extra
+        )}
+      >
+        <Icon className="h-5 w-5 shrink-0" />
+        <span
+          className={cn(
+            'grow text-left',
+            'whitespace-nowrap truncate', // --- Previene salto de línea
+            isDesktopCollapsed && 'hidden'
+          )}
+        >
+          {item.title}
+        </span>
+      </GuardedButton>
+    );
+  };
+
+  // --- Componente de Sub-Botón de Navegación reutilizable ---
+  const SubNavButton = ({ item }: { item: NavSubItem }) => {
+    return (
+      <GuardedButton
+        href={item.href}
+        onClick={handleNavigation}
+        variant="ghost"
+        className={cn(
+          'w-full justify-start rounded-none py-2 cursor-pointer',
+          'text-primary-foreground',
+          'hover:bg-sidebar-hover-bg',
+          // --- Estilo de sub-item ---
+          'pr-3', // Indentación
+          pathname === item.href &&
+            'bg-sidebar-primary text-sidebar-foreground font-bold'
+        )}
+      >
+        {/* Sin icono, solo texto */}
+        <span className="grow text-left whitespace-nowrap">{item.title}</span>
+      </GuardedButton>
+    );
+  };
 
   const sidebarContent = (
     <>
       <TooltipProvider key={isDesktopCollapsed ? 'collapsed' : 'expanded'}>
-        <SidebarHeader
-          className={cn(
-            'h-16 flex items-center justify-between px-4 py-0',
-            proBorderClass,
-            'border-b'
-          )}
-        >
+        <SidebarHeader className="h-16 flex items-center justify-between px-4 py-0">
           <div
             className={cn(
               'flex items-center w-full h-full justify-center md:justify-between',
@@ -112,10 +179,10 @@ export function SidebarPro() {
           >
             <SidebarTrigger
               onClick={toggleDesktopCollapse}
-              className={cn('hidden md:flex cursor-pointer', proTextColor)} // Color de icono
+              className="hidden md:flex cursor-pointer"
             />
             <Image
-              src="/blanco 250px.svg" // <-- CAMBIAMOS AL LOGO BLANCO
+              src="/logo de universitas legal blanco.png"
               alt="Universitas Legal Logo"
               width={120}
               height={48}
@@ -129,40 +196,118 @@ export function SidebarPro() {
         </SidebarHeader>
 
         <SidebarContent className="overflow-x-hidden">
-          <SidebarGroup className="flex flex-col space-y-1">
-            {/* Filtramos para mostrar SOLO items 'pro' y los generales */}
-            {mainNav
-              .filter(
-                (item) =>
-                  item.href.includes('/pro') || // Mostramos links 'pro'
-                  item.href.includes('/actas-pro') || // Mostramos links 'actas-pro'
-                  item.href.includes('/consultoria') // Mostramos 'Asistente IA'
-              )
-              .map((item) => (
-                <Tooltip key={item.href} delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <GuardedButton
-                      href={item.href}
-                      onClick={handleNavigation}
-                      variant="ghost"
-                      className={cn(
-                        'flex w-full items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 transition-colors cursor-pointer overflow-hidden',
-                        proTextColor, // Texto blanco
-                        proHoverClass, // Hover oscuro
-                        isDesktopCollapsed && 'justify-center p-2',
-                        pathname === item.href && proActiveClass // Activo claro
-                      )}
-                    >
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      <span
+          {/* --- Lógica de Renderizado Principal --- */}
+          <SidebarGroup className="flex flex-col space-y-1 py-2 px-0">
+            {proNav.map((item) =>
+              item.subItems ? (
+                // --- Si tiene sub-items, decidimos entre Dropdown o Collapsible ---
+                isDesktopCollapsed ? (
+                  // --- FIX #1: Modo Colapsado -> <DropdownMenu /> ---
+                  <Tooltip delayDuration={0} key={item.id}>
+                    <TooltipTrigger asChild>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          {/* Botón solo con icono */}
+                          <GuardedButton
+                            href="#" // No navega
+                            variant="ghost"
+                            className={cn(
+                              'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden justify-center rounded-none',
+                              'text-primary-foreground',
+                              'hover:bg-sidebar-hover-bg',
+                              openCollapsible === item.id &&
+                                'bg-primary-foreground/20 font-bold'
+                            )}
+                          >
+                            <item.icon className="h-5 w-5 shrink-0" />
+                          </GuardedButton>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuContent
+                            side="right"
+                            align="start"
+                            sideOffset={5}
+                            className="w-40 bg-primary text-primary-foreground border-primary-foreground/20"
+                          >
+                            <DropdownMenuLabel className="font-semibold">
+                              {item.title}
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-primary-foreground/20" />
+                            {item.subItems.map((subItem) => (
+                              <DropdownMenuItem
+                                asChild
+                                key={subItem.id}
+                                className="p-0"
+                              >
+                                <SubNavButton item={subItem} />
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenu>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>{item.title}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ) : (
+                  // ---  Modo Expandido ---
+                  <Collapsible
+                    key={item.id}
+                    open={openCollapsible === item.id}
+                    onOpenChange={(isOpen) =>
+                      setOpenCollapsible(isOpen ? item.id : '')
+                    }
+                    className="w-full"
+                  >
+                    <CollapsibleTrigger asChild>
+                      {/* Botón con texto y flecha */}
+                      <GuardedButton
+                        href="#" // No navega
+                        variant="ghost"
                         className={cn(
-                          'grow text-left',
-                          isDesktopCollapsed && 'hidden'
+                          'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden w-full justify-between py-2 px-3 rounded-none',
+                          'text-primary-foreground',
+                          'hover:bg-sidebar-hover-bg', // --- Sin 'hover:underline' ---
+                          openCollapsible === item.id && ''
                         )}
                       >
-                        {item.title}
-                      </span>
-                    </GuardedButton>
+                        <div className="flex items-center gap-3">
+                          <item.icon className="h-5 w-5 shrink-0" />
+                          <span className="grow text-left whitespace-nowrap">
+                            {item.title}
+                          </span>
+                        </div>
+                        {/* --- Flecha fluida --- */}
+                        <FaChevronDown
+                          className={cn(
+                            'h-4 w-4 shrink-0 transition-transform duration-200',
+                            openCollapsible === item.id && 'rotate-180'
+                          )}
+                        />
+                      </GuardedButton>
+                    </CollapsibleTrigger>
+
+                    <CollapsibleContent
+                      className={cn(
+                        'text-sm bg-blue-900/50', // Base
+                        isDesktopCollapsed && 'hidden'
+                      )}
+                    >
+                      {/* --- Estilo de sub-items con línea --- */}
+                      <div className="ml-5 pl-4 border-l border-primary-foreground/30 space-y-1 py-1">
+                        {item.subItems.map((subItem) => (
+                          <SubNavButton item={subItem} key={subItem.id} />
+                        ))}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )
+              ) : (
+                // --- Si NO tiene sub-items, renderiza un botón normal ---
+                <Tooltip key={item.id} delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <NavButton item={item} />
                   </TooltipTrigger>
                   {isDesktopCollapsed && (
                     <TooltipContent side="right">
@@ -170,47 +315,31 @@ export function SidebarPro() {
                     </TooltipContent>
                   )}
                 </Tooltip>
-              ))}
+              )
+            )}
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className=" p-2">
-          <div className="flex flex-col gap-1 space-y-1 ">
-            {/* (Puedes ocultar 'Acerca de' o mantenerlo si quieres) */}
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <GuardedButton
-                  href="/dashboard/acerca-de-pro" // Asumiendo que 'acerca-de' es para todos
-                  onClick={handleNavigation}
-                  variant="ghost"
-                  className={cn(
-                    'flex w-full items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 cursor-pointer overflow-hidden',
-                    proTextColor,
-                    proHoverClass,
-                    isDesktopCollapsed && 'justify-center p-2',
-                    pathname === '/dashboard/acerca-de' && proActiveClass
-                  )}
-                >
-                  <FiInfo className="h-5 w-5 shrink-0" />
-                  <span
-                    className={cn(
-                      'grow text-left',
-                      isDesktopCollapsed && 'hidden'
-                    )}
-                  >
-                    Acerca de
-                  </span>
-                </GuardedButton>
-              </TooltipTrigger>
-              {isDesktopCollapsed && (
-                <TooltipContent side="right">
-                  <p>Acerca de</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </div>
+        <SidebarFooter className="p-2 px-0">
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <NavButton
+                item={{
+                  id: 'pro-acerca-de',
+                  title: 'Acerca de',
+                  href: '/dashboard/acerca-de',
+                  icon: FiInfo,
+                }}
+              />
+            </TooltipTrigger>
+            {isDesktopCollapsed && (
+              <TooltipContent side="right">
+                <p>Acerca de</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
 
-          <div className={cn('mt-0 w-full border-t pt-2', proBorderClass)}>
+          <div className="mt-0 w-full pt-2 px-2">
             <Tooltip delayDuration={0}>
               <DropdownMenu
                 open={isDropdownOpen}
@@ -222,27 +351,25 @@ export function SidebarPro() {
                       variant="ghost"
                       className={cn(
                         'group h-auto w-full justify-between items-center px-3 py-2 cursor-pointer transition-colors duration-200 overflow-hidden focus-none',
-                        proTextColor, // Texto blanco
-                        proHoverClass, // Hover oscuro
                         isDesktopCollapsed &&
                           'w-10 h-10 p-0 hover:bg-transparent',
-                        isDropdownOpen && !isDesktopCollapsed && proActiveClass // Activo claro
+                        isDropdownOpen &&
+                          !isDesktopCollapsed &&
+                          'bg-sidebar-primary text-sidebar-foreground'
                       )}
                     >
-                      {/* ... (Lógica interna del botón de avatar idéntica) ... */}
                       <div className="flex flex-1 items-center gap-3 min-w-0">
                         <Avatar
                           className={cn(
                             'h-8 w-8 transition-all duration-100 ease-in-out',
                             isDesktopCollapsed &&
                               (isDropdownOpen
-                                ? 'rounded-lg bg-white text-primary' // Invertir colores en colapsado/abierto
-                                : 'hover:bg-white hover:text-primary hover:rounded-lg')
+                                ? 'rounded-lg bg-avatar-pro'
+                                : 'hover:bg-avatar-pro hover:rounded-lg')
                           )}
                         >
                           <AvatarImage alt={user?.name || 'Usuario'} />
-                          {/* Fallback usa colores primarios (texto blanco sobre azul) */}
-                          <AvatarFallback className="bg-white text-primary font-bold">
+                          <AvatarFallback className="bg-avatar-pro text-foreground font-bold">
                             {user ? getInitials(user.name, user.apellido) : 'U'}
                           </AvatarFallback>
                         </Avatar>
@@ -257,8 +384,7 @@ export function SidebarPro() {
                               ? `${user.name} ${user.apellido || ''}`.trim()
                               : 'Usuario'}
                           </span>
-                          {/* Email (muted) ahora necesita ser un color claro */}
-                          <span className="text-xs text-primary-foreground/70 whitespace-nowrap truncate w-full">
+                          <span className="text-xs  whitespace-nowrap truncate w-full">
                             {user?.email || ''}
                           </span>
                         </div>
@@ -285,16 +411,14 @@ export function SidebarPro() {
                   </DropdownMenuTrigger>
                 </TooltipTrigger>
 
-                {/* Dropdown se mantiene blanco para legibilidad */}
                 <DropdownMenuContent
-                  className="w-56 bg-white" // Fondo blanco estándar
+                  className="w-56 bg-dropdownperfil-pro"
                   align="end"
                   forceMount
                   side={isDesktop ? 'right' : 'top'}
                   sideOffset={isDesktop ? 10 : 5}
                   onCloseAutoFocus={(e) => e.preventDefault()}
                 >
-                  {/* ... (Contenido del dropdown idéntico, se verá bien en blanco) ... */}
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 ">
@@ -304,14 +428,12 @@ export function SidebarPro() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col space-y-1 min-w-0">
-                        <p className="text-sm font-medium leading-none text-black">
-                          {' '}
-                          {/* Texto negro */}
+                        <p className="text-sm font-medium leading-none">
                           {user
                             ? `${user.name} ${user.apellido || ''}`.trim()
                             : 'Usuario'}
                         </p>
-                        <p className="text-xs leading-none text-muted-foreground truncate w-full">
+                        <p className="text-xs truncate w-full">
                           {user?.email || ''}
                         </p>
                       </div>
@@ -323,13 +445,13 @@ export function SidebarPro() {
                     className="cursor-pointer text-black/80"
                   >
                     <GuardedButton
-                      href="/dashboard/perfil" // Perfil es para todos
+                      href="/dashboard/perfil"
                       onClick={handleNavigation}
                       variant="ghost"
-                      className="bg-white w-full h-full justify-start px-2 py-1.5 text-sm font-normal focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="hover:bg-white w-full h-full justify-start px-2 py-1.5 text-sm font-normal focus-visible:ring-0 focus-visible:ring-offset-0"
                     >
-                      <FiUser className="mr-2 h-4 w-4 text-black/80" />
-                      <span>Perfil</span>
+                      <BsPerson className="mr-2 h-4 w-4 text-foreground" />
+                      <span className="text-foreground">Perfil</span>
                     </GuardedButton>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -337,7 +459,7 @@ export function SidebarPro() {
                     onClick={handleLogoutClick}
                     className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
                   >
-                    <AiOutlineLogout className="mr-2 h-4 w-4 text-destructive" />
+                    <BsArrowBarLeft className="ml-1 mr-2 h-4 w-4 text-destructive" />
                     <span>Cerrar sesión</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -359,8 +481,7 @@ export function SidebarPro() {
       <Sheet open={isMobileMenuOpen} onOpenChange={toggleMobileMenu}>
         <SheetContent
           side="left"
-          // Aplicamos clases Pro al Sheet (móvil)
-          className={cn('w-72 p-0 border-r-0 flex flex-col', proBgClass)}
+          className="w-72 p-0 border-r-0 flex flex-col bg-primary text-primary-foreground"
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Navegación Principal</SheetTitle>
@@ -377,10 +498,9 @@ export function SidebarPro() {
   return (
     <Sidebar
       collapsible="icon"
-      // Aplicamos clases Pro al Sidebar (desktop)
       className={cn(
-        'hidden md:flex border-r',
-        proBgClass, // Fondo azul, texto blanco
+        'hidden md:flex border-none',
+        '[&_[data-slot="sidebar-inner"]]:bg-primary [&_[data-slot="sidebar-inner"]]:text-primary-foreground',
         isDesktopCollapsed ? 'w-20' : 'w-64',
         'transition-all duration-300'
       )}

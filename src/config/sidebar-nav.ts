@@ -114,10 +114,4 @@ export const proNav: NavItem[] = [
     href: '/dashboard/consultoria',
     icon: LiaRobotSolid,
   },
-  {
-    id: 'pro-ma-pro',
-    title: 'MA - Pro',
-    href: '/dashboard/actas-pro/ma-pro',
-    icon: FaWpforms,
-  },
 ];

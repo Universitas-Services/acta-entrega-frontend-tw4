@@ -90,6 +90,9 @@
     --green5: oklch(72.3% 0.219 149.579);
 
     --button-anterior: oklch(0.8702 0.0014 286.37);
+
+    --avatar-pro: oklch(0.8853 0 0);
+    --dropdownperfil-pro: oklch(0.9597 0.0052 247.88); /* #EFF2F5 */
   }
 }
 
@@ -106,6 +109,38 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  @keyframes collapsible-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes collapsible-up {
+    from {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+
+  /* Tailwind 4 (que estás usando) no tiene 'variants' en el config por defecto 
+    para 'animate', así que definimos las clases de utilidad directamente.
+  */
+  .animate-collapsible-down {
+    animation: collapsible-down 0.2s ease-out;
+  }
+  .animate-collapsible-up {
+    animation: collapsible-up 0.2s ease-out;
   }
 }
 
@@ -177,6 +212,8 @@
   --color-green5: var(--green5);
 
   --color-button-anterior: var(--button-anterior);
+  --color-avatar-pro: var(--avatar-pro);
+  --color-dropdownperfil-pro: var(--dropdownperfil-pro);
 
   --shadow-blue-soft:
     0 10px 15px -3px rgba(59, 130, 246, 0.3),

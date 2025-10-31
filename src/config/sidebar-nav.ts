@@ -5,52 +5,113 @@ import { LuLayoutDashboard } from 'react-icons/lu';
 import { FiHelpCircle } from 'react-icons/fi';
 import { LiaRobotSolid } from 'react-icons/lia';
 import { FaWpforms } from 'react-icons/fa';
+import { IoCreateOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
 
 export interface NavItem {
   title: string;
   href: string;
   icon: IconType;
+  subItems?: NavItem[];
+  // 'id' o 'value' para el Collapsible/Accordion
+  id: string;
+}
+
+// --- Interfaz para Sub-items (sin icono) ---
+export interface NavSubItem {
+  title: string;
+  href: string;
+  id: string;
 }
 
 export const mainNav: NavItem[] = [
   {
+    id: 'main-inicio',
     title: 'Inicio',
     href: '/dashboard',
     icon: CgHome,
   },
   {
+    id: 'main-repositorio',
     title: 'Repositorio Legal',
     href: '/dashboard/repositorio',
     icon: AiOutlineBook,
   },
   {
+    id: 'main-compliance',
     title: 'Compliance',
     href: '/dashboard/compliance',
     icon: AiOutlineFileSearch,
   },
   {
+    id: 'main-panel-actas',
     title: 'Panel de Actas',
     href: '/dashboard/panel-actas',
     icon: LuLayoutDashboard,
   },
   {
+    id: 'main-faq',
     title: 'Preguntas Frecuentes',
     href: '/dashboard/faq',
     icon: FiHelpCircle,
   },
   {
+    id: 'main-asistente',
     title: 'Consultor IA',
     href: '/dashboard/asistenteia',
     icon: LiaRobotSolid,
   },
+];
+
+// Links específicos para usuarios Pro
+export const proNav: NavItem[] = [
   {
-    title: 'Compliance',
-    href: '/dashboard/actas-pro/compliance',
-    icon: FaWpforms,
+    id: 'pro-inicio',
+    title: 'Elaboración',
+    href: '/dashboard/pro',
+    icon: IoCreateOutline,
   },
   {
-    title: 'MA - Pro',
-    href: '/dashboard/actas-pro/ma-pro',
-    icon: FaWpforms,
+    id: 'pro-compliance',
+    title: 'Compliance',
+    href: '/dashboard/actas-pro/compliance',
+    icon: IoShieldCheckmarkOutline,
+  },
+  {
+    id: 'pro-panel-actas',
+    title: 'Panel de Actas',
+    href: '#', // El padre no navega
+    icon: LuLayoutDashboard,
+    subItems: [
+      {
+        id: 'pro-elaboracion-panel',
+        title: 'Elaboración',
+        href: '/dashboard/actas-pro/ma-pro', // Ruta del formulario MA-PRO
+        icon: IoCreateOutline, // Ícono de "Elaboración"
+      },
+      {
+        id: 'pro-compliance-panel',
+        title: 'Compliance',
+        href: '/dashboard/actas-pro/compliance',
+        icon: IoShieldCheckmarkOutline, // Ícono de "Compliance"
+      },
+    ],
+  },
+  {
+    id: 'pro-repositorio',
+    title: 'Repositorio Legal',
+    href: '/dashboard/repositorio-pro',
+    icon: AiOutlineBook,
+  },
+  {
+    id: 'pro-asistencia-usuario',
+    title: 'Asistencia al usuario',
+    href: '/dashboard/asistencia-usuario',
+    icon: FiHelpCircle,
+  },
+  {
+    id: 'pro-asistente',
+    title: 'Consultor IA',
+    href: '/dashboard/consultoria',
+    icon: LiaRobotSolid,
   },
 ];

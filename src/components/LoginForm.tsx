@@ -49,11 +49,28 @@ export function LoginForm() {
     try {
       const response = await loginUser(values);
 
-      // Usamos setAuth para guardar el token y los datos del usuario globalmente
+      // --- INICIO DE SIMULACIÓN DE ROL ---
+      // Comprobamos si el email es el de nuestro usuario "pro" de prueba
+      if (values.email.toLowerCase() === 'luiger852@gmail.com') {
+        // Si es así, forzamos el rol en el objeto de usuario
+        response.user.role = 'pro';
+        console.warn('SIMULACIÓN: Rol "pro" asignado a', response.user.email);
+      }
+      // --- FIN DE SIMULACIÓN DE ROL ---
+
+      // Guardamos en el store el usuario (potencialmente modificado)
       setAuth(response.token, response.user);
 
-      // Redirigimos al dashboard
-      router.replace('/dashboard');
+      // --- INICIO DE REDIRECCIÓN POR ROL ---
+      if (response.user.role === 'pro') {
+        // Si es Pro, redirigimos al layout (forms)
+        // Apuntamos a la raíz de actas-pro (que crearemos en Fase 3)
+        router.replace('/dashboard/pro');
+      } else {
+        // Si es Express o rol normal, redirigimos al dashboard (main)
+        router.replace('/dashboard');
+      }
+      // --- FIN DE REDIRECCIÓN POR ROL ---
     } catch (error) {
       if (error instanceof Error) {
         setApiError(error.message);

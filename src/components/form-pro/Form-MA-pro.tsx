@@ -44,7 +44,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FormFieldWithExtras } from '../FormFieldWithExtras';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { FiSave } from 'react-icons/fi';
+import { BsSave } from 'react-icons/bs';
 import {
   Select,
   SelectContent,
@@ -715,13 +715,12 @@ export function ActaMaximaAutoridadProForm() {
             {/* Botón Guardar (desde paso 3 / índice 2) */}
             {currentStep >= 2 && (
               <Button
-                variant="outline"
                 size="sm"
                 onClick={handleSaveProgress}
                 disabled={isLoading}
-                className="cursor-pointer"
+                className="cursor-pointer shadow-xs border bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold"
               >
-                <FiSave className="mr-2 h-4 w-4" />
+                <BsSave className="mr-2 h-4 w-4" />
                 {isLoading ? 'Guardando...' : 'Guardar'}
               </Button>
             )}
@@ -968,7 +967,7 @@ export function ActaMaximaAutoridadProForm() {
               {currentStep === 1 && (
                 <div className="space-y-6">
                   <h3 className="text-lg font-semibold border-b pb-2">
-                    Servidor Público Entrante
+                    Servidor Público Designado
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormFieldWithExtras
@@ -1011,7 +1010,7 @@ export function ActaMaximaAutoridadProForm() {
                     <FormFieldWithExtras
                       name="designacionServidorEntrante"
                       label="Datos de designación"
-                      subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-000"
+                      subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-0000"
                       maxLength={150}
                     />
                   </div>
@@ -1179,7 +1178,7 @@ export function ActaMaximaAutoridadProForm() {
                     <FormFieldWithExtras
                       name="designacionServidorSaliente"
                       label="Datos de designación"
-                      subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-000"
+                      subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-0000"
                       maxLength={150}
                     />
                   </div>

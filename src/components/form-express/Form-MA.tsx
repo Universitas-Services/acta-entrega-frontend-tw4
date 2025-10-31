@@ -603,7 +603,7 @@ export function ActaMaximaAutoridadForm() {
             {currentStep === 1 && (
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold border-b pb-2">
-                  Servidor Público Entrante
+                  Servidor Público Designado
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormFieldWithExtras
@@ -646,7 +646,7 @@ export function ActaMaximaAutoridadForm() {
                   <FormFieldWithExtras
                     name="designacionServidorEntrante"
                     label="Datos de designación"
-                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-000"
+                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-0000"
                     maxLength={150}
                   />
                 </div>
@@ -812,7 +812,7 @@ export function ActaMaximaAutoridadForm() {
                   <FormFieldWithExtras
                     name="designacionServidorSaliente"
                     label="Datos de designación"
-                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-000"
+                    subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-0000"
                     maxLength={150}
                   />
                 </div>

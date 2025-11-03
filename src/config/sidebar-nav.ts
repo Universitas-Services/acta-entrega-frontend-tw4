@@ -91,7 +91,7 @@ export const proNav: NavItem[] = [
       {
         id: 'pro-compliance-panel',
         title: 'Compliance',
-        href: '/dashboard/actas-pro/compliance',
+        href: '/dashboard/panel-de-actas/compliance', // Ruta del Panel Compliance
         icon: IoShieldCheckmarkOutline, // Ícono de "Compliance"
       },
     ],

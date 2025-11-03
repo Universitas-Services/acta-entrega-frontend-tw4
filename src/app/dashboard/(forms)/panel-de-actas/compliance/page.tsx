@@ -3,8 +3,8 @@
 import { useEffect } from 'react'; // <-- 2. Importar useEffect
 import { z } from 'zod';
 import { useHeader } from '@/context/HeaderContext'; // <-- 3. Importar useHeader
-import { columns } from '@/components/panel-actas/elaboracion/columns';
-import { DataTable } from '@/components/panel-actas/elaboracion/data-table';
+import { columns } from '@/components/panel-actas/compliance/columns';
+import { DataTable } from '@/components/panel-actas/compliance/data-table';
 import { actaSchema, Acta } from '@/lib/data-schema'; // <-- 4. Importar el tipo Acta
 import actasData from '@/lib/actas'; // <-- 5. Importar el JSON directamente
 
@@ -13,7 +13,7 @@ export default function ActasPage() {
 
   // 7. Establecer el título del header cuando el componente se monte
   useEffect(() => {
-    setTitle('Panel de actas (Elaboración)');
+    setTitle('Panel de actas (Compliance)');
   }, [setTitle]);
 
   // 8. Validar y usar los datos del JSON importado

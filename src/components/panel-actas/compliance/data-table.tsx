@@ -82,13 +82,6 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  React.useEffect(() => {
-    const secondRow = table.getRowModel().rows[1];
-    if (secondRow) {
-      secondRow.toggleSelected(true);
-    }
-  }, [table]);
-
   const shadowEffectClass =
     'border-b-4 border-gray-300 active:border-b-2 disabled:border-b-4 disabled:border-gray-200';
   const activePageStyle = 'bg-white border-b-4 border-gray-300 shadow-xs';

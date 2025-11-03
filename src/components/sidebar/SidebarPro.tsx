@@ -71,6 +71,7 @@ export function SidebarPro() {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [openCollapsible, setOpenCollapsible] = useState<string>('');
+  const [openPanelDropdown, setOpenPanelDropdown] = useState<string>('');
 
   const handleLogoutClick = () => {
     openModal('logoutConfirmation', {
@@ -88,6 +89,7 @@ export function SidebarPro() {
     if (!isDesktop) {
       toggleMobileMenu();
     }
+    setOpenPanelDropdown('');
   };
 
   // Efecto para abrir el Collapsible si estás en una sub-página
@@ -211,46 +213,60 @@ export function SidebarPro() {
               item.subItems ? (
                 // --- Si tiene sub-items, decidimos entre Dropdown o Collapsible ---
                 isDesktopCollapsed ? (
-                  // --- FIX #1: Modo Colapsado -> <DropdownMenu /> ---
-                  <DropdownMenu key={item.id}>
-                    <DropdownMenuTrigger asChild>
-                      {/* Botón solo con icono */}
-                      <GuardedButton
-                        href="#" // No navega
-                        variant="ghost"
-                        className={cn(
-                          'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden justify-center rounded-none',
-                          'text-primary-foreground',
-                          'hover:bg-sidebar-hover-bg',
-                          openCollapsible === item.id && 'font-bold'
-                        )}
-                      >
-                        <item.icon className="h-5 w-5 shrink-0" />
-                      </GuardedButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuPortal>
-                      <DropdownMenuContent
-                        side="right"
-                        align="start"
-                        sideOffset={5}
-                        className="w-40 bg-primary text-primary-foreground border-primary-foreground/20"
-                      >
-                        <DropdownMenuLabel className="font-semibold">
-                          {item.title}
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-primary-foreground/20" />
-                        {item.subItems.map((subItem) => (
-                          <DropdownMenuItem
-                            asChild
-                            key={subItem.id}
-                            className="p-0"
+                  // --- Modo Colapsado -> <DropdownMenu /> ---
+                  <Tooltip key={item.id} delayDuration={0}>
+                    <DropdownMenu
+                      key={item.id}
+                      open={openPanelDropdown === item.id}
+                      onOpenChange={(isOpen) =>
+                        setOpenPanelDropdown(isOpen ? item.id : '')
+                      }
+                    >
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          {/* Botón solo con icono */}
+                          <GuardedButton
+                            href="#" // No navega
+                            variant="ghost"
+                            className={cn(
+                              'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden justify-center rounded-none',
+                              'text-primary-foreground',
+                              'hover:bg-sidebar-hover-bg',
+                              openCollapsible === item.id && 'font-bold'
+                            )}
                           >
-                            <SubNavButton item={subItem} />
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenu>
+                            <item.icon className="h-5 w-5 shrink-0" />
+                          </GuardedButton>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuContent
+                          side="right"
+                          align="start"
+                          sideOffset={5}
+                          className="w-40 bg-primary text-primary-foreground border-primary-foreground/20 space-y-1"
+                        >
+                          <DropdownMenuLabel className="font-semibold">
+                            {item.title}
+                          </DropdownMenuLabel>
+                          <DropdownMenuSeparator className="bg-primary-foreground/20" />
+                          {item.subItems.map((subItem) => (
+                            <DropdownMenuItem
+                              asChild
+                              key={subItem.id}
+                              className="p-0"
+                            >
+                              <SubNavButton item={subItem} />
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenu>
+
+                    <TooltipContent side="right">
+                      <p>{item.title}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 ) : (
                   // ---  Modo Expandido ---
                   <Collapsible

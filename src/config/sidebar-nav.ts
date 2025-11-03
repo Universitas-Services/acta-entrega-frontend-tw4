@@ -85,13 +85,13 @@ export const proNav: NavItem[] = [
       {
         id: 'pro-elaboracion-panel',
         title: 'Elaboración',
-        href: '/dashboard/actas-pro/ma-pro', // Ruta del formulario MA-PRO
+        href: '/dashboard/panel-de-actas/elaboracion', // Ruta del Panel Elaboración
         icon: IoCreateOutline, // Ícono de "Elaboración"
       },
       {
         id: 'pro-compliance-panel',
         title: 'Compliance',
-        href: '/dashboard/actas-pro/compliance',
+        href: '/dashboard/panel-de-actas/compliance', // Ruta del Panel Compliance
         icon: IoShieldCheckmarkOutline, // Ícono de "Compliance"
       },
     ],

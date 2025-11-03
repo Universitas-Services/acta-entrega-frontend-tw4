@@ -1,24 +1,23 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { z } from 'zod';
+'use client'; // <-- 1. Convertir a Componente de Cliente
 
+import { useEffect } from 'react'; // <-- 2. Importar useEffect
+import { z } from 'zod';
+import { useHeader } from '@/context/HeaderContext'; // <-- 3. Importar useHeader
 import { columns } from '@/components/columns';
 import { DataTable } from '@/components/data-table';
-import { actaSchema } from '@/lib/data-schema';
+import { actaSchema, Acta } from '@/lib/data-schema'; // <-- 4. Importar el tipo Acta
+import actasData from '@/lib/actas'; // <-- 5. Importar el JSON directamente
 
-// Función para obtener y validar los datos de actas
-async function getActas() {
-  const dataPath = path.join(process.cwd(), 'src/lib/actas.json');
+export default function ActasPage() {
+  const { setTitle } = useHeader(); // <-- 6. Usar el hook
 
-  const data = await fs.readFile(dataPath, 'utf-8'); // Especificar la codificación
-  const actas = JSON.parse(data);
+  // 7. Establecer el título del header cuando el componente se monte
+  useEffect(() => {
+    setTitle('Panel de actas (Elaboración)');
+  }, [setTitle]);
 
-  // Usamos Zod para asegurar que los datos tienen la forma esperada.
-  return z.array(actaSchema).parse(actas);
-}
-
-export default async function ActasPage() {
-  const actas = await getActas();
+  // 8. Validar y usar los datos del JSON importado
+  const actas = z.array(actaSchema).parse(actasData) as Acta[];
 
   return (
     <div className="flex-1 flex-col space-y-8 p-4 md:p-8 md:flex">

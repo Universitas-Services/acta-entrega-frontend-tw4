@@ -161,7 +161,7 @@ export function SidebarPro() {
         onClick={handleNavigation}
         variant="ghost"
         className={cn(
-          'w-full justify-start rounded-none py-2 cursor-pointer',
+          'w-full justify-start py-2 cursor-pointer',
           'text-primary-foreground',
           'hover:bg-sidebar-hover-bg',
           // --- Estilo de sub-item ---
@@ -233,7 +233,7 @@ export function SidebarPro() {
                         side="right"
                         align="start"
                         sideOffset={5}
-                        className="w-40 bg-primary text-primary-foreground border-primary-foreground/20"
+                        className="w-40 bg-primary text-primary-foreground border-primary-foreground/20 space-y-1"
                       >
                         <DropdownMenuLabel className="font-semibold">
                           {item.title}

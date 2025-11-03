@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ACTA-001",
+    "numero": "Acta 2023-001",
+    "organo": "Consejo Directivo",
+    "tipo": "Servidor Entrante",
+    "estatus": "Guardada"
+  },
+  {
+    "id": "ACTA-002",
+    "numero": "Acta 2024-003",
+    "organo": "Instituto Nacional de Tránsito (INTT)",
+    "tipo": "Servidor Saliente",
+    "estatus": "Enviada"
+  },
+  {
+    "id": "ACTA-003",
+    "numero": "Acta 2023-001",
+    "organo": "Ministerio del Poder Popular para el Deporte",
+    "tipo": "Máxima Autoridad",
+    "estatus": "Generada"
+  },
+  {
+    "id": "ACTA-004",
+    "numero": "Acta 2023-001",
+    "organo": "Ministerio de Poder Popular para la Educación",
+    "tipo": "Servidor Saliente",
+    "estatus": "Guardada"
+  },
+  {
+    "id": "ACTA-005",
+    "numero": "Acta 2023-001",
+    "organo": "Alcaldía de Iribarren",
+    "tipo": "Servidor Saliente",
+    "estatus": "Enviada"
+  },
+  {
+    "id": "ACTA-006",
+    "numero": "Acta 2023-001",
+    "organo": "Gobernación del Estado Nueva Esparta",
+    "tipo": "Servidor Entrante",
+    "estatus": "Generada"
+  },
+  {
+    "id": "ACTA-007",
+    "numero": "Acta 2023-001",
+    "organo": "Instituto de Cultura del Municipio Iribarren",
+    "tipo": "Máxima Autoridad",
+    "estatus": "Guardada"
+  },
+  {
+    "id": "ACTA-008",
+    "numero": "Acta 2023-001",
+    "organo": "Fundación para el mantenimiento de infraestructura",
+    "tipo": "Máxima Autoridad",
+    "estatus": "Enviada"
+  },
+  {
+    "id": "ACTA-009",
+    "numero": "Acta 2023-001",
+    "organo": "Consejo Directivo",
+    "tipo": "Servidor Entrante",
+    "estatus": "Generada"
+  },
+  {
+    "id": "ACTA-010",
+    "numero": "Acta 2023-001",
+    "organo": "Consejo Directivo",
+    "tipo": "Servidor Saliente",
+    "estatus": "Enviada"
+  }
+]

@@ -169,43 +169,57 @@ export const actaMaximaAutoridadSchemaBase = z.object({
   deficienciasActa: z.string().optional(),
 });
 
-// ESQUEMA FINAL: Aplicamos la validación inteligente con superRefine
-export const actaMaximaAutoridadSchema =
-  actaMaximaAutoridadSchemaBase.superRefine((data, ctx) => {
-    const selectedAnexo = data.Anexo_VII;
+// 1. Creamos el tipo base para el formulario PRO (sin interesProducto)
+const actaMaximaAutoridadProSchemaBase = actaMaximaAutoridadSchemaBase.omit({
+  interesProducto: true,
+});
 
-    if (!selectedAnexo || selectedAnexo === 'NO APLICA') {
-      return; // Si no hay anexo seleccionado o es "NO APLICA", la validación para esta parte es exitosa.
-    }
+// 2. Inferimos el tipo de dato de este nuevo schema base
+type ProFormData = z.infer<typeof actaMaximaAutoridadProSchemaBase>;
 
-    const anexoContent =
-      dynamicStepContent[selectedAnexo as keyof typeof dynamicStepContent];
+// 3. Definimos el helper dynamicRefine usando este tipo más restrictivo
+const dynamicRefine = (data: ProFormData, ctx: z.RefinementCtx) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') {
+    return;
+  }
+  const anexoContent =
+    dynamicStepContent[selectedAnexo as keyof typeof dynamicStepContent];
+  if (!anexoContent) return;
 
-    if (!anexoContent) return; // Si por alguna razón la selección no coincide, no validamos.
-
-    if (anexoContent.type === 'questions') {
-      anexoContent.questions.forEach((q) => {
-        const fieldName = q.name as keyof typeof data;
-        if (!data[fieldName]) {
-          // Si la respuesta es vacía, null, o undefined
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: [fieldName],
-            message: 'Debe seleccionar una opción.',
-          });
-        }
-      });
-    } else if (anexoContent.type === 'textarea') {
-      const fieldName = anexoContent.fieldName;
-      if (!data[fieldName] || (data[fieldName] as string).trim() === '') {
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: [fieldName],
-          message: 'Este campo es requerido según su selección.',
+          message: 'Debe seleccionar una opción.',
         });
       }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof ProFormData;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
     }
-  });
+  }
+};
+
+// --- Schema para EXPRESS (Gratis) ---
+// Usa el schema base original (con interesProducto)
+export const actaMaximaAutoridadSchema =
+  actaMaximaAutoridadSchemaBase.superRefine(dynamicRefine);
+
+// --- Schema para PRO ---
+// Usa el schema base "Pro" (sin interesProducto)
+export const actaMaximaAutoridadProSchema =
+  actaMaximaAutoridadProSchemaBase.superRefine(dynamicRefine);
 
 // --- Esquema para Acta Saliente ---
 
@@ -376,7 +390,6 @@ export const actaSalienteSchema = actaSalienteSchemaBase.superRefine(
       ];
 
     if (!anexoContent) return; // Si por alguna razón la selección no coincide, no validamos.
-
     if (anexoContent.type === 'questions') {
       anexoContent.questions.forEach((q) => {
         const fieldName = q.name as keyof typeof data;

@@ -30,7 +30,7 @@ import { ShadcnDatePicker } from '../DatePicker';
 import { ShadcnTimePicker } from '../TimePicker';
 import { SiNoQuestion } from '../SiNoQuestion';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
-import { actaMaximaAutoridadSchema } from '@/lib/schemas'; // Schema de MA
+import { actaMaximaAutoridadProSchema } from '@/lib/schemas'; // Schema de MA
 import { LuTriangleAlert, LuBadgeAlert } from 'react-icons/lu';
 import {
   steps, // Importar steps de las nuevas constantes
@@ -65,7 +65,7 @@ import { cn } from '@/lib/utils';
 import { CiCircleCheck } from 'react-icons/ci';
 
 // Tipado del formulario usando el schema importado
-type FormData = z.infer<typeof actaMaximaAutoridadSchema>;
+type FormData = z.infer<typeof actaMaximaAutoridadProSchema>;
 
 export function ActaMaximaAutoridadProForm() {
   // Cambiar nombre del componente
@@ -81,23 +81,20 @@ export function ActaMaximaAutoridadProForm() {
   const [apiError, setApiError] = useState<string | null>(null);
   const { setIsDirty } = useFormDirtyStore();
   const [isSavedOnce, setIsSavedOnce] = useState(false); // Estado de guardado
-  const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [alertContent, setAlertContent] = useState({
     message: '',
     action: () => {},
   });
-  const alertTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref para el timeout del alert
-  const remainingTimeRef = useRef(8000); // Duración total del auto-cierre
-  const startTimeRef = useRef(0);
   const [erroredSteps, setErroredSteps] = useState<number[]>([]);
+  const [isFormGloballyValid, setIsFormGloballyValid] = useState(false);
 
   useEffect(() => {
-    setTitle('Acta Máxima Autoridad (PRO)'); // Título específico
+    setTitle('Acta Máxima Autoridad (PRO)');
   }, [setTitle]);
 
   const form = useForm<FormData>({
     mode: 'onChange',
-    resolver: zodResolver(actaMaximaAutoridadSchema),
+    resolver: zodResolver(actaMaximaAutoridadProSchema),
     shouldUnregister: false,
     defaultValues: {
       email: '',
@@ -188,7 +185,6 @@ export function ActaMaximaAutoridadProForm() {
       accionesAuditoria: '',
       deficienciasActa: '',
       // Paso final
-      interesProducto: '',
     },
   });
 
@@ -234,64 +230,11 @@ export function ActaMaximaAutoridadProForm() {
     }
   };
 
-  // --- useEffect para que el Alert desaparezca solo ---
-  useEffect(() => {
-    // Si hay un temporizador previo, lo limpiamos para evitar duplicados
-    if (alertTimeoutRef.current) {
-      clearTimeout(alertTimeoutRef.current);
-    }
-
-    // Si el alert debe mostrarse, iniciamos un nuevo temporizador
-    if (showValidationAlert) {
-      alertTimeoutRef.current = setTimeout(() => {
-        setShowValidationAlert(false);
-      }, 8000); // El alert se ocultará después de 8 segundos
-    }
-
-    // Función de limpieza: se ejecuta cuando el componente se desmonta
-    // o cuando showValidationAlert cambia.
-    return () => {
-      if (alertTimeoutRef.current) {
-        clearTimeout(alertTimeoutRef.current);
-      }
-    };
-  }, [showValidationAlert]); // Este efecto depende del estado de visibilidad del alert
-
-  // -- Funciones para manejar la animación de salida del Alert ---
-  const hideAlert = useCallback(() => {
-    setShowValidationAlert(false);
-  }, []);
-
-  // --- Lógica de pausa y reanudación del temporizador ---
-  const startTimer = useCallback(() => {
-    startTimeRef.current = Date.now();
-    if (alertTimeoutRef.current) {
-      clearTimeout(alertTimeoutRef.current);
-    }
-    alertTimeoutRef.current = setTimeout(hideAlert, remainingTimeRef.current);
-  }, [hideAlert]);
-
-  const pauseTimer = useCallback(() => {
-    if (alertTimeoutRef.current) {
-      clearTimeout(alertTimeoutRef.current);
-      const elapsedTime = Date.now() - startTimeRef.current;
-      remainingTimeRef.current -= elapsedTime;
-    }
-  }, []);
-
-  // useEffect para iniciar el temporizador cuando el alert aparece
-  useEffect(() => {
-    if (showValidationAlert) {
-      remainingTimeRef.current = 8000;
-      startTimer();
-    }
-    // La función de limpieza no necesita cambiar
-    return () => {
-      if (alertTimeoutRef.current) {
-        clearTimeout(alertTimeoutRef.current);
-      }
-    };
-  }, [showValidationAlert, startTimer]); // Array de dependencias corregido y completo
+  // Se llama cuando la validación global es exitosa
+  const onValidationSuccess = () => {
+    setErroredSteps([]); // Limpia los pasos en rojo
+    setIsFormGloballyValid(true); // Activa el botón "Crear Acta"
+  };
 
   // --- Manejador de errores para la validación final ---
   const onFormInvalid = (errors: FieldErrors<FormData>) => {
@@ -324,21 +267,20 @@ export function ActaMaximaAutoridadProForm() {
     });
 
     if (stepsWithErrors.length > 0) {
-      setErroredSteps(stepsWithErrors);
+      setErroredSteps(stepsWithErrors); // Actualiza paginación en rojo
       const firstErrorStepIndex = stepsWithErrors[0] - 1;
       const alertMessage =
         stepsWithErrors.length === 1
           ? `Te faltan campos por llenar en el Paso ${stepsWithErrors[0]}.`
           : `Te faltan campos por llenar en los Pasos: ${stepsWithErrors.join(', ')}.`;
 
-      // Crear el toast con un botón de acción
+      // Actualiza el contenido para el panel del Paso 10
       setAlertContent({
         message: alertMessage,
         action: () => {
-          hideAlert();
+          // La acción para el botón "Ir al error"
           setCurrentStep(firstErrorStepIndex);
-          setShowValidationAlert(false); // Ocultar el alert después de hacer clic
-
+          // Lógica de scroll al campo
           setTimeout(() => {
             const stepFields = steps[firstErrorStepIndex]?.fields || [];
             const firstErrorFieldInStep =
@@ -375,8 +317,29 @@ export function ActaMaximaAutoridadProForm() {
           }, 100);
         },
       });
-      // Muestra el Alert
-      setShowValidationAlert(true);
+      setIsFormGloballyValid(false); // Desactiva el botón "Crear Acta"
+    } else {
+      // ESTE ES EL FALLBACK: Hay errores, pero no pudimos mapearlos a un paso.
+      // (Con el schema corregido, esto no debería pasar, pero es una buena práctica tenerlo)
+      setErroredSteps([]);
+      setAlertContent({
+        message:
+          'Se encontraron errores de validación desconocidos. Revisa la consola para más detalles.',
+        action: () => console.error('Errores no mapeados:', errors),
+      });
+      setIsFormGloballyValid(false);
+    }
+  };
+
+  // Valida todo el formulario
+  const runStep10Validation = async () => {
+    const isValid = await form.trigger(); // Valida TODOS los campos
+    if (isValid) {
+      onValidationSuccess();
+    } else {
+      // Si es inválido, el resolver ya pobló formState.errors.
+      // Solo necesitamos llamar a onFormInvalid para actualizar nuestros estados.
+      onFormInvalid(form.formState.errors);
     }
   };
 
@@ -396,9 +359,6 @@ export function ActaMaximaAutoridadProForm() {
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular llamada a API
       toast.success('Progreso guardado exitosamente.');
       setIsSavedOnce(true); // <-- Marcar como guardado
-      // Opcional: podrías querer resetear el estado 'isDirty' después de guardar
-      // form.reset({}, { keepValues: true }); // Resetea 'isDirty' manteniendo valores
-      // setIsDirty(false); // O forzarlo manualmente
     } catch (error) {
       toast.error('Error al guardar el progreso.');
     } finally {
@@ -406,12 +366,20 @@ export function ActaMaximaAutoridadProForm() {
     }
   };
 
+  const handleSaveAndExit = async () => {
+    await handleSaveProgress();
+    // Redirige al panel (asegúrate que la ruta sea correcta)
+    router.push('/dashboard/panel-de-actas/elaboracion');
+  };
+
   // --- Funciones de Navegación (Adaptadas para 10 pasos y salto en Paso 9) ---
   const nextStep = async () => {
-    let fieldsToValidate = steps[currentStep]?.fields;
-    const currentFieldsArray = Array.isArray(fieldsToValidate)
-      ? fieldsToValidate
+    const baseFields = steps[currentStep]?.fields;
+    const currentFieldsArray: (keyof FormData)[] = Array.isArray(baseFields)
+      ? baseFields
       : [];
+
+    let fieldsToValidate: (keyof FormData)[] = currentFieldsArray;
 
     // Lógica específica para validar el paso 9 (índice 8 - Anexos Adicionales)
     if (currentStep === 8) {
@@ -432,8 +400,6 @@ export function ActaMaximaAutoridadProForm() {
         }
       }
       // Si es "NO APLICA", solo validamos 'Anexo_VI' y 'Anexo_VII' (ya en currentFieldsArray)
-    } else {
-      fieldsToValidate = currentFieldsArray;
     }
 
     const isValid = await trigger(fieldsToValidate, { shouldFocus: false });
@@ -493,7 +459,7 @@ export function ActaMaximaAutoridadProForm() {
   const prevStep = () => {
     // Lógica de salto al retroceder
     if (currentStep === 9 && getValues('Anexo_VII') === 'NO APLICA') {
-      setCurrentStep(7); // Volver al paso ANTERIOR al dropdown (índice 7)
+      setCurrentStep(8); // Volver al paso ANTERIOR al dropdown (índice 8)
     } else if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
       scrollToTop();
@@ -514,9 +480,13 @@ export function ActaMaximaAutoridadProForm() {
       } else {
         let canAdvance = true;
         for (let i = currentStep; i < stepIndex; i++) {
-          let fieldsToValidateIntermediate = Array.isArray(steps[i]?.fields)
-            ? steps[i].fields
-            : [];
+          const baseFieldsIntermediate = steps[i]?.fields;
+          const currentFieldsArrayIntermediate: (keyof FormData)[] =
+            Array.isArray(baseFieldsIntermediate) ? baseFieldsIntermediate : [];
+
+          let fieldsToValidateIntermediate: (keyof FormData)[] =
+            currentFieldsArrayIntermediate;
+
           // Añadir validación dinámica intermedia para el paso 9 (índice 8)
           if (i === 8) {
             const selectedKey = getValues('Anexo_VII');
@@ -591,6 +561,8 @@ export function ActaMaximaAutoridadProForm() {
     let lastPushed = 0;
     for (const pageNum of pageNumbers) {
       const isErrored = erroredSteps.includes(pageNum);
+      const isActive = currentPage === pageNum;
+
       if (pageNum === -1) {
         if (lastPushed !== -1) {
           items.push(<PaginationEllipsis key={`ellipsis-${items.length}`} />);
@@ -608,7 +580,7 @@ export function ActaMaximaAutoridadProForm() {
                   goToStep(pageNum - 1);
                 }
               }}
-              isActive={currentPage === pageNum}
+              isActive={isActive}
               className={cn(
                 'cursor-pointer',
                 currentPage === pageNum && 'font-bold',
@@ -629,18 +601,74 @@ export function ActaMaximaAutoridadProForm() {
     return items;
   };
 
+  // useEffect ahora dispara la validación completa en el Paso 10
   useEffect(() => {
-    // Solo ejecutamos esta lógica si hay errores que estamos rastreando.
+    // Solo re-validamos si estamos en el Paso 10 y los datos cambian
+    if (currentStep === 9) {
+      const debounceTimeout = setTimeout(runStep10Validation, 500);
+      return () => clearTimeout(debounceTimeout);
+    }
+  }, [watchedValues, currentStep]); // Dependemos de los valores y del paso actual
+
+  // Dispara la validación UNA VEZ al entrar al Paso 10
+  useEffect(() => {
+    if (currentStep === 9) {
+      // 9 es el índice del Paso 10
+      runStep10Validation();
+    }
+  }, [currentStep]); // Se dispara solo cuando currentStep cambia
+
+  // Re-validar pasos con errores en tiempo real
+  useEffect(() => {
+    // Si no hay errores rastreados, no hacer nada.
     if (erroredSteps.length === 0) return;
 
     const checkErroredSteps = async () => {
       const stillErrored: number[] = [];
+
       // Usamos Promise.all para validar todos los pasos con errores en paralelo.
       await Promise.all(
         erroredSteps.map(async (stepNum) => {
           const stepIndex = stepNum - 1;
-          const fieldsToValidate = steps[stepIndex]
-            ?.fields as (keyof FormData)[];
+          const stepConfig = steps[stepIndex];
+
+          if (!stepConfig) return; // Seguridad
+
+          // Se copia la lógica de 'nextStep' para obtener los campos correctos
+          const baseFields = stepConfig.fields;
+          const currentFieldsArray: (keyof FormData)[] = Array.isArray(
+            baseFields
+          )
+            ? baseFields
+            : [];
+
+          let fieldsToValidate: (keyof FormData)[] = currentFieldsArray;
+
+          if (stepIndex === 8) {
+            // Si es el Paso 9 (índice 8)
+            const selectedKey = getValues('Anexo_VII');
+            if (selectedKey && selectedKey !== 'NO APLICA') {
+              const dynamicContent =
+                dynamicStepContent[selectedKey as keyof DynamicContent];
+              if (dynamicContent) {
+                if (dynamicContent.type === 'questions') {
+                  const dynamicFields = dynamicContent.questions.map(
+                    (q) => q.name
+                  );
+                  fieldsToValidate = [...currentFieldsArray, ...dynamicFields];
+                } else if (dynamicContent.type === 'textarea') {
+                  fieldsToValidate = [
+                    ...currentFieldsArray,
+                    dynamicContent.fieldName,
+                  ];
+                }
+              }
+            }
+          }
+
+          // Si el paso no tiene campos (como el Paso 10), no lo validamos
+          if (fieldsToValidate.length === 0) return;
+
           // Disparamos la validación solo para los campos de este paso.
           const isStepValid = await form.trigger(fieldsToValidate);
 
@@ -649,8 +677,10 @@ export function ActaMaximaAutoridadProForm() {
           }
         })
       );
+
       // Actualizamos el estado solo si la lista de errores ha cambiado.
-      if (stillErrored.length !== erroredSteps.length) {
+      // Usamos JSON.stringify para una comparación simple de arrays.
+      if (JSON.stringify(stillErrored) !== JSON.stringify(erroredSteps)) {
         setErroredSteps(stillErrored);
       }
     };
@@ -660,7 +690,7 @@ export function ActaMaximaAutoridadProForm() {
 
     // Limpieza: cancelamos el timeout si el usuario sigue escribiendo.
     return () => clearTimeout(debounceTimeout);
-  }, [watchedValues, erroredSteps, form]); // Dependemos de los valores y la lista de errores.
+  }, [watchedValues, erroredSteps, form, getValues]); // Dependemos de los valores y la lista de errores.
 
   // --- Renderizado Condicional del Contenido ---
   const currentStepData = steps[currentStep];
@@ -672,34 +702,6 @@ export function ActaMaximaAutoridadProForm() {
 
   return (
     <>
-      {/* --- Alert flotante personalizado --- */}
-      {showValidationAlert && (
-        <Alert
-          variant="destructive"
-          onMouseEnter={pauseTimer}
-          onMouseLeave={startTimer}
-          className="relative pr-10 fixed top-5 right-5 z-50 w-full max-w-md animate-in fade-in-90 slide-in-from-top-4 shadow-lg shadow-red-500/15"
-        >
-          <LuBadgeAlert className="h-4 w-4" />
-          <AlertTitle>Campos Incompletos</AlertTitle>
-          <AlertDescription className="flex items-center justify-between gap-4">
-            {alertContent.message}
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={alertContent.action}
-              className="flex-shrink-0 cursor-pointer"
-            >
-              Ir al error
-            </Button>
-          </AlertDescription>
-          <button
-            onClick={() => setShowValidationAlert(false)}
-            className="absolute top-2 right-2 p-1 rounded-md text-destructive/80 hover:text-destructive hover:bg-destructive/10 transition-colors"
-            aria-label="Cerrar alerta"
-          ></button>
-        </Alert>
-      )}
       <Card className="w-full bg-white flex flex-col h-[calc(100vh-10rem)] gap-0 overflow-hidden">
         {/* Header Fijo */}
         <CardHeader className="border-b sticky top-0 bg-white z-10">
@@ -1467,18 +1469,46 @@ export function ActaMaximaAutoridadProForm() {
 
               {/* PASO 10 (Índice 9) - FINAL */}
               {currentStep === 9 && (
-                <div className="space-y-4">
-                  <SiNoQuestion
-                    name="interesProducto"
-                    label="Nos complace que haya completado su acta. ¿Le gustaría recibir información para obtener la versión Pro con acceso a funcionalidades avanzadas?"
-                    options={['SI', 'NO']}
-                  />
-                  {/* Mensaje de finalización condicional */}
-                  {form.watch('interesProducto') && ( // Mostrar si ya se respondió
-                    <div className="text-center p-6 mt-8 bg-gray-50 rounded-lg border border-dashed transition-opacity duration-500">
+                <div className="text-center p-6 mt-8 bg-gray-50 rounded-lg border border-dashed transition-opacity duration-500">
+                  {!isFormGloballyValid ? (
+                    // --- VISTA DE ERROR ---
+                    <>
+                      <LuBadgeAlert className="mx-auto h-12 w-12 text-destructive" />
+                      <h3 className="mt-4 text-xl font-semibold text-g8">
+                        Campos Incompletos
+                      </h3>
+                      <p className="mt-2 text-sm text-gray-600">
+                        {alertContent.message ||
+                          'Revisa los pasos anteriores. Hay campos obligatorios sin llenar.'}
+                      </p>
+                      <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          onClick={alertContent.action} // Reutiliza la acción de 'onFormInvalid'
+                          className="cursor-pointer"
+                        >
+                          Ir al primer error
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleSaveAndExit} // Nueva función
+                          className="cursor-pointer text-black"
+                          disabled={isLoading}
+                        >
+                          {isLoading
+                            ? 'Guardando...'
+                            : 'Guardar y Salir al Panel'}
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    // --- VISTA DE ÉXITO ---
+                    <>
                       <CiCircleCheck className="mx-auto h-12 w-12 text-green5" />
                       <h3 className="mt-4 text-xl font-semibold text-g8">
-                        ¡Ha completado el formulario!
+                        ¡Ha completado el formulsario!
                       </h3>
                       <p className="mt-2 text-sm text-gray-600">
                         Ha llenado exitosamente el acta de entrega. Por favor,
@@ -1488,7 +1518,7 @@ export function ActaMaximaAutoridadProForm() {
                         Una vez que esté seguro, presione <b>Crear acta</b> para
                         generar el documento final.
                       </p>
-                    </div>
+                    </>
                   )}
                 </div>
               )}
@@ -1550,8 +1580,8 @@ export function ActaMaximaAutoridadProForm() {
                 <Button
                   type="button"
                   form="ma-pro-form"
-                  onClick={form.handleSubmit(onSubmit, onFormInvalid)}
-                  disabled={isLoading}
+                  onClick={form.handleSubmit(onSubmit)}
+                  disabled={isLoading || !isFormGloballyValid}
                   variant="default"
                   className="cursor-pointer shadow-sm"
                 >

@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { actaMaximaAutoridadSchema } from './schemas';
+import { actaMaximaAutoridadProSchema } from './schemas';
 
-type FormData = z.infer<typeof actaMaximaAutoridadSchema>;
+type FormData = z.infer<typeof actaMaximaAutoridadProSchema>;
 
 type QuestionsStep = {
   type: 'questions';
@@ -169,7 +169,7 @@ export const steps: StepInfo[] = [
     id: 10,
     title: 'Finalización y Envío',
     subtitle: 'Último paso antes de generar su acta.',
-    fields: ['interesProducto'],
+    fields: [],
   },
 ];
 

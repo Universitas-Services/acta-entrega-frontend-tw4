@@ -12,7 +12,7 @@ const proCardsData = [
     title: 'Acta de entrega del servidor público SALIENTE',
     description:
       'Inicia aquí el proceso para documentar la transferencia de tu cargo, asegurando un cierre de gestión ordenado y conforme a la normativa.',
-    href: '/dashboard/actas-pro/saliente',
+    href: '/dashboard/actas-pro/saliente-pro',
     icon: <HiDocumentArrowUp className="h-10 w-10 text-primary" />,
   },
   {
@@ -20,7 +20,7 @@ const proCardsData = [
     title: 'Acta de entrega del servidor público ENTRANTE',
     description:
       'Comienza a elaborar el acta para recibir tu nuevo cargo. Registra el estado de la dependencia y establece un punto de partida claro para tu gestión.',
-    href: '/dashboard/actas-pro/entrante',
+    href: '/dashboard/actas-pro/entrante-pro',
     icon: <HiDocumentArrowDown className="h-10 w-10 text-primary" />,
   },
   {

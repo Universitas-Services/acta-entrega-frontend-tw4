@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { actaSalienteSchema } from './schemas'; // Importamos el schema para inferir el tipo
+import { actaEntranteSchema } from '../schemas'; // Importamos el schema para inferir el tipo
 
 // Definimos el tipo FormData aquí para poder usarlo en nuestros tipos de constantes.
 // Nota: Esto crea una dependencia circular de tipos, que TypeScript maneja bien.
 // Si prefieres evitarla, puedes definir los fieldName como literales de string:
 // fieldName: 'accionesAuditoria' | 'deficienciasActa';
-type FormData = z.infer<typeof actaSalienteSchema>;
+type FormData = z.infer<typeof actaEntranteSchema>;
 
 // --- TIPOS COMPARTIDOS ---
 
@@ -53,9 +53,19 @@ export const steps = [
     title: 'Intervinientes en el Acta',
     subtitle: 'Artículo 10.3 Resolución CGR N.º 01-000162 de fecha 27-07-2009',
     fields: [
-      'nombreServidorRecibe',
-      'cedulaServidorRecibe',
-      'designacionServidorRecibe',
+      'nombreServidorEntrante',
+      'cedulaServidorEntrante',
+      'profesionServidorEntrante',
+      'designacionServidorEntrante',
+      'nombreAuditor',
+      'cedulaAuditor',
+      'profesionAuditor',
+      'nombreTestigo1',
+      'cedulaTestigo1',
+      'profesionTestigo1',
+      'nombreTestigo2',
+      'cedulaTestigo2',
+      'profesionTestigo2',
       'nombreServidorSaliente',
       'cedulaServidorSaliente',
       'designacionServidorSaliente',
@@ -199,7 +209,7 @@ export const anexosAdicionalesTitulos = [
 
 // --- CONTENIDO DINÁMICO DEL PASO 10 ---
 
-export const dynamicStepContentSaliente: DynamicContent = {
+export const dynamicStepContentEntrante: DynamicContent = {
   'UNIDADES ADMINISTRADORAS': {
     type: 'questions',
     title: 'Anexo VII. UNIDADES ADMINISTRADORAS',

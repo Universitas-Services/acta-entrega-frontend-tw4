@@ -23,7 +23,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHeader } from '@/context/HeaderContext';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
-import { complianceSchema, ComplianceFormData } from '@/lib/compliance-schema';
+import {
+  complianceSchema,
+  ComplianceFormData,
+} from '@/lib/pro/compliance-schema';
 import { LuTriangleAlert } from 'react-icons/lu';
 import {
   steps,
@@ -31,7 +34,7 @@ import {
   dynamicStepContentCompliance,
   ComplianceDynamicContent,
   ComplianceStepInfo,
-} from '@/lib/compliance-constants';
+} from '@/lib/pro/compliance-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { format } from 'date-fns';

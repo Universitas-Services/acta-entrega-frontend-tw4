@@ -46,7 +46,7 @@ import {
   anexosAdicionalesTitulos,
   dynamicStepContentSaliente,
   DynamicContent,
-} from '@/lib/acta-saliente-constants';
+} from '@/lib/express/acta-saliente-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { useFormState } from 'react-hook-form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';

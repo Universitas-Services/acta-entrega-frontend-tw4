@@ -19,8 +19,10 @@ export function GuardedButton({
   ...props
 }: GuardedButtonProps) {
   const router = useRouter();
-  const { isDirty, setIsDirty } = useFormDirtyStore();
-  const { open } = useModalStore(); // <-- Obtenemos la función 'open' del store
+  // --- LEER EL ESTADO COMPLETO Y LAS ACCIONES ---
+  const { isDirty, isProForm, hasReachedStep3, onSave, clearFormState } =
+    useFormDirtyStore();
+  const { open } = useModalStore();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (onClick) {
@@ -30,21 +32,30 @@ export function GuardedButton({
     if (isDirty) {
       e.preventDefault(); // Detenemos la navegación por defecto
 
-      // Llamamos al store para abrir el modal
-      open('unsavedChanges', {
-        // Le pasamos la lógica que debe ejecutarse si el usuario confirma
-        onConfirm: () => {
-          setIsDirty(false); // Limpiamos el estado "dirty"
-          router.push(href); // Y navegamos
-        },
-      });
+      const navigateAction = () => {
+        clearFormState(); // Limpiamos el estado "dirty"
+        router.push(href);
+      };
+
+      // --- LÓGICA DE DECISIÓN ---
+      if (isProForm && hasReachedStep3) {
+        // CASO PRO (Paso 3+): Abrir el nuevo modal de "Guardar al Salir"
+        open('saveOnExitPro', {
+          onSave: onSave, // Pasamos la función de guardado del formulario
+          onNavigate: navigateAction, // Pasamos la función de navegación
+        });
+      } else {
+        // CASO EXPRESS (o Pro en Pasos 1-2): Abrir el modal estándar
+        open('unsavedChanges', {
+          onConfirm: navigateAction, // La confirmación solo navega
+        });
+      }
     } else {
       // Navegación normal si no hay cambios
       setTimeout(() => router.push(href), 100);
     }
   };
 
-  // El botón ya no renderiza ningún diálogo. Está limpio y desacoplado.
   return (
     <Button onClick={handleClick} {...props}>
       {children}

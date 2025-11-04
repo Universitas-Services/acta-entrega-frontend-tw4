@@ -79,7 +79,6 @@ export function ActaMaximaAutoridadProForm() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
-  const { setIsDirty } = useFormDirtyStore();
   const [isSavedOnce, setIsSavedOnce] = useState(false); // Estado de guardado
   const [alertContent, setAlertContent] = useState({
     message: '',
@@ -87,6 +86,12 @@ export function ActaMaximaAutoridadProForm() {
   });
   const [erroredSteps, setErroredSteps] = useState<number[]>([]);
   const [isFormGloballyValid, setIsFormGloballyValid] = useState(false);
+
+  // --- ESTADO PARA RASTREAR EL PASO 3 ---
+  const [hasReachedStep3, setHasReachedStep3] = useState(false);
+
+  // --- OBTENER ACCIONES DEL STORE ---
+  const { setFormState, clearFormState } = useFormDirtyStore();
 
   useEffect(() => {
     setTitle('Acta Máxima Autoridad (PRO)');
@@ -191,11 +196,6 @@ export function ActaMaximaAutoridadProForm() {
   const { isDirty } = useFormState({ control: form.control });
   const { watch, getValues, trigger } = form; // Necesitamos watch y getValues para el paso dinámico
   const watchedValues = form.watch(); // Observa todos los valores del formulario
-
-  useEffect(() => {
-    setIsDirty(isDirty);
-    return () => setIsDirty(false);
-  }, [isDirty, setIsDirty]);
 
   // onSubmit (SIMULADO POR AHORA)
   const onSubmit = async (data: FormData) => {
@@ -349,7 +349,7 @@ export function ActaMaximaAutoridadProForm() {
   };
 
   // Función de Guardar
-  const handleSaveProgress = async () => {
+  const handleSaveProgress = useCallback(async () => {
     // Convertir a async si llamas a API
     console.log('Guardando progreso...', getValues());
     setIsLoading(true); // Indicar carga
@@ -364,7 +364,7 @@ export function ActaMaximaAutoridadProForm() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getValues, setIsSavedOnce, setIsLoading]);
 
   const handleSaveAndExit = async () => {
     await handleSaveProgress();
@@ -699,6 +699,38 @@ export function ActaMaximaAutoridadProForm() {
     | 'NO APLICA'
     | undefined
     | ''; // Para el paso 9
+
+  // --- useEffect PARA RASTREAR EL PASO 3 ---
+  useEffect(() => {
+    // currentStep es 0-indexado, así que el Paso 3 es el índice 2
+    if (currentStep >= 2 && !hasReachedStep3) {
+      setHasReachedStep3(true);
+    }
+  }, [currentStep, hasReachedStep3]);
+
+  // --- useEffect PARA ACTUALIZAR EL STORE GLOBAL ---
+  useEffect(() => {
+    // Esta función se pasa al store para que el GuardedButton la llame
+    const onSave = () => handleSaveProgress();
+
+    setFormState({
+      isDirty,
+      isProForm: true,
+      hasReachedStep3,
+      onSave, // Pasamos la función de guardado
+    });
+
+    // Al desmontar este componente (al salir de la pág), limpiar el store
+    return () => {
+      clearFormState();
+    };
+  }, [
+    isDirty,
+    hasReachedStep3,
+    setFormState,
+    clearFormState,
+    handleSaveProgress,
+  ]);
 
   return (
     <>

@@ -30,14 +30,14 @@ import { ShadcnDatePicker } from '../DatePicker';
 import { ShadcnTimePicker } from '../TimePicker';
 import { SiNoQuestion } from '../SiNoQuestion';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
-import { actaentranteProSchema } from '@/lib/schemas'; // Schema de Entrante
+import { actaSalienteProSchema } from '@/lib/schemas'; // Schema de Saliente
 import { LuTriangleAlert, LuBadgeAlert } from 'react-icons/lu';
 import {
   steps,
   anexosAdicionalesTitulos,
   dynamicStepContent,
-  DynamicContent,
-} from '@/lib/pro/acta-entrante-pro-constants';
+  type DynamicContent,
+} from '@/lib/pro/acta-saliente-pro-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FormFieldWithExtras } from '../FormFieldWithExtras';
@@ -64,9 +64,9 @@ import { cn } from '@/lib/utils';
 import { CiCircleCheck } from 'react-icons/ci';
 
 // Tipado del formulario usando el schema importado
-type FormData = z.infer<typeof actaentranteProSchema>;
+type FormData = z.infer<typeof actaSalienteProSchema>;
 
-export function ActaEntranteProForm() {
+export function ActaSalienteProForm() {
   // Cambiar nombre del componente
   const router = useRouter();
   const { setTitle } = useHeader();
@@ -93,12 +93,12 @@ export function ActaEntranteProForm() {
   const { setFormState, clearFormState } = useFormDirtyStore();
 
   useEffect(() => {
-    setTitle('Acta de entrega del servidor público ENTRANTE');
+    setTitle('Acta de entrega del servidor público SALIENTE');
   }, [setTitle]);
 
   const form = useForm<FormData>({
     mode: 'onChange',
-    resolver: zodResolver(actaentranteProSchema),
+    resolver: zodResolver(actaSalienteProSchema),
     shouldUnregister: false,
     defaultValues: {
       email: '',
@@ -111,22 +111,17 @@ export function ActaEntranteProForm() {
       fechaSuscripcion: '',
       direccionOrgano: '',
       motivoEntrega: '',
-      nombreServidorEntrante: '',
-      cedulaServidorEntrante: '',
-      profesionServidorEntrante: '',
-      designacionServidorEntrante: '',
-      nombreAuditor: '',
-      cedulaAuditor: '',
-      profesionAuditor: '',
-      nombreTestigo1: '',
-      cedulaTestigo1: '',
-      profesionTestigo1: '',
-      nombreTestigo2: '',
-      cedulaTestigo2: '',
-      profesionTestigo2: '',
+
       nombreServidorSaliente: '',
       cedulaServidorSaliente: '',
       designacionServidorSaliente: '',
+
+      nombreServidorRecibe: '',
+      cedulaServidorRecibe: '',
+      designacionServidorRecibe: '',
+
+      Anexo_VI: '',
+      Anexo_VII: '',
       disponeEstadoSituacionPresupuestaria: '',
       disponeRelacionGastosComprometidosNoCausados: '',
       disponeRelacionGastosComprometidosCausadosNoPagados: '',
@@ -160,9 +155,6 @@ export function ActaEntranteProForm() {
       disponePlanOperativoAnual: '',
       disponeClasificacionArchivo: '',
       incluyeUbicacionFisicaArchivo: '',
-      Anexo_VI: '',
-      Anexo_VII: '', // Campos del paso 9
-      // Campos dinámicos (inicializados)
       disponeRelacionMontosFondosAsignados: '',
       disponeSaldoEfectivoFondos: '',
       disponeRelacionBienesAsignados: '',
@@ -198,7 +190,7 @@ export function ActaEntranteProForm() {
 
   // onSubmit (SIMULADO POR AHORA)
   const onSubmit = async (data: FormData) => {
-    console.log('DATOS FINALES A ENVIAR (Entrante-PRO):', data);
+    console.log('DATOS FINALES A ENVIAR (Saliente-PRO):', data);
     setIsLoading(true);
     setApiError(null);
     try {
@@ -374,8 +366,8 @@ export function ActaEntranteProForm() {
   // --- Funciones de Navegación (Adaptadas para 10 pasos y salto en Paso 9) ---
   const nextStep = async () => {
     const baseFields = steps[currentStep]?.fields;
-    const currentFieldsArray: (keyof FormData)[] = Array.isArray(baseFields)
-      ? baseFields
+    const currentFieldsArray: (keyof FormData)[] = Array.isArray(baseFields) // <-- Tipado corregido
+      ? (baseFields as (keyof FormData)[])
       : [];
 
     let fieldsToValidate: (keyof FormData)[] = currentFieldsArray;
@@ -481,7 +473,9 @@ export function ActaEntranteProForm() {
         for (let i = currentStep; i < stepIndex; i++) {
           const baseFieldsIntermediate = steps[i]?.fields;
           const currentFieldsArrayIntermediate: (keyof FormData)[] =
-            Array.isArray(baseFieldsIntermediate) ? baseFieldsIntermediate : [];
+            Array.isArray(baseFieldsIntermediate)
+              ? (baseFieldsIntermediate as (keyof FormData)[])
+              : [];
 
           let fieldsToValidateIntermediate: (keyof FormData)[] =
             currentFieldsArrayIntermediate;
@@ -632,13 +626,11 @@ export function ActaEntranteProForm() {
           const stepConfig = steps[stepIndex];
 
           if (!stepConfig) return; // Seguridad
-
-          // Se copia la lógica de 'nextStep' para obtener los campos correctos
           const baseFields = stepConfig.fields;
           const currentFieldsArray: (keyof FormData)[] = Array.isArray(
             baseFields
           )
-            ? baseFields
+            ? (baseFields as (keyof FormData)[])
             : [];
 
           let fieldsToValidate: (keyof FormData)[] = currentFieldsArray;
@@ -1000,181 +992,6 @@ export function ActaEntranteProForm() {
               {currentStep === 1 && (
                 <div className="space-y-6">
                   <h3 className="text-lg font-semibold border-b pb-2">
-                    Servidor Público Designado
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormFieldWithExtras
-                      name="nombreServidorEntrante"
-                      label="Nombre"
-                      subtitle="Ej: Pedro Jose Rodríguez Hernández"
-                      maxLength={50}
-                      validationType="textOnly"
-                    />
-                    <FormField
-                      control={form.control}
-                      name="cedulaServidorEntrante"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Cédula</FormLabel>
-                          <FormDescription className="italic">
-                            Ej: V-00.000.000
-                          </FormDescription>
-                          <FormControl>
-                            <InputCompuesto
-                              id={field.name}
-                              type="cedula"
-                              options={['V', 'E']} // Opciones para el desplegable
-                              placeholder=""
-                              {...field}
-                              onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormFieldWithExtras
-                      name="profesionServidorEntrante"
-                      label="Profesión"
-                      subtitle="Ej: Contador, Ingeniero, Abogado"
-                      maxLength={50}
-                      validationType="textOnly"
-                    />
-                    <FormFieldWithExtras
-                      name="designacionServidorEntrante"
-                      label="Datos de designación"
-                      subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-0000"
-                      maxLength={150}
-                    />
-                  </div>
-                  <h3 className="text-lg font-semibold border-b pb-2">
-                    Auditor
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <FormFieldWithExtras
-                      name="nombreAuditor"
-                      label="Nombre"
-                      subtitle="Ej: Pedro José Rodríguez Hernández"
-                      maxLength={50}
-                      validationType="textOnly"
-                    />
-                    <FormField
-                      control={form.control}
-                      name="cedulaAuditor"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Cédula</FormLabel>
-                          <FormDescription className="italic">
-                            Ej: V-00.000.000
-                          </FormDescription>
-                          <FormControl>
-                            <InputCompuesto
-                              id={field.name}
-                              type="cedula"
-                              options={['V', 'E']} // Opciones para el desplegable
-                              placeholder=""
-                              {...field}
-                              onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormFieldWithExtras
-                      name="profesionAuditor"
-                      label="Profesión"
-                      subtitle="Ej: Contador, Ingeniero, Abogado"
-                      maxLength={50}
-                      validationType="textOnly"
-                    />
-                  </div>
-                  <h3 className="text-lg font-semibold border-b pb-2">
-                    Testigos
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                    <div className="space-y-4 p-4 border rounded-md">
-                      <p className="font-medium">Testigo N° 1</p>
-                      <FormFieldWithExtras
-                        name="nombreTestigo1"
-                        label="Nombre"
-                        subtitle="Ej: Pedro José Rodríguez Hernández"
-                        maxLength={50}
-                        validationType="textOnly"
-                      />
-                      <FormField
-                        control={form.control}
-                        name="cedulaTestigo1"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Cédula</FormLabel>
-                            <FormDescription className="italic">
-                              Ej: V-00.000.000
-                            </FormDescription>
-                            <FormControl>
-                              <InputCompuesto
-                                id={field.name}
-                                type="cedula"
-                                options={['V', 'E']} // Opciones para el desplegable
-                                placeholder=""
-                                {...field}
-                                onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormFieldWithExtras
-                        name="profesionTestigo1"
-                        label="Profesión"
-                        subtitle="Ej: Contador, Ingeniero, Abogado"
-                        maxLength={50}
-                        validationType="textOnly"
-                      />
-                    </div>
-                    <div className="space-y-4 p-4 border rounded-md">
-                      <p className="font-medium">Testigo N° 2</p>
-                      <FormFieldWithExtras
-                        name="nombreTestigo2"
-                        label="Nombre"
-                        subtitle="Ej: Pedro José Rodríguez Hernández"
-                        maxLength={50}
-                        validationType="textOnly"
-                      />
-                      <FormField
-                        control={form.control}
-                        name="cedulaTestigo2"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Cédula</FormLabel>
-                            <FormDescription className="italic">
-                              Ej: V-00.000.000
-                            </FormDescription>
-                            <FormControl>
-                              <InputCompuesto
-                                id={field.name}
-                                type="cedula"
-                                options={['V', 'E']} // Opciones para el desplegable
-                                placeholder=""
-                                {...field}
-                                onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormFieldWithExtras
-                        name="profesionTestigo2"
-                        label="Profesión"
-                        subtitle="Ej: Contador, Ingeniero, Abogado"
-                        maxLength={50}
-                        validationType="textOnly"
-                      />
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-semibold border-b pb-2">
                     Servidor Público Saliente
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1210,6 +1027,48 @@ export function ActaEntranteProForm() {
                     />
                     <FormFieldWithExtras
                       name="designacionServidorSaliente"
+                      label="Datos de designación"
+                      subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-0000"
+                      maxLength={150}
+                    />
+                  </div>
+
+                  <h3 className="text-lg font-semibold border-b pb-2">
+                    Servidor Público Entrante
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <FormFieldWithExtras
+                      name="nombreServidorRecibe"
+                      label="Nombre"
+                      subtitle="Ej: Pedro José Rodríguez Hernández"
+                      maxLength={50}
+                      validationType="textOnly"
+                    />
+                    <FormField
+                      control={form.control}
+                      name="cedulaServidorRecibe"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Cédula</FormLabel>
+                          <FormDescription className="italic">
+                            Ej: V-00.000.000
+                          </FormDescription>
+                          <FormControl>
+                            <InputCompuesto
+                              id={field.name}
+                              type="cedula"
+                              options={['V', 'E']} // Opciones para el desplegable
+                              placeholder=""
+                              {...field}
+                              onChange={(value) => field.onChange(value)} // Conecta el cambio con el formulario
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormFieldWithExtras
+                      name="designacionServidorRecibe"
                       label="Datos de designación"
                       subtitle="Ej: Resolución N° 000/00 de fecha 00-00-0000 publicado en Gaceta N° 0000 de fecha 00-00-0000"
                       maxLength={150}

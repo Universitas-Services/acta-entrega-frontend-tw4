@@ -33,7 +33,6 @@ import {
   anexosAdicionalesTitulosCompliance,
   dynamicStepContentCompliance,
   ComplianceDynamicContent,
-  ComplianceStepInfo,
 } from '@/lib/pro/compliance-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -1143,7 +1142,7 @@ export function ComplianceForm() {
         description={dialogContent.description}
         onConfirm={() => {
           setShowSuccessDialog(false);
-          router.push('/dashboard'); // O a donde corresponda
+          router.push('/dashboard/pro');
         }}
       />
     </Card>

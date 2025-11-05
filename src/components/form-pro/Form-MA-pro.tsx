@@ -1630,7 +1630,7 @@ export function ActaMaximaAutoridadProForm() {
           description={dialogContent.description}
           onConfirm={() => {
             setShowSuccessDialog(false);
-            router.push('/dashboard');
+            router.push('/dashboard/pro');
           }}
         />
       </Card>

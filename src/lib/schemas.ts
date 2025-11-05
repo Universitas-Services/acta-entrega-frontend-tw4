@@ -1,7 +1,31 @@
 import * as z from 'zod';
-import { dynamicStepContent } from './express/acta-ma-constants';
-import { dynamicStepContentEntrante } from './express/acta-entrante-constants';
-import { dynamicStepContentSaliente } from './express/acta-saliente-constants';
+
+// --- IMPORTACIONES DE CONSTANTES (SEPARADAS) ---
+import {
+  dynamicStepContent as dynamicContentExpress_MA,
+  type DynamicContent as DynamicContentExpress_MA,
+} from './express/acta-ma-constants';
+import {
+  dynamicStepContentEntrante as dynamicContentExpress_Entrante,
+  type DynamicContent as DynamicContentExpress_Entrante,
+} from './express/acta-entrante-constants';
+import {
+  dynamicStepContentSaliente as dynamicContentExpress_Saliente,
+  type DynamicContent as DynamicContentExpress_Saliente,
+} from './express/acta-saliente-constants';
+
+import {
+  dynamicStepContent as dynamicContentPro_MA,
+  type DynamicContent as DynamicContentPro_MA,
+} from './pro/acta-ma-pro-constants';
+import {
+  dynamicStepContent as dynamicContentPro_Entrante,
+  type DynamicContent as DynamicContentPro_Entrante,
+} from './pro/acta-entrante-pro-constants';
+import {
+  dynamicStepContent as dynamicContentPro_Saliente,
+  type DynamicContent as DynamicContentPro_Saliente,
+} from './pro/acta-saliente-pro-constants';
 
 // Expresión regular para RIF (ej: G-20000000-0)
 const rifRegex = /^[GJE]-\d{8}-\d{1}$/;
@@ -169,22 +193,18 @@ export const actaMaximaAutoridadSchemaBase = z.object({
   deficienciasActa: z.string().optional(),
 });
 
-// Creamos el tipo base para el formulario PRO (sin interesProducto)
-const actaMaximaAutoridadProSchemaBase = actaMaximaAutoridadSchemaBase.omit({
-  interesProducto: true,
-});
-
-// Inferimos el tipo de dato de este nuevo schema base
-type ProFormData = z.infer<typeof actaMaximaAutoridadProSchemaBase>;
-
-// Definimos el helper dynamicRefine usando este tipo más restrictivo
-const dynamicRefine = (data: ProFormData, ctx: z.RefinementCtx) => {
+// --- Refine para MA EXPRESS ---
+const dynamicRefine_MA_Express = (
+  data: z.infer<typeof actaMaximaAutoridadSchemaBase>,
+  ctx: z.RefinementCtx
+) => {
   const selectedAnexo = data.Anexo_VII;
-  if (!selectedAnexo || selectedAnexo === 'NO APLICA') {
-    return;
-  }
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
+
   const anexoContent =
-    dynamicStepContent[selectedAnexo as keyof typeof dynamicStepContent];
+    dynamicContentExpress_MA[
+      selectedAnexo as keyof DynamicContentExpress_MA // <-- TIPO CORREGIDO
+    ];
   if (!anexoContent) return;
 
   if (anexoContent.type === 'questions') {
@@ -199,7 +219,7 @@ const dynamicRefine = (data: ProFormData, ctx: z.RefinementCtx) => {
       }
     });
   } else if (anexoContent.type === 'textarea') {
-    const fieldName = anexoContent.fieldName as keyof ProFormData;
+    const fieldName = anexoContent.fieldName as keyof typeof data;
     const value = data[fieldName] as unknown;
     if (typeof value !== 'string' || value.trim() === '') {
       ctx.addIssue({
@@ -211,15 +231,50 @@ const dynamicRefine = (data: ProFormData, ctx: z.RefinementCtx) => {
   }
 };
 
-// --- Schema para EXPRESS (Gratis) ---
-// Usa el schema base original (con interesProducto)
-export const actaMaximaAutoridadSchema =
-  actaMaximaAutoridadSchemaBase.superRefine(dynamicRefine);
+// --- Refine para MA PRO ---
+const actaMaximaAutoridadProSchemaBase = actaMaximaAutoridadSchemaBase.omit({
+  interesProducto: true,
+});
+type ProFormDataMA = z.infer<typeof actaMaximaAutoridadProSchemaBase>;
 
-// --- Schema para PRO ---
-// Usa el schema base "Pro" (sin interesProducto)
+const dynamicRefine_MA_Pro = (data: ProFormDataMA, ctx: z.RefinementCtx) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
+
+  const anexoContent =
+    dynamicContentPro_MA[selectedAnexo as keyof DynamicContentPro_MA]; // <-- TIPO CORREGIDO
+  if (!anexoContent) return;
+
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [fieldName],
+          message: 'Debe seleccionar una opción.',
+        });
+      }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof ProFormDataMA;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
+    }
+  }
+};
+
+// --- Exportaciones de Schemas MA ---
+export const actaMaximaAutoridadSchema =
+  actaMaximaAutoridadSchemaBase.superRefine(dynamicRefine_MA_Express);
+
 export const actaMaximaAutoridadProSchema =
-  actaMaximaAutoridadProSchemaBase.superRefine(dynamicRefine);
+  actaMaximaAutoridadProSchemaBase.superRefine(dynamicRefine_MA_Pro);
 
 // --- Esquema para Acta Saliente ---
 
@@ -375,26 +430,16 @@ export const actaSalienteSchemaBase = z.object({
   deficienciasActa: z.string().optional(),
 });
 
-// Creamos el tipo base para el formulario PRO (sin interesProducto)
-const actaSalienteProSchemaBase = actaSalienteSchemaBase.omit({
-  interesProducto: true,
-});
-
-// Inferimos el tipo de dato de este nuevo schema base
-type SalienteProFormData = z.infer<typeof actaSalienteProSchemaBase>;
-
-// Definimos el helper dynamicRefine usando este tipo más restrictivo
-const dynamicRefineSaliente = (
-  data: SalienteProFormData,
+// --- Refine para Saliente EXPRESS ---
+const dynamicRefine_Saliente_Express = (
+  data: z.infer<typeof actaSalienteSchemaBase>,
   ctx: z.RefinementCtx
 ) => {
   const selectedAnexo = data.Anexo_VII;
-  if (!selectedAnexo || selectedAnexo === 'NO APLICA') {
-    return;
-  }
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
   const anexoContent =
-    dynamicStepContentSaliente[
-      selectedAnexo as keyof typeof dynamicStepContentSaliente
+    dynamicContentExpress_Saliente[
+      selectedAnexo as keyof DynamicContentExpress_Saliente // <-- TIPO CORREGIDO
     ];
   if (!anexoContent) return;
 
@@ -410,7 +455,7 @@ const dynamicRefineSaliente = (
       }
     });
   } else if (anexoContent.type === 'textarea') {
-    const fieldName = anexoContent.fieldName as keyof SalienteProFormData;
+    const fieldName = anexoContent.fieldName as keyof typeof data;
     const value = data[fieldName] as unknown;
     if (typeof value !== 'string' || value.trim() === '') {
       ctx.addIssue({
@@ -422,16 +467,54 @@ const dynamicRefineSaliente = (
   }
 };
 
-// --- Schema para EXPRESS (Gratis) ---
-// Usa el schema base original (con interesProducto)
-export const actaSalienteSchema = actaSalienteSchemaBase.superRefine(
-  dynamicRefineSaliente
-);
+// --- Refine para Saliente PRO ---
+const actaSalienteProSchemaBase = actaSalienteSchemaBase.omit({
+  interesProducto: true,
+});
+type ProFormDataSaliente = z.infer<typeof actaSalienteProSchemaBase>;
 
-// --- Schema para PRO ---
-// Usa el schema base "Pro" (sin interesProducto)
+const dynamicRefine_Saliente_Pro = (
+  data: ProFormDataSaliente,
+  ctx: z.RefinementCtx
+) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
+  const anexoContent =
+    dynamicContentPro_Saliente[
+      selectedAnexo as keyof DynamicContentPro_Saliente // <-- TIPO CORREGIDO
+    ];
+  if (!anexoContent) return;
+
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [fieldName],
+          message: 'Debe seleccionar una opción.',
+        });
+      }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof ProFormDataSaliente;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
+    }
+  }
+};
+
+// --- Exportaciones de Schemas Saliente ---
+export const actaSalienteSchema = actaSalienteSchemaBase.superRefine(
+  dynamicRefine_Saliente_Express
+);
 export const actaSalienteProSchema = actaSalienteProSchemaBase.superRefine(
-  dynamicRefineSaliente
+  dynamicRefine_Saliente_Pro
 );
 
 // ACTA ENTRANTE SCHEMA
@@ -597,26 +680,16 @@ export const actaEntranteSchemaBase = z.object({
   deficienciasActa: z.string().optional(),
 });
 
-// Creamos el tipo base para el formulario PRO (sin interesProducto)
-const actaentranteProSchemaBase = actaEntranteSchemaBase.omit({
-  interesProducto: true,
-});
-
-// Inferimos el tipo de dato de este nuevo schema base
-type EntranteProFormData = z.infer<typeof actaentranteProSchemaBase>;
-
-// Definimos el helper dynamicRefine usando este tipo más restrictivo
-const dynamicRefineEntrante = (
-  data: EntranteProFormData,
+// --- Refine para Entrante EXPRESS ---
+const dynamicRefine_Entrante_Express = (
+  data: z.infer<typeof actaEntranteSchemaBase>,
   ctx: z.RefinementCtx
 ) => {
   const selectedAnexo = data.Anexo_VII;
-  if (!selectedAnexo || selectedAnexo === 'NO APLICA') {
-    return;
-  }
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
   const anexoContent =
-    dynamicStepContentEntrante[
-      selectedAnexo as keyof typeof dynamicStepContentEntrante
+    dynamicContentExpress_Entrante[
+      selectedAnexo as keyof DynamicContentExpress_Entrante // <-- TIPO CORREGIDO
     ];
   if (!anexoContent) return;
 
@@ -632,7 +705,7 @@ const dynamicRefineEntrante = (
       }
     });
   } else if (anexoContent.type === 'textarea') {
-    const fieldName = anexoContent.fieldName as keyof EntranteProFormData;
+    const fieldName = anexoContent.fieldName as keyof typeof data;
     const value = data[fieldName] as unknown;
     if (typeof value !== 'string' || value.trim() === '') {
       ctx.addIssue({
@@ -644,14 +717,52 @@ const dynamicRefineEntrante = (
   }
 };
 
-// --- Schema para EXPRESS (Gratis) ---
-// Usa el schema base original (con interesProducto)
-export const actaEntranteSchema = actaEntranteSchemaBase.superRefine(
-  dynamicRefineEntrante
-);
+// --- Refine para Entrante PRO ---
+const actaEntranteProSchemaBase = actaEntranteSchemaBase.omit({
+  interesProducto: true,
+});
+type ProFormDataEntrante = z.infer<typeof actaEntranteProSchemaBase>;
 
-// --- Schema para PRO ---
-// Usa el schema base "Pro" (sin interesProducto)
-export const actaentranteProSchema = actaentranteProSchemaBase.superRefine(
-  dynamicRefineEntrante
+const dynamicRefine_Entrante_Pro = (
+  data: ProFormDataEntrante,
+  ctx: z.RefinementCtx
+) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
+  const anexoContent =
+    dynamicContentPro_Entrante[
+      selectedAnexo as keyof DynamicContentPro_Entrante // <-- TIPO CORREGIDO
+    ];
+  if (!anexoContent) return;
+
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [fieldName],
+          message: 'Debe seleccionar una opción.',
+        });
+      }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof ProFormDataEntrante;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
+    }
+  }
+};
+
+// --- Exportaciones de Schemas Entrante ---
+export const actaEntranteSchema = actaEntranteSchemaBase.superRefine(
+  dynamicRefine_Entrante_Express
+);
+export const actaentranteProSchema = actaEntranteProSchemaBase.superRefine(
+  dynamicRefine_Entrante_Pro
 );

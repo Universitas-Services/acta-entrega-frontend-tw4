@@ -15,10 +15,10 @@ export default function Header() {
   const isDesktop = useMediaQuery('(min-width: 768px)');
 
   return (
-    // ▼▼▼ MODIFICACIÓN 1: Quitamos 'relative' y 'justify-between' ▼▼▼
-    <header className="flex min-h-16 shrink-0 items-center bg-background px-4 md:px-6">
+    // Se quita 'relative' y 'justify-between'
+    <header className="flex min-h-16 shrink-0 items-center bg-background px-0 md:px-6">
       {/* --- Columna Izquierda --- */}
-      <div className="flex w-1/4 justify-start">
+      <div className="flex w-1/4 justify-center">
         <Button
           variant="ghost"
           onClick={toggleMobileMenu}
@@ -44,7 +44,7 @@ export default function Header() {
         )}
       </div>
 
-      {/* ▼▼▼ MODIFICACIÓN 2: Título en una columna flexible ▼▼▼ */}
+      {/* Título en una columna flexible */}
       <div className="flex-1 min-w-0">
         <h1 className="text-center text-xl font-semibold text-foreground sm:text-2xl md:text-2xl">
           {title}

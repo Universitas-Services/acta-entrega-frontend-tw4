@@ -1,4 +1,3 @@
-// src/app/dashboard/(forms)/layout.tsx
 'use client';
 
 import Header from '@/components/Header';
@@ -10,6 +9,7 @@ import { PopupManager } from '@/components/PopupManager';
 import { LogoutConfirmationDialog } from '@/components/LogoutConfirmationDialog';
 import { SessionManager } from '@/components/SessionManager';
 import { UnsavedChangesDialog } from '@/components/UnsavedChangesDialog';
+import { SaveOnExitDialog } from '@/components/SaveOnExitDialog';
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
@@ -21,7 +21,7 @@ export default function FormsProLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    // --- INICIO: Lógica para controlar el scroll del body ---
+    // --- Lógica para controlar el scroll del body ---
     // Al montar este layout (o al navegar dentro de él), ocultamos el scroll del body
     document.body.style.overflow = 'hidden';
 
@@ -30,7 +30,7 @@ export default function FormsProLayout({
       // Restauramos el scroll del body a su estado normal
       document.body.style.overflow = '';
     };
-    // --- FIN: Lógica para controlar el scroll del body ---
+    // --- Lógica para controlar el scroll del body ---
   }, []); // El array vacío asegura que esto se ejecute solo al montar/desmontar el layout
 
   useEffect(() => {
@@ -69,6 +69,7 @@ export default function FormsProLayout({
           {/* Modales globales */}
           <LogoutConfirmationDialog />
           <UnsavedChangesDialog />
+          <SaveOnExitDialog />
           <PopupManager />
           <SessionManager />
         </SidebarProvider>

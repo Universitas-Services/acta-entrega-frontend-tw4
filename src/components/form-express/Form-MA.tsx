@@ -46,7 +46,7 @@ import {
   anexosAdicionalesTitulos,
   dynamicStepContent,
   DynamicContent,
-} from '@/lib/acta-ma-constants';
+} from '@/lib/express/acta-ma-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { useFormState } from 'react-hook-form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -181,18 +181,26 @@ export function ActaMaximaAutoridadForm() {
 
   const selectedAnexo = watch('Anexo_VII') as DynamicStepKey;
 
-  const { setIsDirty } = useFormDirtyStore();
+  const { setFormState, clearFormState } = useFormDirtyStore();
   const { isDirty } = useFormState({ control: form.control });
 
   // useEffect para comunicar el estado del formulario al store
   useEffect(() => {
-    setIsDirty(isDirty);
+    // Usar 'setFormState'
+    // Le decimos al store que el form está "sucio", pero que NO es un formulario Pro
+    // y que NO ha llegado al paso 3.
+    setFormState({
+      isDirty: isDirty,
+      isProForm: false,
+      hasReachedStep3: false,
+    });
 
     // Función de limpieza: se ejecuta cuando el componente se desmonta
     return () => {
-      setIsDirty(false);
+      // Usar 'clearFormState' para un reseteo completo
+      clearFormState();
     };
-  }, [isDirty, setIsDirty]);
+  }, [isDirty, setFormState, clearFormState]); // Dependencias actualizadas
 
   const onSubmit = async (data: FormData) => {
     console.log('DATOS FINALES A ENVIAR:', data);

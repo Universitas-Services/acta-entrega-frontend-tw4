@@ -23,15 +23,17 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHeader } from '@/context/HeaderContext';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
-import { complianceSchema, ComplianceFormData } from '@/lib/compliance-schema';
+import {
+  complianceSchema,
+  ComplianceFormData,
+} from '@/lib/pro/compliance-schema';
 import { LuTriangleAlert } from 'react-icons/lu';
 import {
   steps,
   anexosAdicionalesTitulosCompliance,
   dynamicStepContentCompliance,
   ComplianceDynamicContent,
-  ComplianceStepInfo,
-} from '@/lib/compliance-constants';
+} from '@/lib/pro/compliance-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { format } from 'date-fns';
@@ -72,7 +74,7 @@ export function ComplianceForm() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [highestStepVisited, setHighestStepVisited] = useState(currentStep);
 
-  const { setIsDirty } = useFormDirtyStore();
+  const { setFormState, clearFormState } = useFormDirtyStore();
 
   useEffect(() => {
     setTitle('Compliance de Actas de Entrega'); // Título específico
@@ -195,7 +197,7 @@ export function ComplianceForm() {
     },
   });
 
-  const { watch, getValues, trigger } = form; // Necesitamos watch para reaccionar al cambio del dropdown
+  const { watch, getValues } = form; // Necesitamos watch para reaccionar al cambio del dropdown
 
   const { isDirty } = useFormState({ control: form.control });
 
@@ -205,11 +207,21 @@ export function ComplianceForm() {
     | undefined
     | ''; // Tipado más preciso
 
-  // Efecto para estado dirty (copiado de Form-MA)
+  // Actualizar el useEffect para usar el store
   useEffect(() => {
-    setIsDirty(isDirty);
-    return () => setIsDirty(false);
-  }, [isDirty, setIsDirty]);
+    // Le decimos al store que el form está "sucio", pero que NO es un formulario Pro
+    // (para que muestre el modal de 'unsavedChanges' y no el de 'saveOnExitPro')
+    setFormState({
+      isDirty: isDirty,
+      isProForm: true,
+      hasReachedStep3: false,
+    });
+
+    // Función de limpieza: se ejecuta cuando el componente se desmonta
+    return () => {
+      clearFormState();
+    };
+  }, [isDirty, setFormState, clearFormState]); // Dependencias actualizadas
 
   // Función onSubmit (placeholder por ahora)
   const onSubmit = async (data: ComplianceFormData) => {
@@ -1130,7 +1142,7 @@ export function ComplianceForm() {
         description={dialogContent.description}
         onConfirm={() => {
           setShowSuccessDialog(false);
-          router.push('/dashboard'); // O a donde corresponda
+          router.push('/dashboard/pro');
         }}
       />
     </Card>

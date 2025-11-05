@@ -1,13 +1,7 @@
 import { z } from 'zod';
-import { actaSalienteSchema } from './schemas'; // Importamos el schema para inferir el tipo
+import { actaMaximaAutoridadProSchema } from '../schemas';
 
-// Definimos el tipo FormData aquí para poder usarlo en nuestros tipos de constantes.
-// Nota: Esto crea una dependencia circular de tipos, que TypeScript maneja bien.
-// Si prefieres evitarla, puedes definir los fieldName como literales de string:
-// fieldName: 'accionesAuditoria' | 'deficienciasActa';
-type FormData = z.infer<typeof actaSalienteSchema>;
-
-// --- TIPOS COMPARTIDOS ---
+type FormData = z.infer<typeof actaMaximaAutoridadProSchema>;
 
 type QuestionsStep = {
   type: 'questions';
@@ -15,24 +9,28 @@ type QuestionsStep = {
   subtitle: string;
   questions: { name: keyof FormData; label: string }[];
 };
-
 type TextareaStep = {
   type: 'textarea';
   title: string;
   subtitle: string;
   fieldName: keyof FormData;
 };
-
 export type DynamicStep = QuestionsStep | TextareaStep;
+export type DynamicContent = { [key: string]: DynamicStep };
 
-export type DynamicContent = {
-  [key: string]: DynamicStep;
+// Tipo para la información de cada paso
+export type StepInfo = {
+  id: number;
+  title: string;
+  subtitle?: string;
+  fields: (keyof FormData)[];
 };
 
 // --- ESTRUCTURA DE LOS PASOS ---
-
-export const steps = [
+// Total 10 pasos
+export const steps: StepInfo[] = [
   {
+    // PASO 1 (Índice 0)
     id: 1,
     title: 'Datos generales del Acta',
     fields: [
@@ -49,19 +47,31 @@ export const steps = [
     ],
   },
   {
+    // PASO 2 (Índice 1)
     id: 2,
     title: 'Intervinientes en el Acta',
     subtitle: 'Artículo 10.3 Resolución CGR N.º 01-000162 de fecha 27-07-2009',
     fields: [
-      'nombreServidorRecibe',
-      'cedulaServidorRecibe',
-      'designacionServidorRecibe',
+      'nombreServidorEntrante',
+      'cedulaServidorEntrante',
+      'profesionServidorEntrante',
+      'designacionServidorEntrante',
+      'nombreAuditor',
+      'cedulaAuditor',
+      'profesionAuditor',
+      'nombreTestigo1',
+      'cedulaTestigo1',
+      'profesionTestigo1',
+      'nombreTestigo2',
+      'cedulaTestigo2',
+      'profesionTestigo2',
       'nombreServidorSaliente',
       'cedulaServidorSaliente',
       'designacionServidorSaliente',
     ],
   },
   {
+    // PASO 3 (Índice 2)
     id: 3,
     title:
       'Anexo I: Estado de las cuentas que reflejen la SITUACIÓN PRESUPUESTARIA, cuando sea aplicable.',
@@ -76,6 +86,7 @@ export const steps = [
     ],
   },
   {
+    // PASO 4 (Índice 3)
     id: 4,
     title:
       'Anexo I: Estado de las cuentas que reflejen la SITUACIÓN FINANCIERA Y PATRIMONIAL, cuando sea aplicable.',
@@ -104,6 +115,7 @@ export const steps = [
     ],
   },
   {
+    // PASO 5 (Índice 4)
     id: 5,
     title:
       'Anexo II.  Mención del número de cargos existentes, con señalamiento de si son empleados u obreros, fijos o contratados, así como el número de jubilados y pensionados, de ser el caso.',
@@ -116,6 +128,7 @@ export const steps = [
     ],
   },
   {
+    // PASO 6 (Índice 5)
     id: 6,
     title: 'Anexo III.  Inventario de bienes muebles e inmuebles.',
     subtitle:
@@ -123,6 +136,7 @@ export const steps = [
     fields: ['disponeInventarioBienes'],
   },
   {
+    // PASO 7 (Índice 6)
     id: 7,
     title:
       'Anexo IV. Situación de la ejecución del plan operativo de conformidad con los objetivos propuestos y las metas fijadas en el presupuesto correspondiente.',
@@ -135,6 +149,7 @@ export const steps = [
     ],
   },
   {
+    // PASO 8 (Índice 7)
     id: 8,
     title: 'Anexo V. Índice general del archivo.',
     subtitle:
@@ -142,28 +157,23 @@ export const steps = [
     fields: ['disponeClasificacionArchivo', 'incluyeUbicacionFisicaArchivo'],
   },
   {
+    // PASO 9 (Índice 8) - ANEXOS ADICIONALES (DINÁMICO)
     id: 9,
-    title: 'Anexo VI.',
+    title: 'Anexo VI. y Anexos Adicionales',
     subtitle:
       '(Artículo 11.6 Resolución CGR N.º 01-000162 de fecha 27-07-2009)',
     fields: ['Anexo_VI', 'Anexo_VII'],
   },
   {
+    // PASO 10 (Índice 9) - FINALIZACIÓN
     id: 10,
-    title: 'Anexos Específicos',
-    subtitle: 'Seleccione una opción en el paso anterior',
-    fields: [],
-  },
-  {
-    id: 11,
     title: 'Finalización y Envío',
     subtitle: 'Último paso antes de generar su acta.',
-    fields: ['interesProducto'],
+    fields: [],
   },
 ];
 
-// --- DATOS PARA EL SELECT DEL PASO 9 ---
-
+// --- DATOS PARA EL DROPDOWN DEL PASO 9 ---
 export const anexosAdicionalesTitulos = [
   {
     shortTitle: 'Unidades Administradoras',
@@ -197,9 +207,8 @@ export const anexosAdicionalesTitulos = [
   },
 ];
 
-// --- CONTENIDO DINÁMICO DEL PASO 10 ---
-
-export const dynamicStepContentSaliente: DynamicContent = {
+// --- CONTENIDO DINÁMICO DEL PASO 9 ---
+export const dynamicStepContent: DynamicContent = {
   'UNIDADES ADMINISTRADORAS': {
     type: 'questions',
     title: 'Anexo VII. UNIDADES ADMINISTRADORAS',

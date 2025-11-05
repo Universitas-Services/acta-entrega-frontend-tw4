@@ -30,14 +30,14 @@ import { ShadcnDatePicker } from '../DatePicker';
 import { ShadcnTimePicker } from '../TimePicker';
 import { SiNoQuestion } from '../SiNoQuestion';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
-import { actaMaximaAutoridadProSchema } from '@/lib/schemas'; // Schema de MA
+import { actaentranteProSchema } from '@/lib/schemas'; // Schema de Entrante
 import { LuTriangleAlert, LuBadgeAlert } from 'react-icons/lu';
 import {
   steps,
   anexosAdicionalesTitulos,
   dynamicStepContent,
   DynamicContent,
-} from '@/lib/pro/acta-ma-pro-constants';
+} from '@/lib/pro/acta-entrante-pro-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FormFieldWithExtras } from '../FormFieldWithExtras';
@@ -64,9 +64,9 @@ import { cn } from '@/lib/utils';
 import { CiCircleCheck } from 'react-icons/ci';
 
 // Tipado del formulario usando el schema importado
-type FormData = z.infer<typeof actaMaximaAutoridadProSchema>;
+type FormData = z.infer<typeof actaentranteProSchema>;
 
-export function ActaMaximaAutoridadProForm() {
+export function ActaEntranteProForm() {
   // Cambiar nombre del componente
   const router = useRouter();
   const { setTitle } = useHeader();
@@ -93,12 +93,12 @@ export function ActaMaximaAutoridadProForm() {
   const { setFormState, clearFormState } = useFormDirtyStore();
 
   useEffect(() => {
-    setTitle('Acta Máxima Autoridad (PRO)');
+    setTitle('Acta de entrega del servidor público ENTRANTE');
   }, [setTitle]);
 
   const form = useForm<FormData>({
     mode: 'onChange',
-    resolver: zodResolver(actaMaximaAutoridadProSchema),
+    resolver: zodResolver(actaentranteProSchema),
     shouldUnregister: false,
     defaultValues: {
       email: '',
@@ -198,7 +198,7 @@ export function ActaMaximaAutoridadProForm() {
 
   // onSubmit (SIMULADO POR AHORA)
   const onSubmit = async (data: FormData) => {
-    console.log('DATOS FINALES A ENVIAR (MA-PRO):', data);
+    console.log('DATOS FINALES A ENVIAR (Entrante-PRO):', data);
     setIsLoading(true);
     setApiError(null);
     try {

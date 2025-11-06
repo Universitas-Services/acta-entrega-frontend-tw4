@@ -23,11 +23,10 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useState, useEffect } from 'react';
-import apiClient from '@/lib/axios';
 import { useAuthStore } from '@/stores/useAuthStore';
-import axios from 'axios';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { updateUser, updateProfile } from '@/services/authService';
 
 // El esquema de validación
 const profileSchema = z.object({
@@ -36,6 +35,14 @@ const profileSchema = z.object({
   telefono: z.string().min(1, 'El teléfono es requerido.'),
   institucion: z.string().min(1, 'La institución es requerida.'),
   cargo: z.string().min(1, 'El cargo es requerido.'),
+  plazoEntregaActa: z
+    .number({
+      error: 'Debe ser un número',
+    })
+    .int('Debe ser un número entero')
+    .min(1, 'El plazo debe ser al menos 1')
+    .nullable()
+    .optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -71,7 +78,7 @@ const LoadingSkeleton = () => (
 export function ProfileForm() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { user, setAuth } = useAuthStore();
+  const { user, fetchUser } = useAuthStore();
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -86,51 +93,70 @@ export function ProfileForm() {
 
   // LÓGICA DE CARGA DE DATOS (useEffect)
   useEffect(() => {
-    const fetchProfileData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await apiClient.get('/user/profile');
-        form.reset(response.data);
-      } catch (error) {
-        console.error('Error al obtener los datos del perfil:', error);
-        toast.error('No se pudieron cargar los datos del perfil.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchProfileData();
-  }, [form]);
+    if (user) {
+      form.reset({
+        nombre: user.nombre || '',
+        apellido: user.apellido || '',
+        telefono: user.telefono || '',
+        institucion: user.profile?.institucion || '',
+        cargo: user.profile?.cargo || '',
+        plazoEntregaActa: user.profile?.plazoEntregaActa || null,
+      });
+    }
+  }, [user, form]);
 
   // LÓGICA DE ENVÍO Y ACTUALIZACIÓN DE ESTADO  (onSubmit)
-  const onSubmit = async (data: ProfileFormValues) => {
+  async function onSubmit(values: z.infer<typeof profileSchema>) {
     setIsLoading(true);
     try {
-      const response = await apiClient.put('/user/profile', data);
-      toast.success(response.data.message || 'Perfil actualizado con éxito.');
-      setIsEditing(false);
+      // Actualizamos los datos del Usuario
+      await updateUser({
+        nombre: values.nombre,
+        apellido: values.apellido,
+        telefono: values.telefono,
+      });
 
-      // Actualiza el estado global del usuario para que se refleje en toda la app
-      if (user) {
-        const updatedUser = {
-          ...user,
-          name: data.nombre, // 'name' es la propiedad en el store
-          apellido: data.apellido,
-        };
-        const token = localStorage.getItem('authToken');
-        if (token) {
-          setAuth(token, updatedUser);
-        }
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data?.message) {
-        toast.error(error.response.data.message);
+      // Actualizamos los datos del Perfil
+      await updateProfile({
+        institucion: values.institucion,
+        cargo: values.cargo,
+        plazoEntregaActa: values.plazoEntregaActa,
+      });
+
+      // Volvemos a cargar el usuario en el store
+      // para que los datos se actualicen en toda la app.
+      await fetchUser();
+
+      toast.success('Perfil actualizado exitosamente.');
+      setIsEditing(false);
+    } catch (error: unknown) {
+      console.error('Error al actualizar el perfil:', error);
+
+      // 👇 CORREGIDO: Añadimos un type guard
+      if (error instanceof Error) {
+        toast.error(error.message);
       } else {
-        toast.error('Ocurrió un error inesperado al guardar.');
+        toast.error('Ocurrió un error desconocido.');
       }
     } finally {
       setIsLoading(false);
     }
-  };
+  }
+
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-1/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full mt-4" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   // ESTADO DE CARGA INICIAL CON UN SKELETON
   if (isLoading && !isEditing) {

@@ -1,39 +1,58 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { Skeleton } from './ui/skeleton';
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+/**
+ * Este componente protege las rutas del dashboard.
+ * Comprueba si el usuario está autenticado DESPUÉS de que el store
+ * se haya rehidratado desde el localStorage.
+ */
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  // Obtenemos los valores directamente del store para mayor claridad
-  const token = useAuthStore((state) => state.token);
-  const initialize = useAuthStore((state) => state.initialize);
 
-  // 1. Creamos un estado para saber si ya revisamos el localStorage
-  const [isInitialized, setIsInitialized] = useState(false);
+  // Obtenemos 'isAuthenticated' del store.
+  // Usamos un selector simple para que solo se re-renderice si este valor cambia.
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  useEffect(() => {
-    // Al cargar el componente, inicializamos el estado desde localStorage
-    // y marcamos como inicializado.
-    initialize();
-    setIsInitialized(true);
-  }, [initialize]);
+  // Estado local para saber si estamos "listos" en el cliente.
+  // Esto evita problemas de hidratación de Next.js (Client/Server mismatch)
+  // y nos da tiempo para que el store se cargue desde localStorage.
+  const [isClientReady, setIsClientReady] = useState(false);
 
   useEffect(() => {
-    // 2. Este efecto ahora solo se ejecuta DESPUÉS de la inicialización
-    if (isInitialized && !token) {
-      // Si ya revisamos y AÚN ASÍ no hay token, entonces redirigimos.
-      router.push('/login');
+    // Cuando el componente se monta en el cliente,
+    // comprobamos la autenticación desde el store (que ya se rehidrató).
+
+    if (!isAuthenticated) {
+      // Si no está autenticado, lo enviamos al login.
+      router.replace('/login');
+    } else {
+      // Si está autenticado, permitimos que se muestre el contenido.
+      setIsClientReady(true);
     }
-  }, [token, isInitialized, router]);
+  }, [isAuthenticated, router]);
 
-  //  3. NO MOSTRAMOS NADA hasta que la inicialización haya terminado Y haya un token.
-  // Esto cierra la ventana de tiempo y previene la "condición de carrera".
-  if (!isInitialized || !token) {
-    return null; // Muestra una pantalla en blanco (o un spinner) mientras verifica
+  // Mientras 'isClientReady' sea falso, mostramos un esqueleto de carga.
+  // Esto cubre tanto la carga inicial del cliente como el breve
+  // momento antes de la redirección si el usuario no está autenticado.
+  if (!isClientReady) {
+    return (
+      <div className="flex flex-col space-y-3 p-8">
+        <Skeleton className="h-[125px] w-full rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-[80%]" />
+        </div>
+      </div>
+    );
   }
 
-  // Si todo está en orden, muestra el contenido protegido.
+  // Si 'isClientReady' es verdadero, significa que el usuario
+  // está autenticado y mostramos la página protegida.
   return <>{children}</>;
-}
+};
+
+export default ProtectedRoute;

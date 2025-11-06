@@ -182,7 +182,7 @@ export function RegisterForm() {
       const dataToSend = {
         email: values.email,
         password: values.password,
-        name: values.nombre!,
+        nombre: values.nombre!,
         apellido: values.apellido!,
         telefono: `${values.prefijo}${values.numeroLocal}`,
       };

@@ -1,61 +1,122 @@
 import { create } from 'zustand';
-
-interface User {
-  email: string;
-  name: string;
-  apellido?: string;
-  role: string;
-  isFirstLogin?: boolean; // 1. Añadimos el campo opcional aquí
-}
+// Importamos 'persist' para guardar en localStorage
+import { persist } from 'zustand/middleware';
+// Importamos las nuevas funciones y tipos de nuestro authService corregido
+import {
+  getMyProfile,
+  loginUser,
+  logoutUser,
+  type LoginData,
+  type IUser,
+  type AuthTokenResponse,
+} from '@/services/authService';
+// NO importamos más Zod aquí
 
 interface AuthState {
-  token: string | null;
-  user: User | null;
-  isFirstLogin: boolean; // 2. Y aquí para el estado principal
-  setAuth: (token: string, user: User) => void;
+  access_token: string | null;
+  refresh_token: string | null;
+  user: IUser | null;
+  isAuthenticated: boolean;
+  status: 'idle' | 'loading' | 'error';
+  showFirstLoginPopup: boolean;
+  login: (data: LoginData) => Promise<void>; // Usa la interface LoginData
+  fetchUser: () => Promise<void>;
+  setTokens: (tokens: AuthTokenResponse) => void;
   logout: () => void;
-  initialize: () => void;
-  completeFirstLogin: () => void; // 3. Nueva función para actualizar el estado
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  token: null,
-  user: null,
-  isFirstLogin: false, // Valor inicial
+// Envolvemos todo en 'persist'
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      access_token: null,
+      refresh_token: null,
+      user: null,
+      isAuthenticated: false,
+      status: 'idle',
+      showFirstLoginPopup: false,
 
-  setAuth: (token, user) => {
-    localStorage.setItem('authToken', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    // 4. Guardamos el estado de isFirstLogin al iniciar sesión
-    set({ token, user, isFirstLogin: !!user.isFirstLogin });
-  },
-  // Acción para cerrar sesión
-  logout: () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+      login: async (data) => {
+        set({ status: 'loading' });
+        try {
+          // Llama a loginUser, que devuelve { access_token, refresh_token }
+          const tokens = await loginUser(data);
 
-    localStorage.removeItem('chatMessages');
-    localStorage.removeItem('chatSessionId');
-    set({ token: null, user: null, isFirstLogin: false }); // Reseteamos
-  },
-  // Acción para inicializar el estado desde localStorage al cargar la app
-  initialize: () => {
-    const token = localStorage.getItem('authToken');
-    const user = localStorage.getItem('user');
-    if (token && user) {
-      set({ token, user: JSON.parse(user) });
+          set({
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token,
+            isAuthenticated: true,
+          });
+
+          // Inmediatamente después, llama a fetchUser
+          await get().fetchUser();
+        } catch (error) {
+          set({ status: 'error' });
+          console.error('Error en el store al iniciar sesión:', error);
+          throw error; // Relanza el error para que el LoginForm lo muestre
+        }
+      },
+
+      // fetchUser (para /users/my)
+      fetchUser: async () => {
+        set({ status: 'loading' });
+        try {
+          // Llama al endpoint protegido (/users/my)
+          const userData = await getMyProfile();
+
+          set({
+            user: userData,
+            status: 'idle',
+          });
+
+          // esta lógica funciona porque 'userData' existe
+          if (!userData.profile) {
+            set({ showFirstLoginPopup: true });
+          }
+        } catch (error) {
+          console.error('Error al obtener datos del usuario:', error);
+          set({ status: 'error' });
+          // Si fetchUser falla (ej. token inválido), el interceptor
+          // intentará refrescarlo. Si todo falla, deslogueamos.
+          get().logout();
+        }
+      },
+
+      // setTokens (usada por el interceptor)
+      setTokens: (tokens) => {
+        set({
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+        });
+      },
+
+      // FUNCIÓN LOGOUT CORREGIDA
+      logout: () => {
+        // Llama al backend para invalidar el token
+        logoutUser().catch((err) => {
+          console.error('Error al desloguear en el servidor:', err);
+        });
+
+        // Limpia el estado local
+        set({
+          access_token: null,
+          refresh_token: null,
+          user: null,
+          isAuthenticated: false,
+          showFirstLoginPopup: false,
+          status: 'idle',
+        });
+      },
+    }),
+    {
+      name: 'auth-storage', // Nombre de la clave en localStorage
+      // Guardamos solo esto para que la sesión persista
+      partialize: (state) => ({
+        access_token: state.access_token,
+        refresh_token: state.refresh_token,
+        isAuthenticated: state.isAuthenticated,
+        user: state.user,
+      }),
     }
-  },
-
-  // 5. Nueva función para llamar cuando el popup se haya completado
-  completeFirstLogin: () => {
-    set({ isFirstLogin: false });
-    // También actualizamos el objeto de usuario en localStorage
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      const user = JSON.parse(userStr);
-      user.isFirstLogin = false;
-      localStorage.setItem('user', JSON.stringify(user));
-    }
-  },
-}));
+  )
+);

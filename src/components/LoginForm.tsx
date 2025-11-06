@@ -17,7 +17,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { loginUser } from '@/services/authService';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 const formSchema = z.object({
@@ -33,51 +32,29 @@ export function LoginForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const { setAuth } = useAuthStore();
+  const login = useAuthStore((state) => state.login);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '', password: '' },
   });
 
-  // Lógica de envío actualizada para llamar al backend
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    setApiError(null);
-
+    setError(null);
     try {
-      const response = await loginUser(values);
+      await login(values);
 
-      // --- INICIO DE SIMULACIÓN DE ROL ---
-      // Comprobamos si el email es el de nuestro usuario "pro" de prueba
-      if (values.email.toLowerCase() === 'luiger852@gmail.com') {
-        // Si es así, forzamos el rol en el objeto de usuario
-        response.user.role = 'pro';
-        console.warn('SIMULACIÓN: Rol "pro" asignado a', response.user.email);
-      }
-      // --- FIN DE SIMULACIÓN DE ROL ---
-
-      // Guardamos en el store el usuario (potencialmente modificado)
-      setAuth(response.token, response.user);
-
-      // --- INICIO DE REDIRECCIÓN POR ROL ---
-      if (response.user.role === 'pro') {
-        // Si es Pro, redirigimos al layout (forms)
-        // Apuntamos a la raíz de actas-pro (que crearemos en Fase 3)
-        router.replace('/dashboard/pro');
+      router.push('/dashboard');
+    } catch (err: unknown) {
+      // Si el store lanza un error (ej. 401 Credenciales Inválidas),
+      // el 'authService' lo captura y lo muestra aquí.
+      if (err instanceof Error) {
+        setError(err.message);
       } else {
-        // Si es Express o rol normal, redirigimos al dashboard (main)
-        router.replace('/dashboard');
+        setError('Ocurrió un error desconocido.');
       }
-      // --- FIN DE REDIRECCIÓN POR ROL ---
-    } catch (error) {
-      if (error instanceof Error) {
-        setApiError(error.message);
-      } else {
-        setApiError('Ocurrió un error inesperado.');
-      }
-    } finally {
       setIsLoading(false);
     }
   }
@@ -91,12 +68,12 @@ export function LoginForm() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {apiError && (
+          {error && (
             <div
               className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-md relative"
               role="alert"
             >
-              <span className="block sm:inline">{apiError}</span>
+              <span className="block sm:inline">{error}</span>
             </div>
           )}
 

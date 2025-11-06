@@ -1,33 +1,61 @@
-// src/services/authService.ts
-import apiClient from '@/lib/axios';
-import axios, { AxiosError } from 'axios';
-import * as z from 'zod';
+import apiClient, { axiosPublic } from '@/lib/axios';
+import { isAxiosError } from 'axios';
 
-// Definimos el tipo de los datos que esperamos del backend al hacer login
-interface LoginResponse {
-  message: string;
-  token: string;
-  user: {
-    email: string;
-    name: string;
-    role: string;
-  };
+// --- Definición de Tipos ---
+
+export interface LoginData {
+  email: string;
+  password: string;
 }
 
-/**
- * Llama al endpoint de login del backend.
- * @param data - Objeto con email y password.
- * @returns La respuesta del servidor con el token y los datos del usuario.
- */
+// La respuesta REAL del backend (login y refresh)
+export interface AuthTokenResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
+// Tipo para los datos de registro limpios
+export interface CleanRegisterData {
+  nombre: string;
+  apellido?: string;
+  email: string;
+  password: string;
+  telefono?: string;
+}
+
+// El usuario REAL del backend (de /users/my)
+export interface IUserProfile {
+  id: string;
+  institucion: string;
+  cargo: string;
+  plazoEntregaActa: number | null;
+}
+
+export interface IUser {
+  id: string;
+  email: string;
+  nombre: string;
+  apellido: string | null;
+  telefono: string | null;
+  role: string;
+  is_email_verified: boolean;
+  profile: IUserProfile | null;
+}
+
+// --- Funciones de Autenticación (Login/Logout/Refresh/Profile) ---
+
+// Usa axiosPublic
 export const loginUser = async (
-  data: z.infer<z.ZodObject<{ email: z.ZodString; password: z.ZodString }>>
-): Promise<LoginResponse> => {
+  data: LoginData
+): Promise<AuthTokenResponse> => {
   try {
-    const response = await apiClient.post<LoginResponse>('/auth/login', data);
+    const response = await axiosPublic.post<AuthTokenResponse>(
+      '/auth/login',
+      data
+    );
     return response.data;
-  } catch (error) {
-    if (error instanceof AxiosError && error.response && error.response.data) {
-      // Si hay un error en la respuesta del servidor, lo relanzamos para que el formulario lo capture
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response) {
       throw new Error(
         error.response.data.message || 'Error al iniciar sesión.'
       );
@@ -36,57 +64,56 @@ export const loginUser = async (
   }
 };
 
-export const logoutUser = async (): Promise<void> => {
+// Usa apiClient (privado) porque requiere autenticación
+export const getMyProfile = async (): Promise<IUser> => {
   try {
-    // Llama al endpoint POST /auth/logout que creamos.
-    // apiClient ya incluye el token de autorización automáticamente.
-    await apiClient.post('/auth/logout');
-  } catch (error) {
-    // Si la llamada falla (ej. por falta de internet), no queremos que el usuario
-    // se quede "atrapado". Simplemente registramos el error en la consola
-    // y el cierre de sesión en el frontend continuará.
-    console.error('No se pudo notificar el logout al servidor:', error);
+    const response = await apiClient.get<IUser>('/users/my');
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al obtener perfil.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
   }
 };
 
-// --- REGISTRO (NUEVO CÓDIGO) ---
-interface RegisterResponse {
-  message: string;
-}
-
-/**
- * Llama al endpoint de registro del backend.
- * @param data - Objeto con los datos del nuevo usuario.
- * @returns La respuesta del servidor.
- */
-export const registerUser = async (
-  data: z.infer<
-    z.ZodObject<{
-      email: z.ZodString;
-      password: z.ZodString;
-      name: z.ZodString;
-      apellido: z.ZodOptional<z.ZodString>;
-      telefono: z.ZodOptional<z.ZodString>;
-      institucion: z.ZodOptional<z.ZodString>;
-      cargo: z.ZodOptional<z.ZodString>;
-    }>
-  >
-): Promise<RegisterResponse> => {
+// Usa axiosPublic
+export const refreshToken = async (rt: string): Promise<AuthTokenResponse> => {
   try {
-    const response = await apiClient.post<RegisterResponse>(
+    const response = await axiosPublic.post<AuthTokenResponse>(
+      '/auth/refresh',
+      {},
+      { headers: { Authorization: `Bearer ${rt}` } }
+    );
+    return response.data;
+  } catch (error: unknown) {
+    throw new Error('No se pudo refrescar la sesión.');
+  }
+};
+
+// Usa apiClient (privado) para invalidar el token en el backend
+export const logoutUser = async (): Promise<void> => {
+  try {
+    await apiClient.post('/auth/logout');
+  } catch (error: unknown) {
+    console.error('Error en el logout del servidor:', error);
+  }
+};
+
+// Usa 'axiosPublic'
+export const registerUser = async (
+  data: CleanRegisterData
+): Promise<{ message: string }> => {
+  try {
+    const response = await axiosPublic.post<{ message: string }>(
       '/auth/register',
       data
     );
     return response.data;
   } catch (error) {
-    if (error instanceof AxiosError && error.response && error.response.data) {
-      // El backend puede enviar un array de errores, los unimos
-      if (Array.isArray(error.response.data.errors)) {
-        const messages = error.response.data.errors
-          .map((e: { msg: string }) => e.msg)
-          .join(', ');
-        throw new Error(messages);
-      }
+    if (isAxiosError(error) && error.response) {
       throw new Error(
         error.response.data.message || 'Error al registrar el usuario.'
       );
@@ -95,69 +122,62 @@ export const registerUser = async (
   }
 };
 
-// --- RECUPERACIÓN DE CONTRASEÑA ---
-
-/**
- * Llama al endpoint para solicitar el envío del código OTP.
- */
+// Usa 'axiosPublic'
 export const forgotPassword = async (
   email: string
 ): Promise<{ message: string }> => {
   try {
-    const response = await apiClient.post('/auth/forgot-password', { email });
+    const response = await axiosPublic.post<{ message: string }>(
+      '/auth/forgot-password',
+      { email }
+    );
     return response.data;
   } catch (error) {
-    if (error instanceof AxiosError && error.response && error.response.data) {
+    if (isAxiosError(error) && error.response) {
       throw new Error(
-        error.response.data.message || 'Error al solicitar el código.'
+        error.response.data.message ||
+          'Error al enviar el correo de recuperación.'
       );
     }
     throw new Error('No se pudo conectar con el servidor.');
   }
 };
 
-/**
- * Llama al endpoint para verificar el código OTP.
- * @returns La respuesta del servidor, que incluye un token temporal para el reseteo.
- */
+// Usa 'axiosPublic'
 export const verifyOtp = async (
   email: string,
   otp: string
 ): Promise<{ message: string; resetToken: string }> => {
   try {
-    const response = await apiClient.post('/auth/verify-otp', { email, otp });
+    const response = await axiosPublic.post<{
+      message: string;
+      resetToken: string;
+    }>('/auth/verify-otp', { email, otp });
     return response.data;
   } catch (error) {
-    if (error instanceof AxiosError && error.response && error.response.data) {
+    if (isAxiosError(error) && error.response) {
       throw new Error(
-        error.response.data.message || 'Error al verificar el código.'
+        error.response.data.message || 'Error al verificar el OTP.'
       );
     }
     throw new Error('No se pudo conectar con el servidor.');
   }
 };
 
-/**
- * Llama al endpoint para establecer la nueva contraseña.
- * @param data Objeto con la nueva contraseña y su confirmación.
- * @param resetToken El token temporal obtenido en el paso de verificación.
- */
-// ▼▼▼ CORRECCIÓN ▼▼▼
-// La función ahora acepta un objeto 'data' para enviar el cuerpo completo de la petición.
+// <Usa 'axiosPublic' (el token se pasa en el body, no requiere auth)
 export const resetPassword = async (
-  data: { newPassword: string; confirmPassword: string },
-  resetToken: string
+  email: string,
+  newPassword: string,
+  otp: string // Asumiendo que el backend lo necesita para validar
 ): Promise<{ message: string }> => {
   try {
-    // Este endpoint está protegido, por lo que enviamos el token temporal como un Bearer token.
-    const response = await apiClient.post('/auth/reset-password', data, {
-      headers: {
-        Authorization: `Bearer ${resetToken}`,
-      },
-    });
+    const response = await axiosPublic.post<{ message: string }>(
+      '/auth/reset-password',
+      { email, newPassword, otp }
+    );
     return response.data;
   } catch (error) {
-    if (error instanceof AxiosError && error.response && error.response.data) {
+    if (isAxiosError(error) && error.response) {
       throw new Error(
         error.response.data.message || 'Error al actualizar la contraseña.'
       );
@@ -166,22 +186,92 @@ export const resetPassword = async (
   }
 };
 
-// ▼▼▼ 2. FUNCIÓN deleteAccount CORREGIDA ▼▼▼
+// Usa 'axiosPublic'
+export const confirmEmail = async (
+  token: string
+): Promise<{ message: string }> => {
+  try {
+    const response = await axiosPublic.get<{ message: string }>(
+      `/auth/confirm-email/${token}`
+    );
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al confirmar el email.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
 /**
- * Llama al endpoint del backend para eliminar la cuenta del usuario.
- * @param password - La contraseña actual del usuario para confirmación.
+ * Actualiza los datos básicos del usuario (nombre, apellido, teléfono).
+ * Llama al endpoint PUT /users/my
+ */
+export const updateUser = async (data: {
+  nombre?: string;
+  apellido?: string;
+  telefono?: string;
+  institucion?: string;
+  cargo?: string;
+}): Promise<IUser> => {
+  try {
+    const response = await apiClient.put<IUser>('/users/my', data);
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al actualizar usuario.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+/**
+ * Crea o actualiza el perfil del usuario (institución, cargo).
+ * Llama al endpoint POST /users/complete-profile
+ */
+export const updateProfile = async (data: {
+  institucion: string;
+  cargo: string;
+  plazoEntregaActa?: number | null;
+}): Promise<IUserProfile> => {
+  try {
+    const response = await apiClient.post<IUserProfile>(
+      '/users/complete-profile',
+      data
+    );
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al actualizar perfil.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+/**
+ * Elimina la cuenta del usuario.
+ * Llama al endpoint DELETE /users/delete-account
  */
 export const deleteAccount = async (
   password: string
 ): Promise<{ message: string }> => {
   try {
-    const response = await apiClient.delete('/user/delete-account', {
-      data: { password }, // Para peticiones DELETE, los datos van en un objeto 'data'
-    });
+    // El endpoint del backend es /users/delete-account
+    const response = await apiClient.delete<{ message: string }>(
+      '/users/delete-account',
+      {
+        data: { password }, // El DTO espera la contraseña en el body
+      }
+    );
     return response.data;
   } catch (error) {
-    // Ahora 'axios' está definido y la función funciona correctamente
-    if (axios.isAxiosError(error) && error.response) {
+    if (isAxiosError(error) && error.response) {
       throw new Error(
         error.response.data.message || 'Error al eliminar la cuenta.'
       );

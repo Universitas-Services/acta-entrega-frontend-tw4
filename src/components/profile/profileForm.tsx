@@ -35,14 +35,7 @@ const profileSchema = z.object({
   telefono: z.string().min(1, 'El teléfono es requerido.'),
   institucion: z.string().min(1, 'La institución es requerida.'),
   cargo: z.string().min(1, 'El cargo es requerido.'),
-  plazoEntregaActa: z
-    .number({
-      error: 'Debe ser un número',
-    })
-    .int('Debe ser un número entero')
-    .min(1, 'El plazo debe ser al menos 1')
-    .nullable()
-    .optional(),
+  plazoEntregaActa: z.string().min(1, 'El plazo de entrega es requerido.'),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -100,7 +93,7 @@ export function ProfileForm() {
         telefono: user.telefono || '',
         institucion: user.profile?.institucion || '',
         cargo: user.profile?.cargo || '',
-        plazoEntregaActa: user.profile?.plazoEntregaActa || null,
+        plazoEntregaActa: user.profile?.plazoEntregaActa || '',
       });
     }
   }, [user, form]);

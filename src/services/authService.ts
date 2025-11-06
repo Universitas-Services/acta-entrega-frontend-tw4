@@ -28,7 +28,7 @@ export interface IUserProfile {
   id: string;
   institucion: string;
   cargo: string;
-  plazoEntregaActa: number | null;
+  plazoEntregaActa: string | null;
 }
 
 export interface IUser {
@@ -236,7 +236,7 @@ export const updateUser = async (data: {
 export const updateProfile = async (data: {
   institucion: string;
   cargo: string;
-  plazoEntregaActa?: number | null;
+  plazoEntregaActa?: string | null;
 }): Promise<IUserProfile> => {
   try {
     const response = await apiClient.post<IUserProfile>(

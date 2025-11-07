@@ -3,23 +3,31 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { jwtDecode } from 'jwt-decode';
-import apiClient from '@/lib/axios';
+import { refreshToken } from '@/services/authService';
 import { SessionExpirationAlert } from './SessionExpirationAlert';
 
 export function SessionManager() {
-  const { token, setAuth, logout } = useAuthStore();
+  const { access_token, refresh_token, setTokens, logout } = useAuthStore(
+    (state) => ({
+      access_token: state.access_token,
+      refresh_token: state.refresh_token,
+      setTokens: state.setTokens,
+      logout: state.logout,
+    })
+  );
+
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   useEffect(() => {
     // Si no hay token, no hacemos nada.
-    if (!token) {
+    if (!access_token) {
       return;
     }
 
     let sessionTimeout: NodeJS.Timeout;
 
     try {
-      const decodedToken: { exp: number } = jwtDecode(token);
+      const decodedToken: { exp: number } = jwtDecode(access_token);
       const expirationTime = decodedToken.exp * 1000; // en milisegundos
       const currentTime = Date.now();
 
@@ -46,21 +54,31 @@ export function SessionManager() {
     return () => {
       clearTimeout(sessionTimeout);
     };
-  }, [token, logout]); // La dependencia [token] asegura que esto se re-ejecute.
+  }, [access_token, logout]); // La dependencia [token] asegura que esto se re-ejecute.
 
   const handleConfirm = async () => {
+    // Si no tenemos un refresh token, no podemos hacer nada
+    if (!refresh_token) {
+      logout();
+      return;
+    }
+
     try {
-      const response = await apiClient.post('/auth/refresh-token');
-      // Al llamar a setAuth, el 'token' en el store cambia,
-      // lo que re-activa el useEffect de arriba, creando un nuevo temporizador.
-      setAuth(response.data.token, response.data.user);
+      // 1. Llamamos a nuestra función de servicio
+      const newTokens = await refreshToken(refresh_token);
+
+      // 2. Usamos 'setTokens' para guardar el nuevo par de tokens
+      setTokens(newTokens);
+
+      // 3. Cerramos la alerta
       setIsAlertOpen(false);
     } catch {
+      // Si el refresh token falla, deslogueamos
       logout();
     }
   };
 
-  const handleCancel = () => {
+  const handleLogout = () => {
     logout();
     setIsAlertOpen(false);
   };
@@ -69,7 +87,7 @@ export function SessionManager() {
     <SessionExpirationAlert
       isOpen={isAlertOpen}
       onConfirm={handleConfirm}
-      onCancel={handleCancel}
+      onLogout={handleLogout}
     />
   );
 }

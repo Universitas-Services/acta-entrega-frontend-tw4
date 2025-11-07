@@ -115,7 +115,6 @@ export function ForgotPasswordForm() {
     setIsLoading(false);
   };
 
-  // ▼▼▼ CORRECCIÓN ▼▼▼
   // La función ahora pasa un objeto con ambas contraseñas al servicio.
   const onFinalSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);

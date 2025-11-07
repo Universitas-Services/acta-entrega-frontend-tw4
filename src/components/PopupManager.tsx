@@ -4,10 +4,24 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { FirstLoginPopup } from '@/components/FirstLoginPopup';
 
 export function PopupManager() {
-  // Este componente "escucha" el estado de autenticación
-  const { isFirstLogin } = useAuthStore();
+  // 👇 [CORREGIDO] Obtenemos el estado Y la función para cambiarlo
+  // Usamos 'showFirstLoginPopup' (el nombre real) en lugar de 'isFirstLogin'
+  const { showFirstLoginPopup, setShowFirstLoginPopup } = useAuthStore(
+    (state) => ({
+      showFirstLoginPopup: state.showFirstLoginPopup,
+      setShowFirstLoginPopup: state.setShowFirstLoginPopup,
+    })
+  );
 
-  // Si es el primer inicio de sesión, renderiza el popup.
-  // Si no, no renderiza nada.
-  return <>{isFirstLogin && <FirstLoginPopup isOpen={isFirstLogin} />}</>;
+  return (
+    <>
+      {showFirstLoginPopup && (
+        <FirstLoginPopup
+          isOpen={showFirstLoginPopup}
+          // 👇 [CORREGIDO] Pasamos la prop 'onOpenChange' que faltaba
+          onOpenChange={setShowFirstLoginPopup}
+        />
+      )}
+    </>
+  );
 }

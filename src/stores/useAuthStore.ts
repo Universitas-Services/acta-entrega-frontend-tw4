@@ -23,6 +23,7 @@ interface AuthState {
   fetchUser: () => Promise<void>;
   setTokens: (tokens: AuthTokenResponse) => void;
   logout: () => void;
+  setShowFirstLoginPopup: (isOpen: boolean) => void;
 }
 
 // Envolvemos todo en 'persist'
@@ -106,6 +107,11 @@ export const useAuthStore = create<AuthState>()(
           showFirstLoginPopup: false,
           status: 'idle',
         });
+      },
+
+      // Función para establecer el estado de showFirstLoginPopup
+      setShowFirstLoginPopup: (isOpen: boolean) => {
+        set({ showFirstLoginPopup: isOpen });
       },
     }),
     {

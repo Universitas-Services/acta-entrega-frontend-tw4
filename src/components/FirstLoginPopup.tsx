@@ -50,7 +50,7 @@ export function FirstLoginPopup({
   onOpenChange: (open: boolean) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { fetchUser, showFirstLoginPopup } = useAuthStore();
+  const fetchUser = useAuthStore((state) => state.fetchUser);
 
   const form = useForm<PopupFormData>({
     resolver: zodResolver(popupSchema),
@@ -73,7 +73,6 @@ export function FirstLoginPopup({
 
       await fetchUser();
       toast.success('¡Perfil completado! Bienvenido/a.');
-      onOpenChange(false);
     } catch (apiError: unknown) {
       console.error('Error al completar el perfil:', apiError);
 
@@ -92,7 +91,7 @@ export function FirstLoginPopup({
   }
 
   const handleOpenChange = (open: boolean) => {
-    if (!open && showFirstLoginPopup) {
+    if (isOpen && !open) {
       return;
     }
     onOpenChange(open);

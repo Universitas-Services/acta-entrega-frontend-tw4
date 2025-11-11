@@ -115,19 +115,12 @@ export function ForgotPasswordForm() {
     setIsLoading(false);
   };
 
-  // ▼▼▼ CORRECCIÓN ▼▼▼
   // La función ahora pasa un objeto con ambas contraseñas al servicio.
   const onFinalSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     setApiError(null);
     try {
-      await resetPassword(
-        {
-          newPassword: data.password,
-          confirmPassword: data.confirmPassword,
-        },
-        resetToken
-      );
+      await resetPassword(email, data.password, resetToken);
       setShowSuccessDialog(true);
     } catch (error) {
       if (error instanceof Error) {
@@ -259,7 +252,7 @@ export function ForgotPasswordForm() {
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-muted-foreground cursor-pointer"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground cursor-pointer"
                           >
                             {showPassword ? (
                               <FaEyeSlash size={20} />

@@ -1,39 +1,54 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { Skeleton } from './ui/skeleton';
+import { getIsAuthenticated } from '@/lib/authStorage'; // Importar para verificar autenticación inicial
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-  // Obtenemos los valores directamente del store para mayor claridad
-  const token = useAuthStore((state) => state.token);
-  const initialize = useAuthStore((state) => state.initialize);
-
-  // 1. Creamos un estado para saber si ya revisamos el localStorage
-  const [isInitialized, setIsInitialized] = useState(false);
+  const isAuthenticatedFromStore = useAuthStore(
+    (state) => state.isAuthenticated
+  );
+  const [isClientReady, setIsClientReady] = useState(false);
 
   useEffect(() => {
-    // Al cargar el componente, inicializamos el estado desde localStorage
-    // y marcamos como inicializado.
-    initialize();
-    setIsInitialized(true);
-  }, [initialize]);
+    // Este efecto se ejecuta solo en el cliente.
+    // Verificamos el estado de autenticación directamente de localStorage.
+    const initialAuthStatus = getIsAuthenticated();
+    useAuthStore.setState({ isAuthenticated: initialAuthStatus }); // Sincronizar Zustand con localStorage
+
+    setIsClientReady(true); // Marcar que el cliente ha verificado el estado de autenticación
+  }, []);
 
   useEffect(() => {
-    // 2. Este efecto ahora solo se ejecuta DESPUÉS de la inicialización
-    if (isInitialized && !token) {
-      // Si ya revisamos y AÚN ASÍ no hay token, entonces redirigimos.
-      router.push('/login');
+    if (!isClientReady) {
+      return;
     }
-  }, [token, isInitialized, router]);
 
-  //  3. NO MOSTRAMOS NADA hasta que la inicialización haya terminado Y haya un token.
-  // Esto cierra la ventana de tiempo y previene la "condición de carrera".
-  if (!isInitialized || !token) {
-    return null; // Muestra una pantalla en blanco (o un spinner) mientras verifica
+    // Si el cliente está listo y el usuario NO está autenticado, lo redirigimos.
+    if (!isAuthenticatedFromStore) {
+      router.replace('/login');
+    }
+  }, [isAuthenticatedFromStore, isClientReady, router]);
+
+  // Mostramos el esqueleto mientras el cliente no ha verificado el estado de autenticación
+  // O si el usuario no está autenticado y está a punto de ser redirigido.
+  if (!isClientReady || !isAuthenticatedFromStore) {
+    return (
+      <div className="flex flex-col space-y-3 p-8">
+        <Skeleton className="h-[125px] w-full rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-[80%]" />
+        </div>
+      </div>
+    );
   }
 
-  // Si todo está en orden, muestra el contenido protegido.
+  // Si el cliente está listo y el usuario autenticado, mostramos el contenido.
   return <>{children}</>;
-}
+};
+
+export default ProtectedRoute;

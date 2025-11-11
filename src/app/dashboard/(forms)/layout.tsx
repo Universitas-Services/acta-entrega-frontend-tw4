@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import AppSidebar from '@/components/AppSidebar';
 import { HeaderProvider } from '@/context/HeaderContext';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { PopupManager } from '@/components/PopupManager';
 import { LogoutConfirmationDialog } from '@/components/LogoutConfirmationDialog';
 import { SessionManager } from '@/components/SessionManager';

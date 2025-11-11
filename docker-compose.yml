@@ -18,7 +18,7 @@ services:
     
     # Mapeo de puertos: "PUERTO_EN_TU_MAQUINA:PUERTO_EN_EL_CONTENEDOR"
     ports:
-      - "3000:3000"
+      - "3001:3000"
       
     # Política de reinicio: El contenedor se reiniciará automáticamente si se detiene,
     # a menos que lo detengas tú manualmente.

@@ -4,41 +4,38 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Skeleton } from './ui/skeleton';
+import { getIsAuthenticated } from '@/lib/authStorage'; // Importar para verificar autenticación inicial
 
-/**
- * Este componente protege las rutas del dashboard.
- * Comprueba si el usuario está autenticado DESPUÉS de que el store
- * se haya rehidratado desde el localStorage.
- */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
-
-  // Obtenemos 'isAuthenticated' del store.
-  // Usamos un selector simple para que solo se re-renderice si este valor cambia.
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  // Estado local para saber si estamos "listos" en el cliente.
-  // Esto evita problemas de hidratación de Next.js (Client/Server mismatch)
-  // y nos da tiempo para que el store se cargue desde localStorage.
+  const isAuthenticatedFromStore = useAuthStore(
+    (state) => state.isAuthenticated
+  );
   const [isClientReady, setIsClientReady] = useState(false);
 
   useEffect(() => {
-    // Cuando el componente se monta en el cliente,
-    // comprobamos la autenticación desde el store (que ya se rehidrató).
+    // Este efecto se ejecuta solo en el cliente.
+    // Verificamos el estado de autenticación directamente de localStorage.
+    const initialAuthStatus = getIsAuthenticated();
+    useAuthStore.setState({ isAuthenticated: initialAuthStatus }); // Sincronizar Zustand con localStorage
 
-    if (!isAuthenticated) {
-      // Si no está autenticado, lo enviamos al login.
-      router.replace('/login');
-    } else {
-      // Si está autenticado, permitimos que se muestre el contenido.
-      setIsClientReady(true);
+    setIsClientReady(true); // Marcar que el cliente ha verificado el estado de autenticación
+  }, []);
+
+  useEffect(() => {
+    if (!isClientReady) {
+      return;
     }
-  }, [isAuthenticated, router]);
 
-  // Mientras 'isClientReady' sea falso, mostramos un esqueleto de carga.
-  // Esto cubre tanto la carga inicial del cliente como el breve
-  // momento antes de la redirección si el usuario no está autenticado.
-  if (!isClientReady) {
+    // Si el cliente está listo y el usuario NO está autenticado, lo redirigimos.
+    if (!isAuthenticatedFromStore) {
+      router.replace('/login');
+    }
+  }, [isAuthenticatedFromStore, isClientReady, router]);
+
+  // Mostramos el esqueleto mientras el cliente no ha verificado el estado de autenticación
+  // O si el usuario no está autenticado y está a punto de ser redirigido.
+  if (!isClientReady || !isAuthenticatedFromStore) {
     return (
       <div className="flex flex-col space-y-3 p-8">
         <Skeleton className="h-[125px] w-full rounded-xl" />
@@ -50,8 +47,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // Si 'isClientReady' es verdadero, significa que el usuario
-  // está autenticado y mostramos la página protegida.
+  // Si el cliente está listo y el usuario autenticado, mostramos el contenido.
   return <>{children}</>;
 };
 

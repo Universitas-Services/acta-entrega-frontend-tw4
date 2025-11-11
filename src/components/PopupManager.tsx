@@ -6,11 +6,11 @@ import { FirstLoginPopup } from '@/components/FirstLoginPopup';
 export function PopupManager() {
   // 👇 [CORREGIDO] Obtenemos el estado Y la función para cambiarlo
   // Usamos 'showFirstLoginPopup' (el nombre real) en lugar de 'isFirstLogin'
-  const { showFirstLoginPopup, setShowFirstLoginPopup } = useAuthStore(
-    (state) => ({
-      showFirstLoginPopup: state.showFirstLoginPopup,
-      setShowFirstLoginPopup: state.setShowFirstLoginPopup,
-    })
+  const showFirstLoginPopup = useAuthStore(
+    (state) => state.showFirstLoginPopup
+  );
+  const setShowFirstLoginPopup = useAuthStore(
+    (state) => state.setShowFirstLoginPopup
   );
 
   return (

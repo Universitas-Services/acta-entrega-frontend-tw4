@@ -50,7 +50,10 @@ export function FirstLoginPopup({
   onOpenChange: (open: boolean) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const fetchUser = useAuthStore((state) => state.fetchUser);
+  const setUserProfile = useAuthStore((state) => state.setUserProfile);
+  const setShowFirstLoginPopup = useAuthStore(
+    (state) => state.setShowFirstLoginPopup
+  );
 
   const form = useForm<PopupFormData>({
     resolver: zodResolver(popupSchema),
@@ -65,14 +68,17 @@ export function FirstLoginPopup({
   async function onSubmit(values: PopupFormData) {
     setIsLoading(true);
     try {
-      await updateProfile({
+      const newProfile = await updateProfile({
         institucion: values.institucion,
         cargo: values.cargo,
         plazoEntregaActa: values.plazoEntregaActa,
       });
 
-      await fetchUser();
+      setUserProfile(newProfile);
+
       toast.success('¡Perfil completado! Bienvenido/a.');
+
+      setShowFirstLoginPopup(false); // Cierra el popup
     } catch (apiError: unknown) {
       console.error('Error al completar el perfil:', apiError);
 
@@ -152,11 +158,11 @@ export function FirstLoginPopup({
                     disabled={isLoading}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="cursor-pointer">
                         <SelectValue placeholder="Selecciona una opción..." />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-card">
                       <SelectItem value="Día 1">Día 1</SelectItem>
                       <SelectItem value="Día 2">Día 2</SelectItem>
                       <SelectItem value="Día 3">Día 3</SelectItem>
@@ -171,7 +177,11 @@ export function FirstLoginPopup({
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={isLoading}
+            >
               {isLoading ? 'Guardando...' : 'Guardar y Continuar'}
             </Button>
           </form>

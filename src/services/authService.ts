@@ -55,11 +55,17 @@ export const loginUser = async (
     );
     return response.data;
   } catch (error: unknown) {
-    if (isAxiosError(error) && error.response) {
+    if (isAxiosError(error) && error.response?.data?.message) {
       throw new Error(
         error.response.data.message || 'Error al iniciar sesión.'
       );
     }
+
+    // Fallback por si 'data' o 'message' no existen
+    if (isAxiosError(error)) {
+      throw new Error(error.message || 'Error de Axios al iniciar sesión.');
+    }
+
     throw new Error('No se pudo conectar con el servidor.');
   }
 };
@@ -70,10 +76,13 @@ export const getMyProfile = async (): Promise<IUser> => {
     const response = await apiClient.get<IUser>('/users/my');
     return response.data;
   } catch (error: unknown) {
-    if (isAxiosError(error) && error.response) {
+    if (isAxiosError(error) && error.response?.data?.message) {
       throw new Error(
         error.response.data.message || 'Error al obtener perfil.'
       );
+    }
+    if (isAxiosError(error)) {
+      throw new Error(error.message || 'Error de Axios al obtener perfil.');
     }
     throw new Error('No se pudo conectar con el servidor.');
   }
@@ -82,13 +91,18 @@ export const getMyProfile = async (): Promise<IUser> => {
 // Usa axiosPublic
 export const refreshToken = async (rt: string): Promise<AuthTokenResponse> => {
   try {
+    // Enviamos el refreshToken en el body de la petición
     const response = await axiosPublic.post<AuthTokenResponse>(
       '/auth/refresh',
-      {},
-      { headers: { Authorization: `Bearer ${rt}` } }
+      { refreshToken: rt } // <- El token va aquí
+      // Sin cabecera 'Authorization'
     );
     return response.data;
   } catch (error: unknown) {
+    // Mejoramos el manejo de errores
+    if (isAxiosError(error) && error.response?.data?.message) {
+      throw new Error(error.response.data.message || 'Tu sesión ha expirado.');
+    }
     throw new Error('No se pudo refrescar la sesión.');
   }
 };

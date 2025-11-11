@@ -72,7 +72,7 @@ export function SidebarExpress() {
       onConfirm: async () => {
         await logoutUser();
         logout();
-        router.push('/login');
+        //router.push('/login');
       },
     });
   };

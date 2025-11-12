@@ -97,7 +97,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         status: 'idle',
       });
 
-      if (!userData.profile) {
+      if (!userData.profileCompleted) {
         console.log(
           'useAuthStore: Perfil de usuario incompleto, mostrando popup.'
         );

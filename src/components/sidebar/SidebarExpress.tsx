@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useModalStore } from '@/stores/useModalStore';
 import { logoutUser } from '@/services/authService';
+import { getUserData } from '@/lib/authStorage';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { usePathname, useRouter } from 'next/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -64,6 +65,11 @@ export function SidebarExpress() {
   const { open: openModal } = useModalStore();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // Añade esto para obtener datos del localStorage como fallback
+  const browserStoredUser =
+    typeof window !== 'undefined' ? getUserData() : null;
+  // displayUser usa el user del store si tiene nombre, si no toma el storedUser
+  const displayUser = user && user.nombre ? user : (browserStoredUser ?? user);
 
   const handleLogoutClick = () => {
     openModal('logoutConfirmation', {
@@ -220,10 +226,10 @@ export function SidebarExpress() {
                         >
                           <AvatarImage alt={user?.nombre || 'Usuario'} />
                           <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                            {user
+                            {displayUser
                               ? getInitials(
-                                  user.nombre,
-                                  user.apellido ?? undefined
+                                  displayUser.nombre,
+                                  displayUser.apellido ?? undefined
                                 )
                               : 'U'}
                           </AvatarFallback>
@@ -235,12 +241,12 @@ export function SidebarExpress() {
                           )}
                         >
                           <span className="text-sm font-medium whitespace-nowrap">
-                            {user
-                              ? `${user.nombre} ${user.apellido || ''}`.trim()
+                            {displayUser
+                              ? `${displayUser.nombre} ${displayUser.apellido || ''}`.trim()
                               : 'Usuario'}
                           </span>
                           <span className="text-xs text-muted-foreground whitespace-nowrap truncate w-full">
-                            {user?.email || ''}
+                            {displayUser?.email || ''}
                           </span>
                         </div>
                       </div>

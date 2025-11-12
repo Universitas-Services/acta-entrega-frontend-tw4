@@ -1,4 +1,3 @@
-// src/lib/authStorage.ts
 import { IUser, AuthTokenResponse } from '@/services/authService';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
@@ -66,13 +65,6 @@ export const clearAuthStorage = () => {
     localStorage.removeItem(USER_DATA_KEY);
   }
 };
-
-// --- FUNCIÓN ELIMINADA ---
-// export const clearExternalAuthStorage = () => {
-//   if (isBrowser) {
-//     localStorage.removeItem('auth-storage');
-//   }
-// };
 
 export const setAuthTokens = (tokens: AuthTokenResponse | null) => {
   if (tokens) {

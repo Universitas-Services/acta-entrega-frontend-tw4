@@ -2,10 +2,12 @@ import { create } from 'zustand';
 import { jwtDecode } from 'jwt-decode';
 import {
   getMyProfile,
+  getAuthenticatedUser,
   loginUser,
   refreshToken as apiRefreshToken,
   type LoginData,
   type IUser,
+  type IBasicUser,
   type IUserProfile,
   type AuthTokenResponse,
 } from '@/services/authService';
@@ -14,6 +16,7 @@ import {
   setAuthTokens,
   setUserData,
   getUserData,
+  getMyData,
   clearAuthStorage,
   getIsAuthenticated,
   getAccessToken,
@@ -21,10 +24,11 @@ import {
 } from '@/lib/authStorage';
 
 interface AuthState {
-  status: 'idle' | 'loading' | 'error';
+  status: 'idle' | 'loading' | 'loadingProfile' | 'error';
   showFirstLoginPopup: boolean;
   isAuthenticated: boolean;
   user: IUser | null;
+  basic: IBasicUser | null;
   login: (data: LoginData) => Promise<void>;
   fetchUser: () => Promise<void>;
   setTokens: (tokens: AuthTokenResponse) => void;
@@ -39,9 +43,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   showFirstLoginPopup: false,
   isAuthenticated: getIsAuthenticated(),
   user: getUserData(),
+  basic: getMyData(),
 
   login: async (data) => {
+    // 1. Añadimos un guardia para evitar dobles clics
+    if (get().status === 'loading') return;
     set({ status: 'loading' });
+
     try {
       console.log('useAuthStore: Iniciando login...');
       const tokens = await loginUser(data);
@@ -52,6 +60,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Actualizar el estado de Zustand
       set({
         isAuthenticated: getIsAuthenticated(),
+        status: 'loading', // Aún cargando el perfil completo
       });
 
       await get().fetchUser();
@@ -67,47 +76,37 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   fetchUser: async () => {
-    // Si no estamos autenticados (o estamos en proceso de logout),
-    // no intentes buscar un usuario.
-    if (!get().isAuthenticated) {
-      console.warn('useAuthStore: fetchUser abortado, no autenticado.');
-      return;
-    }
-
-    set({ status: 'loading' });
-
-    const existingUser = getUserData(); // Obtener usuario existente de localStorage
-    const existingProfile = existingUser?.profile;
+    if (get().status === 'loadingProfile') return; // <-- AÑADIR ESTA LÍNEA (con estado propio)
+    set({ status: 'loadingProfile' });
 
     try {
-      console.log('useAuthStore: Iniciando fetchUser...');
-      const userData = await getMyProfile();
-      console.log('useAuthStore: Datos de usuario recibidos:', userData);
+      console.log(
+        'useAuthStore: Iniciando fetchFullProfile (GET /users/profile)...'
+      );
+      // 1. Llama a GET /users/profile
+      const fullProfileData = await getMyProfile();
+      console.log('useAuthStore: Perfil completo recibido:', fullProfileData);
 
-      if (userData.profile === null && existingProfile) {
-        userData.profile = existingProfile;
-        console.log('useAuthStore: Perfil preservado de localStorage.');
-      }
-
-      setUserData(userData); // Guardar datos de usuario directamente en localStorage
-
-      // Actualizar el estado de Zustand
-      set({
-        user: userData,
+      // 2. Fusiona los datos completos en el estado de Zustand
+      //    (localStorage no se toca aquí)
+      set((state) => ({
+        user: { ...state.user, ...fullProfileData },
         status: 'idle',
-      });
+      }));
 
-      if (!userData.profileCompleted) {
+      // --- 👇 LA LÓGICA DEL POPUP ESTÁ AQUÍ 👇 ---
+      // 3. Comprueba la bandera del backend
+      if (!fullProfileData.profileCompleted) {
         console.log(
-          'useAuthStore: Perfil de usuario incompleto, mostrando popup.'
+          'useAuthStore: Perfil incompleto (profileCompleted:false). Mostrando popup.'
         );
         set({ showFirstLoginPopup: true });
       }
+      // 4. Si es 'true', no hace nada y el popup no se muestra.
     } catch (error) {
-      console.error('useAuthStore: Error al obtener datos del usuario:', error);
+      console.error('useAuthStore: Error al obtener perfil completo:', error);
       set({ status: 'error' });
-      get().logout(); // Si fetchUser falla, llamará a logout
-      throw error;
+      get().logout();
     }
   },
 
@@ -159,6 +158,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   checkAuthOnLoad: async () => {
+    if (get().status !== 'idle') return;
+    set({ status: 'loading' });
+    console.log('useAuthStore: Iniciando checkAuthOnLoad...');
+
     const currentAccessToken = getAccessToken();
     const currentRefreshToken = getRefreshToken();
     const { logout, setTokens, fetchUser } = get();
@@ -204,22 +207,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           refreshError
         );
         logout(); // Ahora sí, deslogueamos.
+        return;
       }
     } else {
-      // El token ES válido y NO ha expirado
-      console.log('useAuthStore: Access token válido, cargando usuario...');
-      try {
-        await fetchUser();
-      } catch (fetchError) {
-        // Esto puede pasar si el token es válido pero el servidor lo rechaza
-        // (p.ej. el interceptor falló y llamó a logout).
-        // `fetchUser` ya llama a `logout()` en su propio catch,
-        // así que no necesitamos hacer nada extra aquí.
-        console.error(
-          'useAuthStore: Falló fetchUser (probablemente ya se está deslogueando).',
-          fetchError
-        );
-      }
+      set({ isAuthenticated: true });
+    }
+
+    // --- 👇 LÓGICA DE CARGA DE DATOS AL RECARGAR PÁGINA 👇 ---
+    try {
+      // 1. Siempre obtenemos los datos BÁSICOS primero
+      const basicUser = await getAuthenticatedUser();
+
+      setUserData(basicUser); // Actualiza localStorage
+
+      set({ user: basicUser, status: 'idle' });
+
+      console.log('useAuthStore: Sesión válida, usuario básico (/my) cargado.');
+    } catch (fetchError) {
+      console.error('useAuthStore: Falló fetch al recargar, deslogueando.');
+      get().logout();
     }
   },
 

@@ -31,6 +31,13 @@ export interface IUserProfile {
   plazoEntregaActa: string | null;
 }
 
+export interface IBasicUser {
+  id: string;
+  email: string;
+  nombreCompleto: string;
+  role: string;
+}
+
 export interface IUser {
   id: string;
   email: string;
@@ -67,6 +74,23 @@ export const loginUser = async (
       throw new Error(error.message || 'Error de Axios al iniciar sesión.');
     }
 
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+export const getAuthenticatedUser = async (): Promise<IUser> => {
+  try {
+    const response = await apiClient.get<IUser>('/users/my');
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response?.data?.message) {
+      throw new Error(
+        error.response.data.message || 'Error al obtener perfil.'
+      );
+    }
+    if (isAxiosError(error)) {
+      throw new Error(error.message || 'Error de Axios al obtener perfil.');
+    }
     throw new Error('No se pudo conectar con el servidor.');
   }
 };

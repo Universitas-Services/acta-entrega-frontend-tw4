@@ -1,4 +1,4 @@
-import { IUser, AuthTokenResponse } from '@/services/authService';
+import { IUser, IBasicUser, AuthTokenResponse } from '@/services/authService';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
@@ -51,6 +51,14 @@ export const setUserData = (userData: IUser | null) => {
 };
 
 export const getUserData = (): IUser | null => {
+  if (isBrowser) {
+    const data = localStorage.getItem(USER_DATA_KEY);
+    return data ? JSON.parse(data) : null;
+  }
+  return null;
+};
+
+export const getMyData = (): IBasicUser | null => {
   if (isBrowser) {
     const data = localStorage.getItem(USER_DATA_KEY);
     return data ? JSON.parse(data) : null;

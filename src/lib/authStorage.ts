@@ -1,5 +1,4 @@
-// src/lib/authStorage.ts
-import { IUser, AuthTokenResponse } from '@/services/authService';
+import { IUser, IBasicUser, AuthTokenResponse } from '@/services/authService';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
@@ -59,6 +58,14 @@ export const getUserData = (): IUser | null => {
   return null;
 };
 
+export const getMyData = (): IBasicUser | null => {
+  if (isBrowser) {
+    const data = localStorage.getItem(USER_DATA_KEY);
+    return data ? JSON.parse(data) : null;
+  }
+  return null;
+};
+
 export const clearAuthStorage = () => {
   if (isBrowser) {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
@@ -66,13 +73,6 @@ export const clearAuthStorage = () => {
     localStorage.removeItem(USER_DATA_KEY);
   }
 };
-
-// --- FUNCIÓN ELIMINADA ---
-// export const clearExternalAuthStorage = () => {
-//   if (isBrowser) {
-//     localStorage.removeItem('auth-storage');
-//   }
-// };
 
 export const setAuthTokens = (tokens: AuthTokenResponse | null) => {
   if (tokens) {

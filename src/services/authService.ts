@@ -31,6 +31,13 @@ export interface IUserProfile {
   plazoEntregaActa: string | null;
 }
 
+export interface IBasicUser {
+  id: string;
+  email: string;
+  nombreCompleto: string;
+  role: string;
+}
+
 export interface IUser {
   id: string;
   email: string;
@@ -40,6 +47,7 @@ export interface IUser {
   role: string;
   is_email_verified: boolean;
   profile: IUserProfile | null;
+  profileCompleted: boolean;
 }
 
 // --- Funciones de Autenticación (Login/Logout/Refresh/Profile) ---
@@ -70,10 +78,27 @@ export const loginUser = async (
   }
 };
 
+export const getAuthenticatedUser = async (): Promise<IUser> => {
+  try {
+    const response = await apiClient.get<IUser>('/users/my');
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error) && error.response?.data?.message) {
+      throw new Error(
+        error.response.data.message || 'Error al obtener perfil.'
+      );
+    }
+    if (isAxiosError(error)) {
+      throw new Error(error.message || 'Error de Axios al obtener perfil.');
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
 // Usa apiClient (privado) porque requiere autenticación
 export const getMyProfile = async (): Promise<IUser> => {
   try {
-    const response = await apiClient.get<IUser>('/users/my');
+    const response = await apiClient.get<IUser>('/users/profile');
     return response.data;
   } catch (error: unknown) {
     if (isAxiosError(error) && error.response?.data?.message) {
@@ -231,7 +256,7 @@ export const updateUser = async (data: {
   cargo?: string;
 }): Promise<IUser> => {
   try {
-    const response = await apiClient.put<IUser>('/users/my', data);
+    const response = await apiClient.put<IUser>('/users/profile', data);
     return response.data;
   } catch (error) {
     if (isAxiosError(error) && error.response) {

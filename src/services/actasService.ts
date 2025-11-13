@@ -2,12 +2,12 @@ import apiClient from '@/lib/axios';
 import axios from 'axios';
 import * as z from 'zod';
 
-// Importamos los esquemas desde nuestro archivo central
 import {
   actaMaximaAutoridadSchema,
   actaSalienteSchema,
   actaEntranteSchema,
 } from '@/lib/schemas';
+import { toast } from 'sonner';
 
 // --- ACTAS ---
 type ActaMaximaAutoridadData = z.infer<typeof actaMaximaAutoridadSchema>;
@@ -19,22 +19,76 @@ interface ActaResponse {
   numeroActa: string;
   id: string;
 }
-export const createActaMaximaAutoridad = async (
-  data: ActaMaximaAutoridadData
-): Promise<ActaResponse> => {
+
+// --- FUNCIÓN HELPER INTERNA ---
+
+/**
+ * Dispara el envío del correo electrónico para un acta recién creada.
+ * No lanza un error si falla, solo lo reporta en la consola.
+ * @param actaId - El ID del acta recién creada
+ * @param token - El token de autenticación
+ */
+const sendActaByEmail = async (actaId: string, token: string) => {
+  if (!actaId) return; // No hacer nada si no hay ID
+
   try {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      throw new Error('No estás autenticado. Por favor, inicia sesión.');
-    }
-    const response = await apiClient.post<ActaResponse>(
-      '/actas/maxima-autoridad-paga',
-      data,
+    //Llamar al endpoint de envío de correo
+    await apiClient.post(
+      `/actas/${actaId}/enviar-docx`, // Endpoint de envío
+      {}, // No requiere body
       {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    return response.data;
+    console.log(`Solicitud de envío para Acta ${actaId} exitosa.`);
+  } catch (sendError) {
+    // Importante: No lanzamos un error aquí.
+    // El acta se creó con éxito, no queremos que la UI muestre un error
+    // solo porque falló el envío del correo.
+    console.error(
+      `Acta ${actaId} creada, pero falló el envío de correo:`,
+      toast.error(
+        'El acta se creó, pero no se pudo enviar el correo electrónico.'
+      ),
+      sendError
+    );
+  }
+};
+
+/**
+ * Llama al endpoint unificado /actas para crear un Acta de Máxima Autoridad (EXPRESS).
+ */
+export const createActaMaximaAutoridad = async (
+  data: ActaMaximaAutoridadData
+): Promise<ActaResponse> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('No estás autenticado. Por favor, inicia sesión.');
+    }
+
+    // AÑADIMOS EL TIPO AL CUERPO
+    const body = {
+      type: 'MAXIMA_AUTORIDAD_PAGA',
+      nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
+      metadata: data,
+    };
+
+    // Crear el acta
+    const createResponse = await apiClient.post<ActaResponse>(
+      '/actas',
+      body, // Enviamos el cuerpo con el tipo
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    // Enviar el correo (lo hacemos en segundo plano)
+    // Usamos "await" para asegurar que se intente antes de devolver la respuesta
+    await sendActaByEmail(createResponse.data.id, token);
+
+    // Devolvemos la respuesta de la creación
+    return createResponse.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new Error(error.response.data.message || 'Error al crear el acta.');
@@ -43,36 +97,40 @@ export const createActaMaximaAutoridad = async (
   }
 };
 
-// --- NUEVA FUNCIÓN PARA ACTA SALIENTE ---
-
 /**
- * Llama al endpoint del backend para crear un Acta de Entrega Saliente (Gratis).
- */
-// src/services/actasService.ts
-
-// ... (el resto de tu código)
-
-/**
- * Llama al endpoint del backend para crear un Acta de Entrega Saliente (PAGA).
+ * Llama al endpoint unificado /actas para crear un Acta de Entrega Saliente (EXPRESS).
  */
 export const createActaSalientePaga = async (
   data: ActaSalienteData
 ): Promise<ActaResponse> => {
   try {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('accessToken');
     if (!token) {
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
 
-    // ¡CORRECCIÓN! Apuntamos al endpoint correcto del backend
-    const response = await apiClient.post<ActaResponse>(
-      '/actas/saliente-paga',
-      data,
+    // AÑADIMOS EL TIPO AL CUERPO
+    const body = {
+      type: 'SALIENTE_PAGA',
+      nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
+      metadata: data,
+    };
+
+    // Crear el acta
+    const createResponse = await apiClient.post<ActaResponse>(
+      '/actas',
+      body, // Enviamos el cuerpo con el tipo
       {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    return response.data;
+
+    // Enviar el correo (lo hacemos en segundo plano)
+    // Usamos "await" para asegurar que se intente antes de devolver la respuesta
+    await sendActaByEmail(createResponse.data.id, token);
+
+    // Devolvemos la respuesta de la creación
+    return createResponse.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new Error(
@@ -83,25 +141,40 @@ export const createActaSalientePaga = async (
   }
 };
 
-// --- NUEVO SERVICIO PARA ACTA ENTRANTE (PAGA) ---
-// --- ACTA MÁXIMA AUTORIDAD (YA EXISTENTE) ---
-
+/**
+ * Llama al endpoint unificado /actas para crear un Acta de Entrega Entrante (PAGA).
+ */
 export const createActaEntrante = async (
   data: ActaEntranteData
 ): Promise<ActaResponse> => {
   try {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('accessToken');
     if (!token) {
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
-    const response = await apiClient.post<ActaResponse>(
-      '/actas/entrante-paga',
-      data,
+
+    // AÑADIMOS EL TIPO AL CUERPO
+    const body = {
+      type: 'ENTRANTE_PAGA',
+      nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
+      metadata: data,
+    };
+
+    // Crear el acta
+    const createResponse = await apiClient.post<ActaResponse>(
+      '/actas',
+      body, // Enviamos el cuerpo con el tipo
       {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    return response.data;
+
+    // Enviar el correo (lo hacemos en segundo plano)
+    // Usamos "await" para asegurar que se intente antes de devolver la respuesta
+    await sendActaByEmail(createResponse.data.id, token);
+
+    // Devolvemos la respuesta de la creación
+    return createResponse.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new Error(error.response.data.message || 'Error al crear el acta.');

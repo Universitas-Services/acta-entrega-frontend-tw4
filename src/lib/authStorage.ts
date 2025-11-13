@@ -3,6 +3,7 @@ import { IUser, IBasicUser, AuthTokenResponse } from '@/services/authService';
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 const USER_DATA_KEY = 'UserData';
+const BASIC_USER_DATA_KEY = 'BasicUserData'; // Datos básicos del my
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -42,35 +43,57 @@ export const getRefreshToken = (): string | null => {
 
 export const setUserData = (userData: IUser | null) => {
   if (isBrowser) {
+    // El perfil completo ya no se guarda en localStorage.
+    /*
     if (userData) {
       localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
     } else {
       localStorage.removeItem(USER_DATA_KEY);
     }
+    */
   }
 };
 
 export const getUserData = (): IUser | null => {
   if (isBrowser) {
-    const data = localStorage.getItem(USER_DATA_KEY);
+    //const data = localStorage.getItem(USER_DATA_KEY);
+    //return data ? JSON.parse(data) : null;
+    // El perfil completo ya no se guarda en localStorage.
+    localStorage.removeItem(USER_DATA_KEY); // Limpiamos cualquier dato antiguo
+    return null;
+  }
+  return null;
+};
+
+export const setBasicUserData = (basicUserData: IBasicUser | null) => {
+  if (isBrowser) {
+    if (basicUserData) {
+      localStorage.setItem(BASIC_USER_DATA_KEY, JSON.stringify(basicUserData));
+    } else {
+      localStorage.removeItem(BASIC_USER_DATA_KEY);
+    }
+  }
+};
+
+export const getBasicUserData = (): IBasicUser | null => {
+  if (isBrowser) {
+    const data = localStorage.getItem(BASIC_USER_DATA_KEY);
     return data ? JSON.parse(data) : null;
   }
   return null;
 };
 
 export const getMyData = (): IBasicUser | null => {
-  if (isBrowser) {
-    const data = localStorage.getItem(USER_DATA_KEY);
-    return data ? JSON.parse(data) : null;
-  }
-  return null;
+  // Refactorizado para usar getBasicUserData
+  return getBasicUserData();
 };
 
 export const clearAuthStorage = () => {
   if (isBrowser) {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(USER_DATA_KEY);
+    //localStorage.removeItem(USER_DATA_KEY);
+    localStorage.removeItem(BASIC_USER_DATA_KEY); // Limpiar también la nueva clave
   }
 };
 

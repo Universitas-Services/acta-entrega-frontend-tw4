@@ -23,7 +23,7 @@ export interface CleanRegisterData {
   telefono?: string;
 }
 
-// El usuario REAL del backend (de /users/my)
+// Tipo del perfil del usuario
 export interface IUserProfile {
   id: string;
   institucion: string;
@@ -31,6 +31,7 @@ export interface IUserProfile {
   plazoEntregaActa: string | null;
 }
 
+// Tipo básico del usuario (de /users/my)
 export interface IBasicUser {
   id: string;
   email: string;
@@ -38,6 +39,7 @@ export interface IBasicUser {
   role: string;
 }
 
+// Tipo completo del usuario (de /users/profile)
 export interface IUser {
   id: string;
   email: string;
@@ -78,18 +80,21 @@ export const loginUser = async (
   }
 };
 
-export const getAuthenticatedUser = async (): Promise<IUser> => {
+export const getAuthenticatedUser = async (): Promise<IBasicUser> => {
   try {
-    const response = await apiClient.get<IUser>('/users/my');
+    const response = await apiClient.get<IBasicUser>('/users/my');
     return response.data;
   } catch (error: unknown) {
     if (isAxiosError(error) && error.response?.data?.message) {
       throw new Error(
-        error.response.data.message || 'Error al obtener perfil.'
+        error.response.data.message ||
+          'Error al obtener datos básicos del usuario.'
       );
     }
     if (isAxiosError(error)) {
-      throw new Error(error.message || 'Error de Axios al obtener perfil.');
+      throw new Error(
+        error.message || 'Error de Axios al obtener datos básicos del usuario.'
+      );
     }
     throw new Error('No se pudo conectar con el servidor.');
   }
@@ -119,7 +124,7 @@ export const refreshToken = async (rt: string): Promise<AuthTokenResponse> => {
     // Enviamos el refreshToken en el body de la petición
     const response = await axiosPublic.post<AuthTokenResponse>(
       '/auth/refresh',
-      { refreshToken: rt } // <- El token va aquí
+      { refreshToken: rt } // El token va aquí
       // Sin cabecera 'Authorization'
     );
     return response.data;
@@ -203,7 +208,7 @@ export const verifyOtp = async (
   }
 };
 
-// <Usa 'axiosPublic' (el token se pasa en el body, no requiere auth)
+// Usa 'axiosPublic' (el token se pasa en el body, no requiere auth)
 export const resetPassword = async (
   email: string,
   newPassword: string,
@@ -246,7 +251,7 @@ export const confirmEmail = async (
 
 /**
  * Actualiza los datos básicos del usuario (nombre, apellido, teléfono).
- * Llama al endpoint PUT /users/my
+ * Llama al endpoint PUT /users/profile
  */
 export const updateUser = async (data: {
   nombre?: string;

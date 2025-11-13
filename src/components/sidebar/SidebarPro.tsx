@@ -66,7 +66,7 @@ export function SidebarPro() {
   } = useSidebarStore();
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
+  const { basic, logout } = useAuthStore();
   const { open: openModal } = useModalStore();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -376,14 +376,11 @@ export function SidebarPro() {
                                 : 'hover:bg-avatar-pro hover:rounded-lg')
                           )}
                         >
-                          <AvatarImage alt={user?.nombre || 'Usuario'} />
+                          <AvatarImage
+                            alt={basic?.nombreCompleto || 'Usuario'}
+                          />
                           <AvatarFallback className="bg-avatar-pro text-foreground font-bold">
-                            {user
-                              ? getInitials(
-                                  user.nombre,
-                                  user.apellido ?? undefined
-                                )
-                              : 'U'}
+                            {basic ? getInitials(basic.nombreCompleto) : 'U'}
                           </AvatarFallback>
                         </Avatar>
                         <div
@@ -393,12 +390,10 @@ export function SidebarPro() {
                           )}
                         >
                           <span className="text-sm font-medium whitespace-nowrap">
-                            {user
-                              ? `${user.nombre} ${user.apellido || ''}`.trim()
-                              : 'Usuario'}
+                            {basic?.nombreCompleto || 'Usuario'}
                           </span>
                           <span className="text-xs  whitespace-nowrap truncate w-full">
-                            {user?.email || ''}
+                            {basic?.email || ''}
                           </span>
                         </div>
                       </div>
@@ -435,24 +430,17 @@ export function SidebarPro() {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 ">
-                        <AvatarImage alt={user?.nombre || 'Usuario'} />
+                        <AvatarImage alt={basic?.nombreCompleto || 'Usuario'} />
                         <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                          {user
-                            ? getInitials(
-                                user.nombre,
-                                user.apellido ?? undefined
-                              )
-                            : 'U'}
+                          {basic ? getInitials(basic.nombreCompleto) : 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col space-y-1 min-w-0">
                         <p className="text-sm font-medium leading-none">
-                          {user
-                            ? `${user.nombre} ${user.apellido || ''}`.trim()
-                            : 'Usuario'}
+                          {basic?.nombreCompleto || 'Usuario'}
                         </p>
                         <p className="text-xs truncate w-full">
-                          {user?.email || ''}
+                          {basic?.email || ''}
                         </p>
                       </div>
                     </div>

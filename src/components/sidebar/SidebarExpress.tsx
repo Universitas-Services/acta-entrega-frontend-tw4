@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useModalStore } from '@/stores/useModalStore';
 import { logoutUser } from '@/services/authService';
 import { useSidebarStore } from '@/stores/useSidebarStore';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { mainNav } from '@/config/sidebar-nav';
 import { cn, getInitials } from '@/lib/utils';
@@ -60,9 +60,8 @@ export function SidebarExpress() {
   } = useSidebarStore();
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
+  const { basic, logout } = useAuthStore(); // Se usa 'basic'
   const { open: openModal } = useModalStore();
-  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleLogoutClick = () => {
@@ -72,7 +71,7 @@ export function SidebarExpress() {
       onConfirm: async () => {
         await logoutUser();
         logout();
-        //router.push('/login');
+        //router.push('/login');  // la redirección se maneja en el store
       },
     });
   };
@@ -218,14 +217,11 @@ export function SidebarExpress() {
                                 : 'hover:bg-primary hover:rounded-lg')
                           )}
                         >
-                          <AvatarImage alt={user?.nombre || 'Usuario'} />
+                          <AvatarImage
+                            alt={basic?.nombreCompleto || 'Usuario'}
+                          />
                           <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                            {user
-                              ? getInitials(
-                                  user.nombre,
-                                  user.apellido ?? undefined
-                                )
-                              : 'U'}
+                            {basic ? getInitials(basic.nombreCompleto) : 'U'}
                           </AvatarFallback>
                         </Avatar>
                         <div
@@ -235,12 +231,10 @@ export function SidebarExpress() {
                           )}
                         >
                           <span className="text-sm font-medium whitespace-nowrap">
-                            {user
-                              ? `${user.nombre} ${user.apellido || ''}`.trim()
-                              : 'Usuario'}
+                            {basic?.nombreCompleto || 'Usuario'}
                           </span>
                           <span className="text-xs text-muted-foreground whitespace-nowrap truncate w-full">
-                            {user?.email || ''}
+                            {basic?.email || ''}
                           </span>
                         </div>
                       </div>
@@ -278,24 +272,17 @@ export function SidebarExpress() {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 ">
-                        <AvatarImage alt={user?.nombre || 'Usuario'} />
+                        <AvatarImage alt={basic?.nombreCompleto || 'Usuario'} />
                         <AvatarFallback className="bg-primary text-primary-foreground font-bold">
-                          {user
-                            ? getInitials(
-                                user.nombre,
-                                user.apellido ?? undefined
-                              )
-                            : 'U'}
+                          {basic ? getInitials(basic.nombreCompleto) : 'U'}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col space-y-1 min-w-0">
                         <p className="text-sm font-medium leading-none">
-                          {user
-                            ? `${user.nombre} ${user.apellido || ''}`.trim()
-                            : 'Usuario'}
+                          {basic?.nombreCompleto || 'Usuario'}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground truncate w-full">
-                          {user?.email || ''}
+                          {basic?.email || ''}
                         </p>
                       </div>
                     </div>

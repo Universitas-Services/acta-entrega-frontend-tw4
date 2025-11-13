@@ -16,7 +16,8 @@ import {
   setAuthTokens,
   setUserData,
   getUserData,
-  getMyData,
+  setBasicUserData,
+  getBasicUserData,
   clearAuthStorage,
   getIsAuthenticated,
   getAccessToken,
@@ -43,10 +44,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   showFirstLoginPopup: false,
   isAuthenticated: getIsAuthenticated(),
   user: getUserData(),
-  basic: getMyData(),
+  basic: getBasicUserData(), // Inicializar con la nueva función
 
   login: async (data) => {
-    // 1. Añadimos un guardia para evitar dobles clics
+    // Añadimos un guardia para evitar dobles clics
     if (get().status === 'loading') return;
     set({ status: 'loading' });
 
@@ -63,7 +64,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         status: 'loading', // Aún cargando el perfil completo
       });
 
-      await get().fetchUser();
+      // Después del login, obtenemos los datos básicos y el perfil completo
+      const basicUser = await getAuthenticatedUser();
+      setBasicUserData(basicUser); // Guardar datos básicos en localStorage
+      set({ basic: basicUser }); // Actualizar estado 'basic'
+
+      await get().fetchUser(); // Esto cargará el perfil completo y actualizará 'user'
       console.log('useAuthStore: Login exitoso y usuario cargado.');
     } catch (error) {
       set({ status: 'error' });
@@ -76,33 +82,33 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   fetchUser: async () => {
-    if (get().status === 'loadingProfile') return; // <-- AÑADIR ESTA LÍNEA (con estado propio)
+    if (get().status === 'loadingProfile') return; // LÍNEA (con estado propio)
     set({ status: 'loadingProfile' });
 
     try {
       console.log(
         'useAuthStore: Iniciando fetchFullProfile (GET /users/profile)...'
       );
-      // 1. Llama a GET /users/profile
+      // Llama a GET /users/profile
       const fullProfileData = await getMyProfile();
       console.log('useAuthStore: Perfil completo recibido:', fullProfileData);
 
-      // 2. Fusiona los datos completos en el estado de Zustand
-      //    (localStorage no se toca aquí)
+      // Fusiona los datos completos en el estado de Zustand
       set((state) => ({
         user: { ...state.user, ...fullProfileData },
         status: 'idle',
       }));
+      setUserData(fullProfileData); // Actualiza localStorage con el perfil completo
 
-      // --- 👇 LA LÓGICA DEL POPUP ESTÁ AQUÍ 👇 ---
-      // 3. Comprueba la bandera del backend
+      // --- LÓGICA DEL POPUP ---
+      // Comprueba la bandera del backend
       if (!fullProfileData.profileCompleted) {
         console.log(
           'useAuthStore: Perfil incompleto (profileCompleted:false). Mostrando popup.'
         );
         set({ showFirstLoginPopup: true });
       }
-      // 4. Si es 'true', no hace nada y el popup no se muestra.
+      // Si es 'true', no hace nada y el popup no se muestra.
     } catch (error) {
       console.error('useAuthStore: Error al obtener perfil completo:', error);
       set({ status: 'error' });
@@ -134,6 +140,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({
       isAuthenticated: false,
       user: null,
+      basic: null, // Limpiar también el estado basic
       showFirstLoginPopup: false,
       status: 'idle',
     });
@@ -144,7 +151,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       axiosPublic
         .post(
           '/auth/logout',
-          { refreshToken: tokenToInvalidate } // <- El token va aquí
+          { refreshToken: tokenToInvalidate } // El token va aquí
           // Sin cabecera 'Authorization'
         )
         .catch((err) => {
@@ -198,7 +205,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         // Usar el refresh token para obtener nuevos tokens
         const newTokens = await apiRefreshToken(currentRefreshToken);
         setTokens(newTokens); // Guardar los nuevos tokens
-        await fetchUser(); // Cargar usuario con los nuevos tokens
+        // Después del refresh, obtenemos los datos básicos y el perfil completo
+        const basicUser = await getAuthenticatedUser();
+        setBasicUserData(basicUser); // Guardar datos básicos en localStorage
+        set({ basic: basicUser }); // Actualizar estado 'basic'
+        await fetchUser(); // Cargar usuario con los nuevos tokens (perfil completo)
         console.log('useAuthStore: Tokens refrescados y usuario cargado.');
       } catch (refreshError) {
         // Si el refresh falla (ej. refresh token también expiró o es inválido)
@@ -213,14 +224,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isAuthenticated: true });
     }
 
-    // --- 👇 LÓGICA DE CARGA DE DATOS AL RECARGAR PÁGINA 👇 ---
+    // --- LÓGICA DE CARGA DE DATOS AL RECARGAR PÁGINA ---
     try {
-      // 1. Siempre obtenemos los datos BÁSICOS primero
-      const basicUser = await getAuthenticatedUser();
+      // Siempre obtenemos los datos BÁSICOS primero
+      const basicUser = await getAuthenticatedUser(); // GET /my
+      setBasicUserData(basicUser); // Actualiza localStorage con datos básicos
+      // Actualiza el estado 'basic' del store y se pone status 'idle'
+      set({ basic: basicUser, status: 'idle' });
 
-      setUserData(basicUser); // Actualiza localStorage
-
-      set({ user: basicUser, status: 'idle' });
+      // Luego, intentamos obtener el perfil completo si no está ya cargado o si es necesario
+      /* const currentUser = getUserData();
+      if (!currentUser || !currentUser.profileCompleted) {
+        await fetchUser(); // Cargar el perfil completo si no está o está incompleto
+      } else {
+        set({ user: currentUser, status: 'idle' }); // Si ya está completo, solo actualiza el estado 'user'
+      }*/
 
       console.log('useAuthStore: Sesión válida, usuario básico (/my) cargado.');
     } catch (fetchError) {
@@ -238,7 +256,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set((state) => {
       const currentUser = getUserData();
       if (currentUser) {
-        const updatedUser = { ...currentUser, profile: profile };
+        const updatedUser = {
+          ...currentUser,
+          profile: profile,
+          profileCompleted: true,
+        }; // Marcar como completo
         setUserData(updatedUser);
         return { user: updatedUser };
       }

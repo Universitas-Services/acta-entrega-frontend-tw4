@@ -9,12 +9,12 @@ import { cn } from '@/lib/utils';
 
 export default function AppSidebar() {
   // Obtenemos el usuario del store de autenticación
-  const { user } = useAuthStore();
+  const { basic } = useAuthStore();
   // Obtenemos el estado de colapso para el esqueleto
   const { isDesktopCollapsed } = useSidebarStore();
 
   // Estado de carga (mientras el user store se hidrata)
-  if (!user) {
+  if (!basic) {
     // Muestra un esqueleto del sidebar para evitar "saltos" (layout shift)
     // Solo mostramos esqueleto en desktop, en móvil no es necesario
     return (
@@ -51,7 +51,7 @@ export default function AppSidebar() {
   }
 
   // Lógica principal: renderizado condicional basado en el rol
-  if (user.role === 'pro') {
+  if (basic.role === 'pro') {
     // Si el usuario es 'pro', renderiza el Sidebar Pro
     return <SidebarPro />;
   }

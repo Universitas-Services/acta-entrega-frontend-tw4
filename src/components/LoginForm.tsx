@@ -44,9 +44,23 @@ export function LoginForm() {
     setIsLoading(true);
     setError(null);
     try {
+      // Espera a que el login se complete.
+      // La función 'login' en el store ya obtiene y guarda los datos básicos.
       await login(values);
 
-      router.push('/dashboard');
+      // Lee el estado 'basic' (que contiene el rol) directamente desde el store
+      const { basic } = useAuthStore.getState();
+
+      // Determina la ruta de destino basada en el rol
+      let targetRoute = '/dashboard'; // Ruta por defecto para 'USER'
+
+      if (basic?.role === 'PAID_USER') {
+        targetRoute = '/dashboard/pro';
+      }
+
+      // Usa router.replace() para navegar
+      // Esto reemplaza /login en el historial, impidiendo volver con "Atrás".
+      router.replace(targetRoute);
     } catch (err: unknown) {
       // Si el store lanza un error (ej. 401 Credenciales Inválidas),
       // el 'authService' lo captura y lo muestra aquí.
@@ -55,7 +69,7 @@ export function LoginForm() {
       } else {
         setError('Ocurrió un error desconocido.');
       }
-      setIsLoading(false);
+      setIsLoading(false); // Solo se ejecuta si hay un error
     }
   }
 

@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { LuSave, LuShieldQuestion } from 'react-icons/lu';
+import { LuShieldQuestion } from 'react-icons/lu';
 import { useModalStore } from '@/stores/useModalStore';
 import { toast } from 'sonner';
 

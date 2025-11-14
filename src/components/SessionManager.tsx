@@ -1,4 +1,3 @@
-// src/components/SessionManager.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,12 +12,10 @@ import {
 } from '@/lib/authStorage';
 
 export function SessionManager() {
-  // --- CORRECCIÓN DEL BUCLE INFINITO ---
   // Seleccionamos cada función individualmente.
   // Esto devuelve una referencia estable y no causa un nuevo renderizado.
   const logout = useAuthStore((state) => state.logout);
   const checkAuthOnLoad = useAuthStore((state) => state.checkAuthOnLoad);
-  // --- FIN DE LA CORRECCIÓN ---
 
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 

@@ -51,7 +51,7 @@ export default function AppSidebar() {
   }
 
   // Lógica principal: renderizado condicional basado en el rol
-  if (basic.role === 'pro') {
+  if (basic.role === 'PAID_USER') {
     // Si el usuario es 'pro', renderiza el Sidebar Pro
     return <SidebarPro />;
   }

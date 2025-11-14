@@ -6,13 +6,26 @@ import {
   actaMaximaAutoridadSchema,
   actaSalienteSchema,
   actaEntranteSchema,
+  actaMaximaAutoridadProSchema,
+  actaSalienteProSchema,
+  actaentranteProSchema,
 } from '@/lib/schemas';
+import {
+  complianceSchema,
+  //type ComplianceFormData,
+} from '@/lib/pro/compliance-schema';
 import { toast } from 'sonner';
 
 // --- ACTAS ---
 type ActaMaximaAutoridadData = z.infer<typeof actaMaximaAutoridadSchema>;
 type ActaSalienteData = z.infer<typeof actaSalienteSchema>;
 type ActaEntranteData = z.infer<typeof actaEntranteSchema>;
+
+type ActaMaximaAutoridadProData = z.infer<typeof actaMaximaAutoridadProSchema>;
+type ActaSalienteProData = z.infer<typeof actaSalienteProSchema>;
+type ActaEntranteProData = z.infer<typeof actaentranteProSchema>;
+//type ActaComplianceData = ComplianceFormData;
+type ComplianceFormData = z.infer<typeof complianceSchema>;
 
 interface ActaResponse {
   message: string;
@@ -178,6 +191,142 @@ export const createActaEntrante = async (
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new Error(error.response.data.message || 'Error al crear el acta.');
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+/**
+ * Llama al endpoint /actas para GUARDAR un Acta de Máxima Autoridad (PRO).
+ */
+export const createActaMaximaAutoridadPro = async (
+  data: ActaMaximaAutoridadProData
+): Promise<ActaResponse> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('No estás autenticado. Por favor, inicia sesión.');
+    }
+
+    const body = {
+      type: 'MAXIMA_AUTORIDAD_PRO',
+      nombreEntidad: data.nombreOrgano,
+      metadata: data,
+    };
+
+    const response = await apiClient.post<ActaResponse>('/actas', body, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // No se llama a sendActaByEmail
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al guardar el acta PRO.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+/**
+ * Llama al endpoint /actas para GUARDAR un Acta Saliente (PRO).
+ */
+export const createActaSalientePro = async (
+  data: ActaSalienteProData
+): Promise<ActaResponse> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('No estás autenticado. Por favor, inicia sesión.');
+    }
+
+    const body = {
+      type: 'SALIENTE_PRO',
+      nombreEntidad: data.nombreOrgano,
+      metadata: data,
+    };
+
+    const response = await apiClient.post<ActaResponse>('/actas', body, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // No se llama a sendActaByEmail
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al guardar el acta saliente PRO.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+/**
+ * Llama al endpoint /actas para GUARDAR un Acta Entrante (PRO).
+ */
+export const createActaEntrantePro = async (
+  data: ActaEntranteProData
+): Promise<ActaResponse> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('No estás autenticado. Por favor, inicia sesión.');
+    }
+
+    const body = {
+      type: 'ENTRANTE_PRO',
+      nombreEntidad: data.nombreOrgano,
+      metadata: data,
+    };
+
+    const response = await apiClient.post<ActaResponse>('/actas', body, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // No se llama a sendActaByEmail
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al guardar el acta entrante PRO.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+/**
+ * Llama al endpoint /actas para GUARDAR un formulario de Compliance.
+ */
+export const createActaCompliance = async (
+  data: ComplianceFormData
+): Promise<ActaResponse> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('No estás autenticado. Por favor, inicia sesión.');
+    }
+
+    const body = {
+      type: 'COMPLIANCE',
+      nombreEntidad: data.nombreOrgano, // Asumiendo que Compliance usa nombreOrgano
+      metadata: data,
+    };
+
+    const response = await apiClient.post<ActaResponse>('/actas', body, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // No se llama a sendActaByEmail
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al guardar el compliance.'
+      );
     }
     throw new Error('No se pudo conectar con el servidor.');
   }

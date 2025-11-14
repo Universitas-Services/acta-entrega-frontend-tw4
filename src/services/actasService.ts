@@ -82,7 +82,7 @@ export const createActaMaximaAutoridad = async (
 
     // AÑADIMOS EL TIPO AL CUERPO
     const body = {
-      type: 'MAXIMA_AUTORIDAD_PAGA',
+      type: 'MAXIMA_AUTORIDAD_GRATIS',
       nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
       metadata: data,
     };
@@ -124,7 +124,7 @@ export const createActaSalientePaga = async (
 
     // AÑADIMOS EL TIPO AL CUERPO
     const body = {
-      type: 'SALIENTE_PAGA',
+      type: 'SALIENTE_GRATIS',
       nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
       metadata: data,
     };
@@ -168,7 +168,7 @@ export const createActaEntrante = async (
 
     // AÑADIMOS EL TIPO AL CUERPO
     const body = {
-      type: 'ENTRANTE_PAGA',
+      type: 'ENTRANTE_GRATIS',
       nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
       metadata: data,
     };
@@ -209,7 +209,7 @@ export const createActaMaximaAutoridadPro = async (
     }
 
     const body = {
-      type: 'MAXIMA_AUTORIDAD_PRO',
+      type: 'MAXIMA_AUTORIDAD_PAGA',
       nombreEntidad: data.nombreOrgano,
       metadata: data,
     };
@@ -243,7 +243,7 @@ export const createActaSalientePro = async (
     }
 
     const body = {
-      type: 'SALIENTE_PRO',
+      type: 'SALIENTE_PAGA',
       nombreEntidad: data.nombreOrgano,
       metadata: data,
     };
@@ -277,7 +277,7 @@ export const createActaEntrantePro = async (
     }
 
     const body = {
-      type: 'ENTRANTE_PRO',
+      type: 'ENTRANTE_PAGA',
       nombreEntidad: data.nombreOrgano,
       metadata: data,
     };

@@ -30,6 +30,7 @@ import { ShadcnDatePicker } from '../DatePicker';
 import { ShadcnTimePicker } from '../TimePicker';
 import { SiNoQuestion } from '../SiNoQuestion';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
+import { createActaMaximaAutoridadPro } from '@/services/actasService';
 import { actaMaximaAutoridadProSchema } from '@/lib/schemas'; // Schema de MA
 import { LuTriangleAlert, LuBadgeAlert } from 'react-icons/lu';
 import {
@@ -198,32 +199,29 @@ export function ActaMaximaAutoridadProForm() {
 
   // onSubmit (SIMULADO POR AHORA)
   const onSubmit = async (data: FormData) => {
-    console.log('DATOS FINALES A ENVIAR (MA-PRO):', data);
+    console.log('DATOS FINALES A ENVIAR:', data);
     setIsLoading(true);
     setApiError(null);
+
     try {
-      // --- LÓGICA REAL (COMENTADA) ---
-      /*
-      const response = await createActaMaximaAutoridad(data); // Usar endpoint correcto de MA
+      const response = await createActaMaximaAutoridadPro(data);
       console.log('Respuesta del servidor:', response);
+
+      // Prepara el contenido para el diálogo de éxito
       setDialogContent({
         title: `¡Acta de Entrega N° ${response.numeroActa} generada!`,
-        description: 'Su documento ha sido creado exitosamente...',
+        description:
+          'Su documento ha sido creado exitosamente. Se ha enviado a su dirección de correo electrónico y la recibirá en un plazo de 5 minutos.',
       });
+
+      // Muestra el diálogo
       setShowSuccessDialog(true);
-      */
-      // --- SIMULACIÓN ---
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      const numeroSimulado = `MA-PRO-${Math.floor(Math.random() * 1000)}`;
-      setDialogContent({
-        title: `¡Acta (PRO) N° ${numeroSimulado} generada!`,
-        description: 'Simulación: Su documento PRO ha sido creado.',
-      });
-      setShowSuccessDialog(true);
-      // --- FIN SIMULACIÓN ---
     } catch (error) {
-      if (error instanceof Error) setApiError(error.message);
-      else setApiError('Ocurrió un error inesperado.');
+      if (error instanceof Error) {
+        setApiError(error.message);
+      } else {
+        setApiError('Ocurrió un error inesperado.');
+      }
     } finally {
       setIsLoading(false);
     }

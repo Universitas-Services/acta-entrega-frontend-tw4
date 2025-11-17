@@ -12,7 +12,7 @@ import {
 } from '@/lib/schemas';
 import {
   complianceSchema,
-  //type ComplianceFormData,
+  type ComplianceFormData,
 } from '@/lib/pro/compliance-schema';
 import { toast } from 'sonner';
 
@@ -25,7 +25,7 @@ type ActaMaximaAutoridadProData = z.infer<typeof actaMaximaAutoridadProSchema>;
 type ActaSalienteProData = z.infer<typeof actaSalienteProSchema>;
 type ActaEntranteProData = z.infer<typeof actaentranteProSchema>;
 //type ActaComplianceData = ComplianceFormData;
-type ComplianceFormData = z.infer<typeof complianceSchema>;
+//type ComplianceFormData = z.infer<typeof complianceSchema>;
 
 interface ActaResponse {
   message: string;
@@ -310,15 +310,13 @@ export const createActaCompliance = async (
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
 
-    const body = {
-      type: 'COMPLIANCE',
-      nombreEntidad: data.nombreOrgano, // Asumiendo que Compliance usa nombreOrgano
-      metadata: data,
-    };
-
-    const response = await apiClient.post<ActaResponse>('/actas', body, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.post<ActaResponse>(
+      '/acta-compliance',
+      data,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
     // No se llama a sendActaByEmail
     return response.data;

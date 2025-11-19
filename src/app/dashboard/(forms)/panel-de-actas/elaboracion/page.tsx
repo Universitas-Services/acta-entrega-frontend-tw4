@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useHeader } from '@/context/HeaderContext';
 import { columns } from '@/components/panel-actas/elaboracion/columns';
 import { DataTable } from '@/components/panel-actas/elaboracion/data-table';
@@ -11,6 +11,8 @@ export default function ActasPage() {
   const { setTitle } = useHeader();
   const [data, setData] = useState<Acta[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const hasFetched = useRef(false);
 
   // Función para cargar datos
   const fetchActas = useCallback(async () => {
@@ -28,7 +30,11 @@ export default function ActasPage() {
   // Cargar al montar y setear título
   useEffect(() => {
     setTitle('Panel de actas (Elaboración)');
-    fetchActas();
+    // Verificación para evitar doble ejecución en desarrollo
+    if (!hasFetched.current) {
+      fetchActas();
+      hasFetched.current = true;
+    }
   }, [setTitle, fetchActas]);
 
   return (

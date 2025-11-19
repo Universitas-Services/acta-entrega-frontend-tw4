@@ -104,6 +104,8 @@ export function ActaMaximaAutoridadProForm() {
   const [isLoadingData, setIsLoadingData] = useState<boolean>(!!urlActaId);
   // Referencia para guardar el ID inmediatamente después de crear (sin esperar re-render)
   const lastSavedIdRef = useRef<string | null>(null);
+  // Guardará el ID que ya se intentó cargar para no repetirlo
+  const dataLoadedRef = useRef<string | null>(null);
   // Escudo para evitar que el useEffect de carga se dispare justo después de guardar
   const shouldSkipLoadRef = useRef<boolean>(false);
 
@@ -219,6 +221,13 @@ export function ActaMaximaAutoridadProForm() {
 
     // Carga normal: Si hay ID en la URL, pedimos datos al backend.
     if (urlActaId) {
+      // Si ya cargamos este ID específico en este ciclo de vida, no hacemos nada.
+      if (dataLoadedRef.current === urlActaId) {
+        return;
+      }
+      // Marcamos inmediatamente este ID como "en proceso de carga"
+      dataLoadedRef.current = urlActaId;
+      // Bajamos el escudo para el futuro
       setIsLoadingData(true);
       const loadData = async () => {
         try {

@@ -1609,8 +1609,8 @@ export function ActaSalienteProForm() {
           title={dialogContent.title}
           description={dialogContent.description}
           onConfirm={() => {
-            setShowSuccessDialog(false);
-            router.push('/dashboard/pro');
+            //setShowSuccessDialog(false);
+            router.push('/dashboard/panel-de-actas/elaboracion');
           }}
         />
       </Card>

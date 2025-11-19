@@ -151,7 +151,7 @@ export function DataTable<TData extends DataWithId, TValue>({
 
           <div className="flex flex-wrap items-center gap-2">
             <AnimatedToggle
-              options={['Seleccionada', 'Todas']}
+              options={['Todas', 'Seleccionada']}
               defaultSelected={viewOption}
               // Asumimos que AnimatedToggle acepta una prop para capturar el cambio
               // Si tu componente usa otro nombre (ej: onChange), ajusta aquí.

@@ -6,6 +6,7 @@ import { columns } from '@/components/panel-actas/elaboracion/columns';
 import { DataTable } from '@/components/panel-actas/elaboracion/data-table';
 import { getMyActas, Acta } from '@/services/actasService';
 import { toast } from 'sonner';
+import { Spinner } from '@/components/ui/spinner';
 
 export default function ActasPage() {
   const { setTitle } = useHeader();
@@ -36,6 +37,17 @@ export default function ActasPage() {
       hasFetched.current = true;
     }
   }, [setTitle, fetchActas]);
+
+  if (loading) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-4 min-h-[calc(100vh-10rem)]">
+        <Spinner className="h-12 w-12 text-primary animate-spin" />
+        <p className="text-muted-foreground text-sm animate-pulse">
+          Cargando panel de actas...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex-col space-y-8 p-4 md:p-8 md:flex">

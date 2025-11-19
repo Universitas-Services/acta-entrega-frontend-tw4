@@ -1750,7 +1750,7 @@ export function ActaMaximaAutoridadProForm() {
           title={dialogContent.title}
           description={dialogContent.description}
           onConfirm={() => {
-            setShowSuccessDialog(false);
+            //setShowSuccessDialog(false);
             router.push('/dashboard/panel-de-actas/elaboracion');
           }}
         />

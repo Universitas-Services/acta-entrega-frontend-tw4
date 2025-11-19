@@ -1,27 +1,61 @@
-'use client'; // <-- 1. Convertir a Componente de Cliente
+// src/app/dashboard/(forms)/panel-de-actas/elaboracion/page.tsx
+'use client';
 
-import { useEffect } from 'react'; // <-- 2. Importar useEffect
-import { z } from 'zod';
-import { useHeader } from '@/context/HeaderContext'; // <-- 3. Importar useHeader
+import { useEffect, useState, useCallback } from 'react';
+import { useHeader } from '@/context/HeaderContext';
 import { columns } from '@/components/panel-actas/elaboracion/columns';
 import { DataTable } from '@/components/panel-actas/elaboracion/data-table';
-import { actaSchema, Acta } from '@/lib/data-schema'; // <-- 4. Importar el tipo Acta
-import actasData from '@/lib/actas'; // <-- 5. Importar el JSON directamente
+import { getMyActas, Acta } from '@/services/actasService';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
+// import { Skeleton } from '@/components/ui/skeleton'; // Opcional si quieres loading skeleton
 
 export default function ActasPage() {
-  const { setTitle } = useHeader(); // <-- 6. Usar el hook
+  const { setTitle } = useHeader();
+  const [data, setData] = useState<Acta[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 7. Establecer el título del header cuando el componente se monte
+  // Función para cargar datos
+  const fetchActas = useCallback(async () => {
+    try {
+      // setLoading(true); // Opcional: si quieres mostrar loading en cada refresh
+      const actas = await getMyActas();
+      setData(actas);
+    } catch (error) {
+      toast.error('Error al cargar tus actas.');
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Cargar al montar y setear título
   useEffect(() => {
     setTitle('Panel de actas (Elaboración)');
-  }, [setTitle]);
+    fetchActas();
+  }, [setTitle, fetchActas]);
 
-  // 8. Validar y usar los datos del JSON importado
-  const actas = z.array(actaSchema).parse(actasData) as Acta[];
+  if (loading) {
+    //return <div className="p-8">Cargando actas...</div>; // O usa un Skeleton
+    <Skeleton className="h-6 w-1/3 mb-4" />;
+    return (
+      <div className="flex-1 flex-col space-y-8 p-4 md:p-8 md:flex">
+        <Skeleton className="h-10 w-full mb-4" />
+        <Skeleton className="h-10 w-full mb-4" />
+        <Skeleton className="h-10 w-full mb-4" />
+        <Skeleton className="h-10 w-full mb-4" />
+        <Skeleton className="h-10 w-full mb-4" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex-col space-y-8 p-4 md:p-8 md:flex">
-      <DataTable data={actas} columns={columns} />
+      <DataTable
+        columns={columns}
+        data={data}
+        onRefresh={fetchActas} // Pasamos la función para recargar
+      />
     </div>
   );
 }

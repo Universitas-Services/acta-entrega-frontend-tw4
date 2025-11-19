@@ -11,6 +11,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  RowData,
 } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
 
@@ -45,14 +46,23 @@ import { AnimatedToggle } from '@/components/animated-toggle';
 import { IoSearch } from 'react-icons/io5';
 import { FiFilter, FiDownload } from 'react-icons/fi';
 
+// Extendemos la interfaz de la tabla para aceptar onRefresh
+declare module '@tanstack/react-table' {
+  interface TableMeta<TData extends RowData> {
+    onRefresh: () => void;
+  }
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onRefresh: () => void; // Función para recargar la data real
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onRefresh,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -70,15 +80,13 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
-    initialState: {
-      pagination: {
-        pageSize: 10,
-      },
-    },
     state: {
       sorting,
       columnFilters,
       rowSelection,
+    },
+    meta: {
+      onRefresh,
     },
   });
 
@@ -87,7 +95,6 @@ export function DataTable<TData, TValue>({
   const activePageStyle = 'bg-white border-b-4 border-gray-300 shadow-xs';
   const disabledPageStyle = 'pointer-events-none opacity-50';
 
-  // PASO 1: Obtenemos las variables para que el código sea más legible
   const currentPageIndex = table.getState().pagination.pageIndex;
   const pageCount = table.getPageCount();
 
@@ -95,15 +102,19 @@ export function DataTable<TData, TValue>({
     <Card>
       <CardHeader>
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          {/* Buscador */}
           <div className="relative w-full md:max-w-sm">
             <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por número de acta"
+              placeholder="Buscar acta"
               value={
-                (table.getColumn('numero')?.getFilterValue() as string) ?? ''
+                (table.getColumn('numeroActa')?.getFilterValue() as string) ||
+                ''
               }
               onChange={(event) =>
-                table.getColumn('numero')?.setFilterValue(event.target.value)
+                table
+                  .getColumn('numeroActa')
+                  ?.setFilterValue(event.target.value)
               }
               className="pl-10"
             />
@@ -112,7 +123,7 @@ export function DataTable<TData, TValue>({
           <div className="flex flex-wrap items-center gap-2">
             <AnimatedToggle
               options={['Seleccionada', 'Todas']}
-              defaultSelected="Seleccionada"
+              defaultSelected="Todas"
             />
 
             <Button variant="outline" className={cn(shadowEffectClass)}>
@@ -130,8 +141,9 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       </CardHeader>
+
       <CardContent>
-        <div className="relative w-full overflow-x-auto rounded-md border">
+        <div className="p-0 rounded-md border md:h-[600px] md:overflow-auto relative">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -204,7 +216,6 @@ export function DataTable<TData, TValue>({
         <div className="md:ml-auto">
           <Pagination>
             <PaginationContent>
-              {/* ======================= VERSIÓN DE ESCRITORIO (SIN CAMBIOS) ======================= */}
               <div className="hidden md:flex items-center space-x-1">
                 <PaginationItem>
                   <PaginationPrevious
@@ -316,7 +327,7 @@ export function DataTable<TData, TValue>({
                 </PaginationItem>
               </div>
 
-              {/* ======================= VERSIÓN MÓVIL (CORREGIDA) ======================= */}
+              {/* ======================= VERSIÓN MÓVIL ======================= */}
               <div className="flex md:hidden items-center space-x-1">
                 <PaginationItem>
                   <PaginationPrevious
@@ -342,7 +353,7 @@ export function DataTable<TData, TValue>({
                   </PaginationLink>
                 </PaginationItem>
 
-                {/* CAMBIO: Se muestra el resto de la paginación solo si hay más de 1 página */}
+                {/* Se muestra el resto de la paginación solo si hay más de 1 página */}
                 {pageCount > 1 && (
                   <>
                     <PaginationItem>
@@ -355,12 +366,12 @@ export function DataTable<TData, TValue>({
                           e.preventDefault();
                           table.setPageIndex(pageCount - 1);
                         }}
-                        // CAMBIO: Se usa pageCount para mostrar el número de la última página real
+                        // Se usa pageCount para mostrar el número de la última página real
                         // La desactivación ahora se basa en si hay suficientes páginas para que "10" sea una opción
                         aria-disabled={10 > pageCount}
                         className={cn(10 > pageCount && disabledPageStyle)}
                       >
-                        {/* CAMBIO: Se muestra el número 10 del diseño, no el pageCount */}
+                        {/* Se muestra el número 10 del diseño, no el pageCount */}
                         10
                       </PaginationLink>
                     </PaginationItem>

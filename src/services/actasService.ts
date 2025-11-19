@@ -27,11 +27,177 @@ type ActaEntranteProData = z.infer<typeof actaentranteProSchema>;
 //type ActaComplianceData = ComplianceFormData;
 //type ComplianceFormData = z.infer<typeof complianceSchema>;
 
+// Definimos un tipo unificado para la metadata
+// Esto reemplaza el uso de 'any' con los tipos reales que manejas
+export type ActaMetadata =
+  | ActaMaximaAutoridadData
+  | ActaSalienteData
+  | ActaEntranteData
+  | ActaMaximaAutoridadProData
+  | ActaSalienteProData
+  | ActaEntranteProData
+  | ComplianceFormData
+  // Fallback seguro: Record<string, unknown> es mejor que 'any' porque obliga a verificar tipos antes de usar
+  | Record<string, unknown>;
+
 interface ActaResponse {
   message: string;
   numeroActa: string;
   id: string;
 }
+
+export interface Acta {
+  id: string;
+  numeroActa: string | null;
+  nombreEntidad: string | null;
+  type: string; // 'ENTRANTE_GRATIS', 'MAXIMA_AUTORIDAD_PAGA', etc.
+  status: 'GUARDADA' | 'DESCARGADA' | 'ENVIADA';
+  metadata: ActaMetadata;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Obtiene todas las actas del usuario (GET /actas)
+ */
+export const getMyActas = async (): Promise<Acta[]> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('No token found');
+
+    const response = await apiClient.get<Acta[]>('/actas', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching actas:', error);
+    throw error;
+  }
+};
+
+/**
+ * Descarga el acta (GET /actas/:id/descargar-docx)
+ */
+export const downloadActa = async (id: string, numeroActa: string) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const response = await apiClient.get(`/actas/${id}/descargar-docx`, {
+      headers: { Authorization: `Bearer ${token}` },
+      responseType: 'blob', // IMPORTANTE: Indica que esperamos un archivo binario
+    });
+
+    // Crear un link temporal en el navegador para forzar la descarga
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `Acta-${numeroActa || 'Borrador'}.docx`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url); // Limpiar memoria
+
+    return true;
+  } catch (error) {
+    console.error('Error downloading acta:', error);
+    throw new Error('No se pudo descargar el archivo.');
+  }
+};
+
+/**
+ * Reenvía el correo (POST /actas/:id/enviar-docx)
+ */
+export const resendActaEmail = async (id: string) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    await apiClient.post(
+      `/actas/${id}/enviar-docx`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return true;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw new Error('No se pudo enviar el correo.');
+  }
+};
+
+/**
+ * Elimina un acta (DELETE /actas/:id)
+ */
+export const deleteActa = async (id: string) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    await apiClient.delete(`/actas/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return true;
+  } catch (error) {
+    console.error('Error deleting acta:', error);
+    throw new Error('No se pudo eliminar el acta.');
+  }
+};
+
+/**
+ * Obtiene un acta específica por su ID (GET /actas/:id)
+ * Útil para precargar formularios de edición.
+ */
+export const getActaById = async (id: string): Promise<Acta> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('No token found');
+
+    const response = await apiClient.get<Acta>(`/actas/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching acta ${id}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Actualiza un acta existente (PATCH /actas/:id)
+ * Se usa para guardar borradores o actualizaciones parciales.
+ */
+export const updateActa = async (
+  id: string,
+  data:
+    | Partial<ActaMaximaAutoridadProData>
+    | Partial<ActaSalienteProData>
+    | Partial<ActaEntranteProData>
+    | Partial<ActaMaximaAutoridadData>
+    | Partial<ActaSalienteData>
+    | Partial<ActaEntranteData>
+): Promise<ActaResponse> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('No token found');
+
+    // --- CORRECCIÓN PRINCIPAL ---
+    // El backend espera que los campos del formulario estén dentro de "metadata".
+    // Además, actualizamos "nombreEntidad" si viene "nombreOrgano" en los datos.
+    const body = {
+      metadata: data,
+      ...(data.nombreOrgano && { nombreEntidad: data.nombreOrgano }),
+    };
+
+    const response = await apiClient.patch<ActaResponse>(`/actas/${id}`, body, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      // Si el error es un array de mensajes (como se ve en tu captura), lo unimos
+      const message = Array.isArray(error.response.data.message)
+        ? error.response.data.message.join(', ')
+        : error.response.data.message || 'Error al actualizar el acta.';
+      throw new Error(message);
+    }
+    throw new Error('No se pudo conectar con el servidor para actualizar.');
+  }
+};
 
 // --- FUNCIÓN HELPER INTERNA ---
 

@@ -73,7 +73,6 @@ import { Spinner } from '@/components/ui/spinner';
 type FormData = z.infer<typeof actaMaximaAutoridadProSchema>;
 
 export function ActaMaximaAutoridadProForm() {
-  // Cambiar nombre del componente
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlActaId = searchParams.get('id'); // ID que viene de la URL (si recargas la página)
@@ -361,36 +360,6 @@ export function ActaMaximaAutoridadProForm() {
   const { isDirty } = useFormState({ control: form.control });
   const { watch, getValues, trigger } = form; // Necesitamos watch y getValues para el paso dinámico
   const watchedValues = form.watch(); // Observa todos los valores del formulario
-
-  // onSubmit
-  /*
-    console.log('DATOS FINALES A ENVIAR:', data);
-    setIsLoading(true);
-    setApiError(null);
-
-    try {
-      const response = await createActaMaximaAutoridadPro(data);
-      console.log('Respuesta del servidor:', response);
-
-      // Prepara el contenido para el diálogo de éxito
-      setDialogContent({
-        title: `¡Acta de Entrega N° ${response.numeroActa} generada!`,
-        description:
-          'Su documento ha sido creado exitosamente. Se ha enviado a su dirección de correo electrónico y la recibirá en un plazo de 5 minutos.',
-      });
-
-      // Muestra el diálogo
-      setShowSuccessDialog(true);
-    } catch (error) {
-      if (error instanceof Error) {
-        setApiError(error.message);
-      } else {
-        setApiError('Ocurrió un error inesperado.');
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };*/
 
   // Se llama cuando la validación global es exitosa
   const onValidationSuccess = () => {
@@ -871,7 +840,7 @@ export function ActaMaximaAutoridadProForm() {
     handleSaveProgress,
   ]);
 
-  // --- SPINNER ---
+  // --- SPINNER DE CARGA INICIAL---
   if (isLoadingData) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] h-full w-full space-y-4">

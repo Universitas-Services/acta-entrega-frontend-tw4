@@ -1738,7 +1738,7 @@ export function ActaEntranteProForm() {
                   onClick={form.handleSubmit(onSubmit)}
                   disabled={isLoading || !isFormGloballyValid}
                   variant="default"
-                  className="cursor-pointer shadow-sm"
+                  className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white"
                 >
                   {isLoading ? 'Enviando...' : 'Crear Acta (PRO)'}
                 </Button>

@@ -108,7 +108,7 @@ export function ActaEntranteProForm() {
   // Escudo para evitar que el useEffect de carga se dispare justo después de guardar
   const shouldSkipLoadRef = useRef<boolean>(false);
 
-  // Referencia para evitar la doble carga en modo desarrollo (EL FIX QUE HICIMOS ANTES)
+  // Referencia para evitar la doble carga en modo desarrollo
   const dataLoadedRef = useRef<string | null>(null);
 
   const contentScrollRef = useRef<HTMLDivElement>(null);

@@ -207,14 +207,9 @@ export const columns: ColumnDef<Acta>[] = [
       if (type.includes('ENTRANTE')) label = 'Servidor Entrante';
       if (type.includes('SALIENTE')) label = 'Servidor Saliente';
 
-      const isPro = type.includes('PAGA');
-
       return (
         <div className="flex flex-col">
           <span>{label}</span>
-          <span className="text-xs text-g4">
-            {isPro ? 'Versión Pro' : 'Versión Gratuita'}
-          </span>
         </div>
       );
     },

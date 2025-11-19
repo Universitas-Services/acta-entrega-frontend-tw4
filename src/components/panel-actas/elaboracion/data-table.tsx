@@ -40,9 +40,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-
+import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedToggle } from '@/components/animated-toggle';
-
 import { IoSearch } from 'react-icons/io5';
 import { FiFilter, FiDownload } from 'react-icons/fi';
 
@@ -53,26 +52,55 @@ declare module '@tanstack/react-table' {
   }
 }
 
-interface DataTableProps<TData, TValue> {
+// Definimos una interfaz base para asegurar que TData tenga ID
+interface DataWithId {
+  id: string;
+}
+
+interface DataTableProps<TData extends DataWithId, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRefresh: () => void; // Función para recargar la data real
+  isLoading?: boolean; // Indicador de carga
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends DataWithId, TValue>({
   columns,
   data,
   onRefresh,
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [rowSelection, setRowSelection] = React.useState({});
+
+  // Estado para la selección de filas
+  const [rowSelection, setRowSelection] = React.useState<
+    Record<string, boolean>
+  >({});
+
+  // Estado para el Toggle ('Todas' | 'Seleccionada')
+  const [viewOption, setViewOption] = React.useState<string>('Todas');
+
+  // --- LÓGICA DE FILTRADO POR SELECCIÓN ---
+  const tableData = React.useMemo(() => {
+    // Si estamos viendo "Todas", pasamos la data original
+    if (viewOption === 'Todas') return data;
+
+    // Si estamos viendo "Seleccionada", filtramos la data
+    // Nota: Usamos (row as any).id asumiendo que TData tiene id.
+    // Es necesario para que la persistencia funcione correctamente.
+    return data.filter((row) => {
+      return rowSelection[row.id]; // Solo devolvemos si el ID está en la selección
+    });
+  }, [data, viewOption, rowSelection]);
 
   const table = useReactTable({
-    data,
+    data: tableData, // Usamos la data calculada en vez de la prop directa
     columns,
+    getRowId: (row) => row.id, // Usamos el ID real en lugar del índice
+    enableRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -117,13 +145,17 @@ export function DataTable<TData, TValue>({
                   ?.setFilterValue(event.target.value)
               }
               className="pl-10"
+              disabled={isLoading} // Deshabilitar input mientras carga
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <AnimatedToggle
               options={['Seleccionada', 'Todas']}
-              defaultSelected="Todas"
+              defaultSelected={viewOption}
+              // Asumimos que AnimatedToggle acepta una prop para capturar el cambio
+              // Si tu componente usa otro nombre (ej: onChange), ajusta aquí.
+              onValueChange={(val: string) => setViewOption(val)}
             />
 
             <Button variant="outline" className={cn(shadowEffectClass)}>
@@ -143,7 +175,7 @@ export function DataTable<TData, TValue>({
       </CardHeader>
 
       <CardContent>
-        <div className="p-0 rounded-md border md:h-[600px] md:overflow-auto relative">
+        <div className="p-0 rounded-md border md:min-h-[532px] md:overflow-auto relative">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -174,7 +206,19 @@ export function DataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {/* --- LÓGICA DEL SKELETON --- */}
+              {isLoading ? (
+                // Renderizamos 5 filas de Skeleton mientras carga
+                Array.from({ length: 5 }).map((_, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {columns.map((_, colIndex) => (
+                      <TableCell key={colIndex} className="p-4">
+                        <Skeleton className="h-6 w-full" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
@@ -213,186 +257,192 @@ export function DataTable<TData, TValue>({
       </CardContent>
 
       <CardFooter className="flex items-center justify-center py-0 px-4">
-        <div className="md:ml-auto">
-          <Pagination>
-            <PaginationContent>
-              <div className="hidden md:flex items-center space-x-1">
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      table.previousPage();
-                    }}
-                    aria-disabled={!table.getCanPreviousPage()}
-                    className={cn(
-                      !table.getCanPreviousPage() && disabledPageStyle
-                    )}
-                  />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      table.setPageIndex(0);
-                    }}
-                    isActive={currentPageIndex === 0}
-                    className={cn(currentPageIndex === 0 && activePageStyle)}
-                  >
-                    1
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      table.setPageIndex(1);
-                    }}
-                    isActive={currentPageIndex === 1}
-                    aria-disabled={pageCount <= 1}
-                    className={cn(
-                      currentPageIndex === 1 && activePageStyle,
-                      pageCount <= 1 && disabledPageStyle
-                    )}
-                  >
-                    2
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      table.setPageIndex(2);
-                    }}
-                    isActive={currentPageIndex === 2}
-                    aria-disabled={pageCount <= 2}
-                    className={cn(
-                      currentPageIndex === 2 && activePageStyle,
-                      pageCount <= 2 && disabledPageStyle
-                    )}
-                  >
-                    3
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      table.setPageIndex(3);
-                    }}
-                    isActive={currentPageIndex === 3}
-                    aria-disabled={pageCount <= 3}
-                    className={cn(
-                      currentPageIndex === 3 && activePageStyle,
-                      pageCount <= 3 && disabledPageStyle
-                    )}
-                  >
-                    4
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      table.setPageIndex(9);
-                    }}
-                    isActive={currentPageIndex === 9}
-                    aria-disabled={pageCount <= 9}
-                    className={cn(
-                      currentPageIndex === 9 && activePageStyle,
-                      pageCount <= 9 && disabledPageStyle
-                    )}
-                  >
-                    10
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      table.nextPage();
-                    }}
-                    aria-disabled={!table.getCanNextPage()}
-                    className={cn(!table.getCanNextPage() && disabledPageStyle)}
-                  />
-                </PaginationItem>
-              </div>
+        {!isLoading && (
+          <div className="md:ml-auto">
+            <Pagination>
+              <PaginationContent>
+                <div className="hidden md:flex items-center space-x-1">
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table.previousPage();
+                      }}
+                      aria-disabled={!table.getCanPreviousPage()}
+                      className={cn(
+                        !table.getCanPreviousPage() && disabledPageStyle
+                      )}
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table.setPageIndex(0);
+                      }}
+                      isActive={currentPageIndex === 0}
+                      className={cn(currentPageIndex === 0 && activePageStyle)}
+                    >
+                      1
+                    </PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table.setPageIndex(1);
+                      }}
+                      isActive={currentPageIndex === 1}
+                      aria-disabled={pageCount <= 1}
+                      className={cn(
+                        currentPageIndex === 1 && activePageStyle,
+                        pageCount <= 1 && disabledPageStyle
+                      )}
+                    >
+                      2
+                    </PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table.setPageIndex(2);
+                      }}
+                      isActive={currentPageIndex === 2}
+                      aria-disabled={pageCount <= 2}
+                      className={cn(
+                        currentPageIndex === 2 && activePageStyle,
+                        pageCount <= 2 && disabledPageStyle
+                      )}
+                    >
+                      3
+                    </PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table.setPageIndex(3);
+                      }}
+                      isActive={currentPageIndex === 3}
+                      aria-disabled={pageCount <= 3}
+                      className={cn(
+                        currentPageIndex === 3 && activePageStyle,
+                        pageCount <= 3 && disabledPageStyle
+                      )}
+                    >
+                      4
+                    </PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table.setPageIndex(9);
+                      }}
+                      isActive={currentPageIndex === 9}
+                      aria-disabled={pageCount <= 9}
+                      className={cn(
+                        currentPageIndex === 9 && activePageStyle,
+                        pageCount <= 9 && disabledPageStyle
+                      )}
+                    >
+                      10
+                    </PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table.nextPage();
+                      }}
+                      aria-disabled={!table.getCanNextPage()}
+                      className={cn(
+                        !table.getCanNextPage() && disabledPageStyle
+                      )}
+                    />
+                  </PaginationItem>
+                </div>
 
-              {/* ======================= VERSIÓN MÓVIL ======================= */}
-              <div className="flex md:hidden items-center space-x-1">
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      table.previousPage();
-                    }}
-                    aria-disabled={!table.getCanPreviousPage()}
-                    className={cn(
-                      !table.getCanPreviousPage() && disabledPageStyle
-                    )}
-                  />
-                </PaginationItem>
+                {/* ======================= VERSIÓN MÓVIL ======================= */}
+                <div className="flex md:hidden items-center space-x-1">
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table.previousPage();
+                      }}
+                      aria-disabled={!table.getCanPreviousPage()}
+                      className={cn(
+                        !table.getCanPreviousPage() && disabledPageStyle
+                      )}
+                    />
+                  </PaginationItem>
 
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    isActive
-                    className={cn(activePageStyle)}
-                  >
-                    {currentPageIndex + 1}
-                  </PaginationLink>
-                </PaginationItem>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      isActive
+                      className={cn(activePageStyle)}
+                    >
+                      {currentPageIndex + 1}
+                    </PaginationLink>
+                  </PaginationItem>
 
-                {/* Se muestra el resto de la paginación solo si hay más de 1 página */}
-                {pageCount > 1 && (
-                  <>
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          table.setPageIndex(pageCount - 1);
-                        }}
-                        // Se usa pageCount para mostrar el número de la última página real
-                        // La desactivación ahora se basa en si hay suficientes páginas para que "10" sea una opción
-                        aria-disabled={10 > pageCount}
-                        className={cn(10 > pageCount && disabledPageStyle)}
-                      >
-                        {/* Se muestra el número 10 del diseño, no el pageCount */}
-                        10
-                      </PaginationLink>
-                    </PaginationItem>
-                  </>
-                )}
+                  {/* Se muestra el resto de la paginación solo si hay más de 1 página */}
+                  {pageCount > 1 && (
+                    <>
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                      <PaginationItem>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            table.setPageIndex(pageCount - 1);
+                          }}
+                          // Se usa pageCount para mostrar el número de la última página real
+                          // La desactivación ahora se basa en si hay suficientes páginas para que "10" sea una opción
+                          aria-disabled={10 > pageCount}
+                          className={cn(10 > pageCount && disabledPageStyle)}
+                        >
+                          {/* Se muestra el número 10 del diseño, no el pageCount */}
+                          10
+                        </PaginationLink>
+                      </PaginationItem>
+                    </>
+                  )}
 
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      table.nextPage();
-                    }}
-                    aria-disabled={!table.getCanNextPage()}
-                    className={cn(!table.getCanNextPage() && disabledPageStyle)}
-                  />
-                </PaginationItem>
-              </div>
-            </PaginationContent>
-          </Pagination>
-        </div>
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        table.nextPage();
+                      }}
+                      aria-disabled={!table.getCanNextPage()}
+                      className={cn(
+                        !table.getCanNextPage() && disabledPageStyle
+                      )}
+                    />
+                  </PaginationItem>
+                </div>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );

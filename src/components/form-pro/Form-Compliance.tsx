@@ -571,19 +571,30 @@ export function ComplianceForm() {
                   name="fecha"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      {' '}
-                      <FormLabel>Fecha</FormLabel>{' '}
+                      <FormLabel>Fecha</FormLabel>
                       <ShadcnDatePicker
+                        // 'T00:00:00' para que la fecha se interprete en la zona horaria local y no en UTC.
                         value={
                           field.value
-                            ? new Date(field.value + 'T00:00:00')
+                            ? (() => {
+                                // Parsea el string 'dd/MM/yyyy' manualmente
+                                const [day, month, year] =
+                                  field.value.split('/');
+                                return new Date(
+                                  `${year}-${month}-${day}T00:00:00`
+                                );
+                              })()
                             : undefined
                         }
-                        onChange={(date) =>
-                          field.onChange(date ? format(date, 'yyyy-MM-dd') : '')
-                        }
-                      />{' '}
-                      <FormMessage />{' '}
+                        onChange={(date) => {
+                          if (date) {
+                            field.onChange(format(date, 'dd/MM/yyyy'));
+                          } else {
+                            field.onChange(''); // Asegúrate de limpiar si no hay fecha
+                          }
+                        }}
+                      />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

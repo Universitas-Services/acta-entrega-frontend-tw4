@@ -825,6 +825,8 @@ export function ActaMaximaAutoridadProForm() {
       isDirty,
       isProForm: true,
       hasReachedStep3,
+      // Si existe en la URL o si acabamos de guardar (ref), se pasa. Si no, va null.
+      actaId: urlActaId || lastSavedIdRef.current,
       onSave, // Pasamos la función de guardado
     });
 
@@ -835,6 +837,7 @@ export function ActaMaximaAutoridadProForm() {
   }, [
     isDirty,
     hasReachedStep3,
+    urlActaId,
     setFormState,
     clearFormState,
     handleSaveProgress,
@@ -843,11 +846,11 @@ export function ActaMaximaAutoridadProForm() {
   // --- SPINNER DE CARGA INICIAL---
   if (isLoadingData) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] h-full w-full space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] h-full w-full space-y-4">
+        <Spinner className="h-12 w-12 text-primary" />
         <p className="text-lg font-medium text-muted-foreground animate-pulse">
           Cargando datos del acta...
         </p>
-        <Spinner className="h-12 w-12 text-primary" />
       </div>
     );
   }

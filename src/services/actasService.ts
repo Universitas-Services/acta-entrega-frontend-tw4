@@ -10,10 +10,7 @@ import {
   actaSalienteProSchema,
   actaentranteProSchema,
 } from '@/lib/schemas';
-import {
-  complianceSchema,
-  type ComplianceFormData,
-} from '@/lib/pro/compliance-schema';
+import { type ComplianceFormData } from '@/lib/pro/compliance-schema';
 import { toast } from 'sonner';
 
 // --- ACTAS ---
@@ -46,6 +43,12 @@ interface ActaResponse {
   id: string;
 }
 
+interface ComplianceResponse {
+  message: string;
+  numeroCompliance: string;
+  id: string;
+}
+
 export interface Acta {
   id: string;
   numeroActa: string | null;
@@ -57,17 +60,56 @@ export interface Acta {
   updatedAt: string;
 }
 
+// Definimos la interfaz para los parámetros de búsqueda (Query Params)
+// Coincide con el DTO "GetActasFilterDto" del backend
+export interface GetActasParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+  type?: string; // 'ENTRANTE_GRATIS', 'SALIENTE_PAGA', etc.
+  status?: string; // 'GUARDADA', 'ENVIADA', etc.
+  startDate?: string; // Formato YYYY-MM-DD
+  endDate?: string; // Formato YYYY-MM-DD
+}
+
+// Definimos la estructura de respuesta paginada
+export interface ActasPaginatedResponse {
+  data: Acta[]; // El array de actas ahora vive aquí adentro
+  total: number; // Total de registros en BD (para calcular páginas)
+  page: number; // Página actual
+  limit: number; // Items por página
+  totalPages?: number; // Opcional, útil para la UI
+  // Agregamos esto para que TS sepa que puede venir un objeto meta
+  meta?: {
+    total: number;
+    lastPage?: number;
+    currentPage?: number;
+    perPage?: number;
+    prev?: number | null;
+    next?: number | null;
+  };
+}
+
 /**
- * Obtiene todas las actas del usuario (GET /actas)
+ * Obtiene las actas del usuario con soporte para Paginación, Filtros y Búsqueda.
+ * GET /actas?page=1&limit=10&search=...
  */
-export const getMyActas = async (): Promise<Acta[]> => {
+export const getMyActas = async (
+  params: GetActasParams = {} // Por defecto objeto vacío para cargar la pág 1 sin filtros
+): Promise<ActasPaginatedResponse> => {
   try {
     const token = localStorage.getItem('accessToken');
     if (!token) throw new Error('No token found');
 
-    const response = await apiClient.get<Acta[]>('/actas', {
+    // Enviamos 'params' en la configuración de Axios
+    const response = await apiClient.get<ActasPaginatedResponse>('/actas', {
       headers: { Authorization: `Bearer ${token}` },
+      params: {
+        // Valor por defecto si no viene en params
+        ...params, // Sobrescribimos con los filtros que envíe el componente
+      },
     });
+
     return response.data;
   } catch (error) {
     console.error('Error fetching actas:', error);
@@ -83,7 +125,7 @@ export const downloadActa = async (id: string, numeroActa: string) => {
     const token = localStorage.getItem('accessToken');
     const response = await apiClient.get(`/actas/${id}/descargar-docx`, {
       headers: { Authorization: `Bearer ${token}` },
-      responseType: 'blob', // IMPORTANTE: Indica que esperamos un archivo binario
+      responseType: 'blob', // Indica que esperamos un archivo binario
     });
 
     // Crear un link temporal en el navegador para forzar la descarga
@@ -174,7 +216,6 @@ export const updateActa = async (
     const token = localStorage.getItem('accessToken');
     if (!token) throw new Error('No token found');
 
-    // --- CORRECCIÓN PRINCIPAL ---
     // El backend espera que los campos del formulario estén dentro de "metadata".
     // Además, actualizamos "nombreEntidad" si viene "nombreOrgano" en los datos.
     const body = {
@@ -221,7 +262,7 @@ const sendActaByEmail = async (actaId: string, token: string) => {
     );
     console.log(`Solicitud de envío para Acta ${actaId} exitosa.`);
   } catch (sendError) {
-    // Importante: No lanzamos un error aquí.
+    // No lanzamos un error aquí.
     // El acta se creó con éxito, no queremos que la UI muestre un error
     // solo porque falló el envío del correo.
     console.error(
@@ -470,7 +511,7 @@ export const createActaEntrantePro = async (
  */
 export const createActaCompliance = async (
   data: ComplianceFormData
-): Promise<ActaResponse> => {
+): Promise<ComplianceResponse> => {
   try {
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -659,40 +700,67 @@ export const createActaCompliance = async (
         data.incluye_relacion_ingresos_venta_terrenos,
     };
 
-    // 2. LIMPIEZA DE DATOS (FILTRO)
+    // LIMPIEZA DE DATOS (FILTRO)
     // Recorremos el objeto y creamos uno nuevo SOLO con las claves que tengan valor real.
     // Eliminamos: null, undefined y strings vacíos "".
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const cleanPayload: Record<string, any> = {};
+    const cleanPayload: Record<string, unknown> = {};
 
     Object.keys(rawPayload).forEach((key) => {
-      let value = rawPayload[key as keyof typeof rawPayload];
+      const typedKey = key as keyof typeof rawPayload;
+      let value: unknown = rawPayload[typedKey];
 
-      // A) Conversión de Fecha para Prisma (ISO 8601)
-      if (
-        key === 'fecha_revision' &&
-        typeof value === 'string' &&
-        value !== ''
-      ) {
-        // Convertimos "2025-10-29" -> "2025-10-29T00:00:00.000Z"
-        value = new Date(value).toISOString();
+      // Conversión de Fecha para Prisma (ISO 8601)
+      if (typedKey === 'fecha_revision' && value) {
+        // Caso 1: Ya es un objeto Date válido
+        if (value instanceof Date && !isNaN(value.getTime())) {
+          value = value.toISOString();
+        }
+        // Caso 2: Es un string
+        else if (typeof value === 'string') {
+          // Intento directo (funciona para YYYY-MM-DD)
+          const d = new Date(value);
+
+          if (!isNaN(d.getTime())) {
+            value = d.toISOString();
+          } else {
+            // Fallback para formato DD/MM/YYYY (común en inputs de texto fecha)
+            // Si tu fecha viene como "21/11/2025"
+            const parts = value.split('/');
+            if (parts.length === 3) {
+              // Reordenamos a YYYY-MM-DD (Mes es índice 1)
+              const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+              const d2 = new Date(isoDate);
+              if (!isNaN(d2.getTime())) {
+                value = d2.toISOString();
+              } else {
+                console.warn('Fecha inválida ignorada:', value);
+                value = undefined; // Evitamos enviar basura
+              }
+            }
+          }
+        }
       }
 
-      // B) Corrección de Enum "NO APLICA" (Espacio vs Guion bajo)
-      // Si el backend espera NO_APLICA pero el front envía "NO APLICA"
+      // Normalización de respuestas "NO APLICA" a "NO_APLICA"
       if (typeof value === 'string' && value === 'NO APLICA') {
         value = 'NO_APLICA';
       }
 
-      // C) Filtro: Solo guardamos valores reales (No null, undefined, ni strings vacíos)
+      // Filtro: Solo guardamos valores reales (No null, undefined, ni strings vacíos)
       if (value !== null && value !== undefined && value !== '') {
         cleanPayload[key] = value;
       }
     });
 
-    // 3. ENVÍO
-    const response = await apiClient.post<ActaResponse>(
+    // Verificación de Token
+    // El token ya fue leído y verificado al inicio de la función desde localStorage.
+    // No usamos authStorage aquí.
+    if (!token)
+      throw new Error('No estás autenticado. Por favor, inicia sesión.');
+
+    // ENVÍO
+    const response = await apiClient.post<ComplianceResponse>(
       '/acta-compliance',
       cleanPayload, // Enviamos el objeto limpio
       {
@@ -702,6 +770,8 @@ export const createActaCompliance = async (
 
     return response.data;
   } catch (error) {
+    console.error('🔴 ERROR REAL EN CREATE COMPLIANCE:', error);
+
     if (axios.isAxiosError(error) && error.response) {
       const errorMessage = Array.isArray(error.response.data.message)
         ? error.response.data.message.join(', ')
@@ -709,6 +779,7 @@ export const createActaCompliance = async (
 
       throw new Error(errorMessage);
     }
-    throw new Error('No se pudo conectar con el servidor.');
+    // Si el error NO es de Axios (ej. TypeError, RangeError), cae aquí:
+    throw new Error('No se pudo conectar con el servidor (Error Local).');
   }
 };

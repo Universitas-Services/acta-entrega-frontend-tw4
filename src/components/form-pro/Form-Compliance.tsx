@@ -236,7 +236,7 @@ export function ComplianceForm() {
 
       // Prepara el contenido para el diálogo de éxito
       setDialogContent({
-        title: `¡Acta de Entrega N° ${response.numeroActa} generada!`,
+        title: `¡Acta de Entrega N° ${response.numeroCompliance} generada!`,
         description:
           'Su documento ha sido creado exitosamente. Se ha enviado a su dirección de correo electrónico y la recibirá en un plazo de 5 minutos.',
       });

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { ColumnDef, Row, Table } from '@tanstack/react-table';
 import {
   ComplianceActa,
@@ -20,6 +21,7 @@ import {
 
 import { BsThreeDots, BsEye } from 'react-icons/bs';
 import { LuArrowUpDown, LuSend, LuDownload } from 'react-icons/lu';
+import { ComplianceObservationSheet } from '@/components/ComplianceObservationSheet';
 import { toast } from 'sonner';
 
 // Interfaz para el meta de la tabla (para refrescar datos)
@@ -35,15 +37,15 @@ interface ActionsCellProps {
 // --- COMPONENTE DE ACCIONES INTERNO ---
 const ActionsCell = ({ row, table }: ActionsCellProps) => {
   const acta = row.original;
-  const router = useRouter();
+  // Estado para controlar la apertura del Sheet
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const refreshTable = () => {
     (table.options.meta as TableMeta)?.onRefresh?.();
   };
 
   const handleViewObservations = () => {
-    // Redirige a la vista del formulario (puedes ajustar la ruta si tienes una vista de "solo lectura")
-    router.push(`/dashboard/actas-pro/compliance?id=${acta.id}`);
+    setIsSheetOpen(true);
   };
 
   const handleDownload = async () => {
@@ -69,52 +71,65 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
   };
 
   return (
-    <div className="flex items-center justify-end space-x-2">
-      {/* Botón directo para ver observaciones (Acción principal) */}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="cursor-pointer text-muted-foreground hover:text-primary"
-        onClick={handleViewObservations}
-        title="Ver Observaciones"
-      >
-        <BsEye className="h-4 w-4 mr-2" />
-        Ver
-      </Button>
+    <>
+      {/* Renderizamos el Sheet aquí, vinculado al estado local */}
+      <ComplianceObservationSheet
+        isOpen={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        actaId={acta.id}
+        numeroCompliance={acta.numeroCompliance || 'S/N'}
+      />
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
-            <span className="sr-only">Open menu</span>
-            <BsThreeDots className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="bg-white text-black min-w-[160px]"
+      <div className="flex items-center justify-end space-x-2">
+        {/* Botón directo para ver observaciones (Abre el Sheet) */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="cursor-pointer text-muted-foreground hover:text-primary"
+          onClick={handleViewObservations}
+          title="Ver Observaciones"
         >
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={handleViewObservations}
+          <BsEye className="h-4 w-4 mr-2" />
+          Ver
+        </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
+              <span className="sr-only">Open menu</span>
+              <BsThreeDots className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="bg-white text-black min-w-[160px]"
           >
-            <BsEye className="mr-2 h-4 w-4" />
-            Ver Observaciones
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={handleSendEmail}
-          >
-            <LuSend className="mr-2 h-4 w-4" />
-            Enviar
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer" onClick={handleDownload}>
-            <LuDownload className="mr-2 h-4 w-4" />
-            Descargar
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={handleViewObservations}
+            >
+              <BsEye className="mr-2 h-4 w-4" />
+              Ver Observaciones
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={handleSendEmail}
+            >
+              <LuSend className="mr-2 h-4 w-4" />
+              Enviar
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={handleDownload}
+            >
+              <LuDownload className="mr-2 h-4 w-4" />
+              Descargar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </>
   );
 };
 

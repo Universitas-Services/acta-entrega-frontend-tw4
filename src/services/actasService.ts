@@ -13,7 +13,7 @@ import {
 import { type ComplianceFormData } from '@/lib/pro/compliance-schema';
 import { toast } from 'sonner';
 
-// --- ACTAS ---
+// --- TIPOS Y SCHEMAS ---
 type ActaMaximaAutoridadData = z.infer<typeof actaMaximaAutoridadSchema>;
 type ActaSalienteData = z.infer<typeof actaSalienteSchema>;
 type ActaEntranteData = z.infer<typeof actaEntranteSchema>;
@@ -21,8 +21,6 @@ type ActaEntranteData = z.infer<typeof actaEntranteSchema>;
 type ActaMaximaAutoridadProData = z.infer<typeof actaMaximaAutoridadProSchema>;
 type ActaSalienteProData = z.infer<typeof actaSalienteProSchema>;
 type ActaEntranteProData = z.infer<typeof actaentranteProSchema>;
-//type ActaComplianceData = ComplianceFormData;
-//type ComplianceFormData = z.infer<typeof complianceSchema>;
 
 // Definimos un tipo unificado para la metadata
 // Esto reemplaza el uso de 'any' con los tipos reales que manejas
@@ -34,9 +32,9 @@ export type ActaMetadata =
   | ActaSalienteProData
   | ActaEntranteProData
   | ComplianceFormData
-  // Fallback seguro: Record<string, unknown> es mejor que 'any' porque obliga a verificar tipos antes de usar
   | Record<string, unknown>;
 
+// --- RESPUESTAS DE API ---
 interface ActaResponse {
   message: string;
   numeroActa: string;
@@ -49,6 +47,7 @@ interface ComplianceResponse {
   id: string;
 }
 
+// --- INTERFACES DE ENTIDADES ---
 export interface Acta {
   id: string;
   numeroActa: string | null;
@@ -59,6 +58,19 @@ export interface Acta {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ComplianceActa {
+  id: string;
+  numeroCompliance: string | null; // Identificador visible (Ej: COMP-2024-001)
+  nombreEntidad: string | null; // Nombre del órgano
+  status: 'GUARDADA' | 'ENVIADA' | 'DESCARGADA'; // Estatus del checklist
+  puntuacion: number; // Score/Puntuación calculada (0-100)
+  metadata?: Record<string, unknown>; // Metadata opcional si se necesita detalle
+  createdAt: string;
+  updatedAt: string;
+}
+
+// --- INTERFACES DE PARÁMETROS DE BÚSQUEDA ---
 
 // Definimos la interfaz para los parámetros de búsqueda (Query Params)
 // Coincide con el DTO "GetActasFilterDto" del backend
@@ -72,6 +84,15 @@ export interface GetActasParams {
   endDate?: string; // Formato YYYY-MM-DD
 }
 
+// --- INTERFACES DE RESPUESTA PAGINADA ---
+
+export interface GetComplianceParams {
+  search?: string;
+  page?: number;
+  limit?: number;
+  status?: string; // Solo filtramos por status en Compliance
+}
+
 // Definimos la estructura de respuesta paginada
 export interface ActasPaginatedResponse {
   data: Acta[]; // El array de actas ahora vive aquí adentro
@@ -80,6 +101,22 @@ export interface ActasPaginatedResponse {
   limit: number; // Items por página
   totalPages?: number; // Opcional, útil para la UI
   // Agregamos esto para que TS sepa que puede venir un objeto meta
+  meta?: {
+    total: number;
+    lastPage?: number;
+    currentPage?: number;
+    perPage?: number;
+    prev?: number | null;
+    next?: number | null;
+  };
+}
+
+export interface CompliancePaginatedResponse {
+  data: ComplianceActa[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages?: number;
   meta?: {
     total: number;
     lastPage?: number;
@@ -506,6 +543,84 @@ export const createActaEntrantePro = async (
 };
 
 /**
+ * Obtiene los checklists de compliance del usuario (GET /acta-compliance/my-checklists)
+ */
+export const getMyComplianceChecklists = async (
+  params: GetComplianceParams = {}
+): Promise<CompliancePaginatedResponse> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('No token found');
+
+    const response = await apiClient.get<CompliancePaginatedResponse>(
+      '/acta-compliance/my-checklists',
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { ...params }, // Pasa search, page, limit, status
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching compliance checklists:', error);
+    throw error;
+  }
+};
+
+/**
+ * Descarga un acta de compliance (GET /acta-compliance/{id}/download)
+ */
+export const downloadCompliance = async (
+  id: string,
+  numeroCompliance: string
+) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const response = await apiClient.get(`/acta-compliance/${id}/download`, {
+      headers: { Authorization: `Bearer ${token}` },
+      responseType: 'blob', // Importante para descarga
+    });
+
+    // Crear link de descarga
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    // Nombre sugerido: Compliance-Numero.docx o similar
+    link.setAttribute(
+      'download',
+      `Compliance-${numeroCompliance || 'Borrador'}.docx`
+    );
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true;
+  } catch (error) {
+    console.error('Error downloading compliance:', error);
+    throw new Error('No se pudo descargar el archivo de compliance.');
+  }
+};
+
+/**
+ * Envía el reporte de compliance por correo (POST /acta-compliance/{id}/email)
+ */
+export const sendComplianceEmail = async (id: string) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    await apiClient.post(
+      `/acta-compliance/${id}/email`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return true;
+  } catch (error) {
+    console.error('Error sending compliance email:', error);
+    throw new Error('No se pudo enviar el correo de compliance.');
+  }
+};
+
+/**
  * Llama al endpoint /acta-compliance para GUARDAR un formulario de Compliance.
  * Mapea los datos y FILTRA los campos vacíos para no romper la validación del backend.
  */
@@ -518,7 +633,6 @@ export const createActaCompliance = async (
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
 
-    // 1. MAPEO DE DATOS (Igual que antes)
     const rawPayload = {
       // --- Datos Generales ---
       correo_electronico: data.email,

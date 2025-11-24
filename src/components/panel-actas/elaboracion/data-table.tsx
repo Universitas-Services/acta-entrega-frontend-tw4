@@ -55,6 +55,8 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
+import { downloadActa } from '@/services/actasService';
+import { toast } from 'sonner';
 
 interface DataWithId {
   id: string;
@@ -155,6 +157,27 @@ export function DataTable<TData extends DataWithId, TValue>({
   const handleStatusChange = (val: string) => {
     setSelectedStatus(val);
     onFilterChange('status', val === 'todos' ? undefined : val);
+  };
+
+  // --- LÓGICA DE DESCARGA GLOBAL ---
+  const selectedRows = table.getSelectedRowModel().rows;
+
+  const handleGlobalDownload = async () => {
+    if (selectedRows.length !== 1) return;
+
+    const selectedActa = selectedRows[0].original;
+
+    const actaData = selectedActa as { numeroActa?: string | null };
+    const numeroActa = actaData.numeroActa || 'SN';
+
+    toast.promise(downloadActa(selectedActa.id, numeroActa), {
+      loading: 'Generando documento...',
+      success: () => {
+        // Opcional: Refrescar o limpiar selección
+        return 'Descarga iniciada';
+      },
+      error: 'Error al descargar el acta',
+    });
   };
 
   // --- LÓGICA DE PAGINACIÓN ---
@@ -287,8 +310,9 @@ export function DataTable<TData extends DataWithId, TValue>({
 
             <Button
               variant="outline"
-              disabled
-              className="border-b-4 border-gray-300"
+              className="border-b-4 border-gray-300 active:border-b-2"
+              disabled={selectedRows.length !== 1 || isLoading} // Solo activo si hay 1 seleccionado
+              onClick={handleGlobalDownload}
             >
               <FiDownload className="mr-2 h-4 w-4" />
               Descargar acta

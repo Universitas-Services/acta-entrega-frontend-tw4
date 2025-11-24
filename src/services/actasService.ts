@@ -64,7 +64,7 @@ export interface ComplianceActa {
   numeroCompliance: string | null; // Identificador visible (Ej: COMP-2024-001)
   nombreEntidad: string | null; // Nombre del órgano
   status: 'GUARDADA' | 'ENVIADA' | 'DESCARGADA'; // Estatus del checklist
-  puntuacion: number; // Score/Puntuación calculada (0-100)
+  puntajeCalculado: number; // Score/Puntuación calculada (0-100)
   metadata?: Record<string, unknown>; // Metadata opcional si se necesita detalle
   createdAt: string;
   updatedAt: string;
@@ -596,9 +596,30 @@ export const downloadCompliance = async (
     window.URL.revokeObjectURL(url);
 
     return true;
-  } catch (error) {
+  } catch (error: unknown) {
+    // --- MANEJO DE ERRORES TIPADO CORRECTAMENTE ---
+    if (
+      axios.isAxiosError(error) &&
+      error.response &&
+      error.response.data instanceof Blob
+    ) {
+      const errorText = await error.response.data.text();
+      try {
+        const errorJson = JSON.parse(errorText) as { message?: string };
+        // Lanzamos el mensaje que viene del backend
+        throw new Error(
+          errorJson.message ||
+            'Error interno del servidor al generar el archivo.'
+        );
+      } catch (e) {
+        throw new Error(
+          'Error crítico en el servidor: ' + errorText.substring(0, 100)
+        );
+      }
+    }
+
     console.error('Error downloading compliance:', error);
-    throw new Error('No se pudo descargar el archivo de compliance.');
+    throw error;
   }
 };
 
@@ -614,8 +635,23 @@ export const sendComplianceEmail = async (id: string) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
     return true;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error sending compliance email:', error);
+
+    if (axios.isAxiosError(error) && error.response) {
+      // Extraer mensaje del backend de forma segura
+      const data = error.response.data as { message?: string } | string;
+      let msg = error.message;
+
+      if (typeof data === 'object' && data !== null && 'message' in data) {
+        msg = data.message || msg;
+      } else if (typeof data === 'string') {
+        msg = data;
+      }
+
+      console.error('🔥 DETALLE ERROR EMAIL:', data);
+      throw new Error(msg);
+    }
     throw new Error('No se pudo enviar el correo de compliance.');
   }
 };

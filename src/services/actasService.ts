@@ -588,7 +588,7 @@ export const downloadCompliance = async (
     // Nombre sugerido: Compliance-Numero.docx o similar
     link.setAttribute(
       'download',
-      `Compliance-${numeroCompliance || 'Borrador'}.docx`
+      `Compliance-${numeroCompliance || 'Borrador'}.pdf`
     );
     document.body.appendChild(link);
     link.click();

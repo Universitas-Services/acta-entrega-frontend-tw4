@@ -261,7 +261,7 @@ export const updateUser = async (data: {
   cargo?: string;
 }): Promise<IUser> => {
   try {
-    const response = await apiClient.put<IUser>('/users/profile', data);
+    const response = await apiClient.patch<IUser>('/users/profile', data);
     return response.data;
   } catch (error) {
     if (isAxiosError(error) && error.response) {
@@ -307,12 +307,9 @@ export const deleteAccount = async (
 ): Promise<{ message: string }> => {
   try {
     // El endpoint del backend es /users/delete-account
-    const response = await apiClient.delete<{ message: string }>(
-      '/users/delete-account',
-      {
-        data: { password }, // El DTO espera la contraseña en el body
-      }
-    );
+    const response = await apiClient.delete<{ message: string }>('/users/me', {
+      data: { password }, // El DTO espera la contraseña en el body
+    });
     return response.data;
   } catch (error) {
     if (isAxiosError(error) && error.response) {

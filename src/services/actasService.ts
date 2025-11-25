@@ -63,7 +63,7 @@ export interface ComplianceActa {
   id: string;
   numeroCompliance: string | null; // Identificador visible (Ej: COMP-2024-001)
   nombreEntidad: string | null; // Nombre del órgano
-  status: 'GUARDADA' | 'ENVIADA' | 'DESCARGADA'; // Estatus del checklist
+  status: 'GUARDADA' | 'DESCARGADA' | 'ENVIADA'; // Estatus del checklist
   puntajeCalculado: number; // Score/Puntuación calculada (0-100)
   metadata?: Record<string, unknown>; // Metadata opcional si se necesita detalle
   createdAt: string;

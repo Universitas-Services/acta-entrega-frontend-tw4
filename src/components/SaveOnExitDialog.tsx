@@ -1,7 +1,6 @@
-// src/components/SaveOnExitDialog.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,40 +18,56 @@ import { toast } from 'sonner';
 
 export function SaveOnExitDialog() {
   const { isOpen, type, payload, close } = useModalStore();
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingAction, setLoadingAction] = useState<'stay' | 'leave' | null>(
+    null
+  );
 
   const isModalOpen = isOpen && type === 'saveOnExitPro';
+
+  // CAMBIO 2: Reseteamos el estado cuando el modal se cierra o abre
+  useEffect(() => {
+    if (!isModalOpen) {
+      setLoadingAction(null);
+    }
+  }, [isModalOpen]);
 
   if (!payload.onSave || !payload.onNavigate) {
     return null;
   }
 
-  const handleSaveAndStay = async () => {
-    setIsLoading(true);
+  // Guardar y Quedarse
+  const handleSaveAndStay = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevenir comportamiento por defecto si es necesario
+    setLoadingAction('stay'); // Marcamos que es este botón
     try {
       await payload.onSave?.();
-      toast.success('Progreso guardado exitosamente.');
-    } catch (error) {
-      toast.error('Error al guardar el progreso.');
-    } finally {
-      setIsLoading(false);
       close();
+    } catch (error) {
+      console.error(error);
+      toast.error('Error inesperado al guardar.');
+    } finally {
+      setLoadingAction(null);
     }
   };
 
-  const handleSaveAndLeave = async () => {
-    setIsLoading(true);
+  // Guardar y Salir
+  const handleSaveAndLeave = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    setLoadingAction('leave'); // Marcamos que es este botón
     try {
       await payload.onSave?.();
-      // No mostramos toast aquí, solo navegamos
-      payload.onNavigate?.();
+      setTimeout(() => {
+        payload.onNavigate?.();
+        close();
+      }, 500);
     } catch (error) {
-      toast.error('Error al guardar, no se puede salir.');
-    } finally {
-      setIsLoading(false);
-      close();
+      toast.error('No se pudo guardar, cancelando salida.');
+      setLoadingAction(null); // Solo quitamos carga si falló
     }
   };
+
+  // Helper para saber si hay ALGUNA acción cargando (para deshabilitar ambos)
+  const isAnyLoading = loadingAction !== null;
 
   return (
     <AlertDialog open={isModalOpen} onOpenChange={close}>
@@ -75,9 +90,11 @@ export function SaveOnExitDialog() {
               variant="outline"
               className="cursor-pointer text-black flex-1 bg-g2 hover:bg-g3 border-g4 font-bold"
               onClick={handleSaveAndStay}
-              disabled={isLoading}
+              disabled={isAnyLoading}
             >
-              {isLoading ? 'Guardando...' : 'Guardar y permanecer'}
+              {loadingAction === 'stay'
+                ? 'Guardando...'
+                : 'Guardar y permanecer'}
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
@@ -85,9 +102,9 @@ export function SaveOnExitDialog() {
               variant="default"
               className="cursor-pointer flex-1 font-bold"
               onClick={handleSaveAndLeave}
-              disabled={isLoading}
+              disabled={isAnyLoading}
             >
-              {isLoading ? 'Guardando...' : 'Guardar y salir'}
+              {loadingAction === 'leave' ? 'Guardando...' : 'Guardar y salir'}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

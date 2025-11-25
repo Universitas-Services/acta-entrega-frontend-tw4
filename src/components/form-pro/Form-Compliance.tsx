@@ -23,6 +23,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHeader } from '@/context/HeaderContext';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
+import { createActaCompliance } from '@/services/actasService';
 import {
   complianceSchema,
   ComplianceFormData,
@@ -225,21 +226,29 @@ export function ComplianceForm() {
 
   // Función onSubmit (placeholder por ahora)
   const onSubmit = async (data: ComplianceFormData) => {
-    console.log('DATOS FINALES A ENVIAR (Compliance):', data);
+    console.log('DATOS FINALES A ENVIAR:', data);
     setIsLoading(true);
     setApiError(null);
+
     try {
-      // const response = await createComplianceActa(data); // Llamada al servicio (a crear)
-      console.log('Simulando envío exitoso...');
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simular espera
+      const response = await createActaCompliance(data);
+      console.log('Respuesta del servidor:', response);
+
+      // Prepara el contenido para el diálogo de éxito
       setDialogContent({
-        title: `¡Autoevaluación Guardada!`,
-        description: 'Su progreso ha sido guardado exitosamente (simulado).',
+        title: `¡Acta de Entrega N° ${response.numeroCompliance} generada!`,
+        description:
+          'Su documento ha sido creado exitosamente. Se ha enviado a su dirección de correo electrónico y la recibirá en un plazo de 5 minutos.',
       });
+
+      // Muestra el diálogo
       setShowSuccessDialog(true);
     } catch (error) {
-      if (error instanceof Error) setApiError(error.message);
-      else setApiError('Ocurrió un error inesperado.');
+      if (error instanceof Error) {
+        setApiError(error.message);
+      } else {
+        setApiError('Ocurrió un error inesperado.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -562,19 +571,30 @@ export function ComplianceForm() {
                   name="fecha"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      {' '}
-                      <FormLabel>Fecha</FormLabel>{' '}
+                      <FormLabel>Fecha</FormLabel>
                       <ShadcnDatePicker
+                        // 'T00:00:00' para que la fecha se interprete en la zona horaria local y no en UTC.
                         value={
                           field.value
-                            ? new Date(field.value + 'T00:00:00')
+                            ? (() => {
+                                // Parsea el string 'dd/MM/yyyy' manualmente
+                                const [day, month, year] =
+                                  field.value.split('/');
+                                return new Date(
+                                  `${year}-${month}-${day}T00:00:00`
+                                );
+                              })()
                             : undefined
                         }
-                        onChange={(date) =>
-                          field.onChange(date ? format(date, 'yyyy-MM-dd') : '')
-                        }
-                      />{' '}
-                      <FormMessage />{' '}
+                        onChange={(date) => {
+                          if (date) {
+                            field.onChange(format(date, 'dd/MM/yyyy'));
+                          } else {
+                            field.onChange(''); // Asegúrate de limpiar si no hay fecha
+                          }
+                        }}
+                      />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -1126,7 +1146,7 @@ export function ComplianceForm() {
                 }
                 disabled={isLoading}
                 variant="default"
-                className="cursor-pointer shadow-sm active:bg-primary/80 active:translate-y-px transition-all"
+                className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white"
               >
                 {isLoading ? 'Enviando...' : 'Finalizar Autoevaluación'}
               </Button>

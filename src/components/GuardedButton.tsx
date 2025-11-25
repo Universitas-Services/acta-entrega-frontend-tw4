@@ -20,8 +20,14 @@ export function GuardedButton({
 }: GuardedButtonProps) {
   const router = useRouter();
   // --- LEER EL ESTADO COMPLETO Y LAS ACCIONES ---
-  const { isDirty, isProForm, hasReachedStep3, onSave, clearFormState } =
-    useFormDirtyStore();
+  const {
+    isDirty,
+    isProForm,
+    hasReachedStep3,
+    actaId,
+    onSave,
+    clearFormState,
+  } = useFormDirtyStore();
   const { open } = useModalStore();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,14 +44,14 @@ export function GuardedButton({
       };
 
       // --- LÓGICA DE DECISIÓN ---
-      if (isProForm && hasReachedStep3) {
-        // CASO PRO (Paso 3+): Abrir el nuevo modal de "Guardar al Salir"
+      if (isProForm && (hasReachedStep3 || !!actaId)) {
+        // CASO PRO: Si es Pro Y (llegó al paso 3 O ya tiene ID guardado) -> Modal de Guardar
         open('saveOnExitPro', {
           onSave: onSave, // Pasamos la función de guardado del formulario
           onNavigate: navigateAction, // Pasamos la función de navegación
         });
       } else {
-        // CASO EXPRESS (o Pro en Pasos 1-2): Abrir el modal estándar
+        // CASO EXPRESS: Si es Express, o es Pro nuevo en paso 1/2 -> Modal simple de "Descartar"
         open('unsavedChanges', {
           onConfirm: navigateAction, // La confirmación solo navega
         });

@@ -21,7 +21,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useHeader } from '@/context/HeaderContext';
 import { Textarea } from '@/components/ui/textarea';
 import { InputCompuesto } from '../InputCompuesto';
@@ -30,7 +30,11 @@ import { ShadcnDatePicker } from '../DatePicker';
 import { ShadcnTimePicker } from '../TimePicker';
 import { SiNoQuestion } from '../SiNoQuestion';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
-import { createActaEntrantePro } from '@/services/actasService';
+import {
+  createActaEntrantePro,
+  getActaById,
+  updateActa,
+} from '@/services/actasService';
 import { actaentranteProSchema } from '@/lib/schemas'; // Schema de Entrante
 import { LuTriangleAlert, LuBadgeAlert } from 'react-icons/lu';
 import {
@@ -63,13 +67,15 @@ import {
 } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
 import { CiCircleCheck } from 'react-icons/ci';
+import { Spinner } from '@/components/ui/spinner';
 
 // Tipado del formulario usando el schema importado
 type FormData = z.infer<typeof actaentranteProSchema>;
 
 export function ActaEntranteProForm() {
-  // Cambiar nombre del componente
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlActaId = searchParams.get('id'); // ID que viene de la URL (si recargas la página)
   const { setTitle } = useHeader();
   const [currentStep, setCurrentStep] = useState(0);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -92,6 +98,20 @@ export function ActaEntranteProForm() {
 
   // --- OBTENER ACCIONES DEL STORE ---
   const { setFormState, clearFormState } = useFormDirtyStore();
+
+  // Estado para saber si estamos cargando datos iniciales (si hay ID)
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(!!urlActaId);
+
+  // Referencia para guardar el ID inmediatamente después de crear (sin esperar re-render)
+  const lastSavedIdRef = useRef<string | null>(null);
+
+  // Escudo para evitar que el useEffect de carga se dispare justo después de guardar
+  const shouldSkipLoadRef = useRef<boolean>(false);
+
+  // Referencia para evitar la doble carga en modo desarrollo
+  const dataLoadedRef = useRef<string | null>(null);
+
+  const contentScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setTitle('Acta de entrega del servidor público ENTRANTE');
@@ -193,39 +213,156 @@ export function ActaEntranteProForm() {
     },
   });
 
-  const { isDirty } = useFormState({ control: form.control });
-  const { watch, getValues, trigger } = form; // Necesitamos watch y getValues para el paso dinámico
-  const watchedValues = form.watch(); // Observa todos los valores del formulario
+  // Lógica de Carga de Datos (GET)
+  useEffect(() => {
+    // Si el escudo está levantado (acabamos de crear), IGNORAMOS este efecto.
+    if (shouldSkipLoadRef.current) {
+      shouldSkipLoadRef.current = false; // Bajamos el escudo para el futuro
+      return;
+    }
 
-  // onSubmit (SIMULADO POR AHORA)
-  const onSubmit = async (data: FormData) => {
-    console.log('DATOS FINALES A ENVIAR:', data);
+    // Carga normal: Si hay ID en la URL, pedimos datos al backend.
+    if (urlActaId) {
+      // Si ya cargamos este ID específico en este ciclo de vida, no hacemos nada.
+      if (dataLoadedRef.current === urlActaId) {
+        return;
+      }
+      // Marcamos inmediatamente este ID como "en proceso de carga"
+      dataLoadedRef.current = urlActaId;
+      // Bajamos el escudo para el futuro
+      setIsLoadingData(true);
+      const loadData = async () => {
+        try {
+          const acta = await getActaById(urlActaId);
+
+          if (acta && acta.metadata) {
+            form.reset(acta.metadata);
+            setIsSavedOnce(true);
+            // Actualizamos la referencia para estar sincronizados
+            lastSavedIdRef.current = acta.id;
+            toast.success('Datos cargados correctamente.');
+          }
+        } catch (error) {
+          console.error(error);
+          toast.error('Error al cargar los datos.');
+        } finally {
+          setIsLoadingData(false);
+        }
+      };
+      loadData();
+    }
+  }, [urlActaId, form]);
+
+  // --- LÓGICA DE GUARDADO CENTRALIZADA ---
+  const handleSaveOrUpdate = async (
+    isFinalSubmission: boolean = false,
+    showToast: boolean = true
+  ): Promise<boolean> => {
     setIsLoading(true);
     setApiError(null);
 
+    const currentData = form.getValues();
+
     try {
-      const response = await createActaEntrantePro(data);
-      console.log('Respuesta del servidor:', response);
+      let response;
 
-      // Prepara el contenido para el diálogo de éxito
-      setDialogContent({
-        title: `¡Acta de Entrega N° ${response.numeroActa} generada!`,
-        description:
-          'Su documento ha sido creado exitosamente. Se ha enviado a su dirección de correo electrónico y la recibirá en un plazo de 5 minutos.',
-      });
+      // DETERMINAR EL ID:
+      // Prioridad 1: ID guardado en memoria (acabamos de crear el acta hace un segundo).
+      // Prioridad 2: ID en la URL (cargamos el acta desde el dashboard).
+      const existingId = lastSavedIdRef.current || urlActaId;
 
-      // Muestra el diálogo
-      setShowSuccessDialog(true);
-    } catch (error) {
-      if (error instanceof Error) {
-        setApiError(error.message);
+      if (existingId) {
+        // --- CASO ACTUALIZAR (PATCH) ---
+        console.log('Actualizando acta existente ID:', existingId);
+        // Actualizar el acta existente
+        response = await updateActa(existingId, currentData);
+
+        if (showToast) {
+          toast.success(
+            isFinalSubmission
+              ? 'Acta actualizada y finalizada.'
+              : 'Cambios guardados correctamente.'
+          );
+        }
       } else {
-        setApiError('Ocurrió un error inesperado.');
+        // --- CASO CREAR (POST) ---
+        console.log('Creando nueva acta...');
+        response = await createActaEntrantePro(currentData);
+
+        // Guardamos el ID en memoria INMEDIATAMENTE para el próximo clic
+        lastSavedIdRef.current = response.id;
+
+        // Levantamos el escudo para que el useEffect no recargue la data que ya tenemos
+        shouldSkipLoadRef.current = true;
+
+        // Actualizamos la URL silenciosamente para que si el usuario refresca, tenga el ID
+        const newUrl = `${window.location.pathname}?id=${response.id}`;
+        router.replace(newUrl, { scroll: false });
+
+        setIsSavedOnce(true);
+        if (showToast) {
+          toast.success('Borrador creado exitosamente.');
+        }
       }
+
+      if (isFinalSubmission) {
+        setDialogContent({
+          title: `¡Acta de Entrega procesada!`,
+          description: 'Su documento ha sido guardado exitosamente.',
+        });
+        setShowSuccessDialog(true);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error al guardar:', error);
+      const msg = error instanceof Error ? error.message : 'Error desconocido';
+      setApiError(msg);
+      toast.error(`Error: ${msg}`);
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
+
+  // --- Wrappers para botones ---
+  const handleSaveProgress = useCallback(async () => {
+    return await handleSaveOrUpdate(false, true);
+  }, [form, urlActaId]); // Dependencias
+
+  const handleSaveAndExit = async () => {
+    // Definimos la promesa que ejecutará toast.promise
+    const savePromise = async () => {
+      // Llamamos a guardar, pero SILENCIOSO (showToast = false)
+      const success = await handleSaveOrUpdate(false, false);
+
+      if (!success) {
+        throw new Error('No se pudo guardar el acta.');
+      }
+
+      // Pequeño delay artificial (800ms) para que el usuario lea "Guardando..."
+      // Esto evita el "flickeo" rápido y da sensación de proceso robusto.
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      // Redirección
+      router.push('/dashboard/panel-de-actas/elaboracion');
+    };
+
+    // Ejecutamos el Toast con estados
+    toast.promise(savePromise(), {
+      loading: 'Guardando cambios y redirigiendo al panel...',
+      success: 'Datos guardados correctamente. Redirigiendo...',
+      error: 'Ocurrió un error al intentar guardar y salir.',
+    });
+  };
+
+  const onSubmit = async (data: FormData) => {
+    await handleSaveOrUpdate(true, true);
+  };
+
+  const { isDirty } = useFormState({ control: form.control });
+  const { watch, getValues, trigger } = form; // Necesitamos watch y getValues para el paso dinámico
+  const watchedValues = form.watch(); // Observa todos los valores del formulario
 
   // Se llama cuando la validación global es exitosa
   const onValidationSuccess = () => {
@@ -340,33 +477,8 @@ export function ActaEntranteProForm() {
     }
   };
 
-  const contentScrollRef = useRef<HTMLDivElement>(null);
   const scrollToTop = () => {
     contentScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Función de Guardar
-  const handleSaveProgress = useCallback(async () => {
-    // Convertir a async si llamas a API
-    console.log('Guardando progreso...', getValues());
-    setIsLoading(true); // Indicar carga
-    // Aquí iría la lógica REAL para guardar en backend
-    // Simulamos un guardado exitoso
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simular llamada a API
-      toast.success('Progreso guardado exitosamente.');
-      setIsSavedOnce(true); // <-- Marcar como guardado
-    } catch (error) {
-      toast.error('Error al guardar el progreso.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [getValues, setIsSavedOnce, setIsLoading]);
-
-  const handleSaveAndExit = async () => {
-    await handleSaveProgress();
-    // Redirige al panel (asegúrate que la ruta sea correcta)
-    router.push('/dashboard/panel-de-actas/elaboracion');
   };
 
   // --- Funciones de Navegación (Adaptadas para 10 pasos y salto en Paso 9) ---
@@ -708,12 +820,16 @@ export function ActaEntranteProForm() {
   // --- useEffect PARA ACTUALIZAR EL STORE GLOBAL ---
   useEffect(() => {
     // Esta función se pasa al store para que el GuardedButton la llame
-    const onSave = () => handleSaveProgress();
+    const onSave = async () => {
+      await handleSaveProgress();
+    };
 
     setFormState({
       isDirty,
       isProForm: true,
       hasReachedStep3,
+      // Si existe en la URL o si acabamos de guardar (ref), se pasa. Si no, va null.
+      actaId: urlActaId || lastSavedIdRef.current,
       onSave, // Pasamos la función de guardado
     });
 
@@ -724,10 +840,23 @@ export function ActaEntranteProForm() {
   }, [
     isDirty,
     hasReachedStep3,
+    urlActaId,
     setFormState,
     clearFormState,
     handleSaveProgress,
   ]);
+
+  // --- SPINNER DE CARGA INICIAL---
+  if (isLoadingData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] h-full w-full space-y-4">
+        <Spinner className="h-12 w-12 text-primary" />
+        <p className="text-lg font-medium text-muted-foreground animate-pulse">
+          Cargando datos del acta...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -1612,7 +1741,7 @@ export function ActaEntranteProForm() {
                   onClick={form.handleSubmit(onSubmit)}
                   disabled={isLoading || !isFormGloballyValid}
                   variant="default"
-                  className="cursor-pointer shadow-sm"
+                  className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white"
                 >
                   {isLoading ? 'Enviando...' : 'Crear Acta (PRO)'}
                 </Button>
@@ -1627,8 +1756,8 @@ export function ActaEntranteProForm() {
           title={dialogContent.title}
           description={dialogContent.description}
           onConfirm={() => {
-            setShowSuccessDialog(false);
-            router.push('/dashboard/pro');
+            //setShowSuccessDialog(false);
+            router.push('/dashboard/panel-de-actas/elaboracion');
           }}
         />
       </Card>

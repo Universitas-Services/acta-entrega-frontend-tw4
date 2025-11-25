@@ -585,7 +585,7 @@ export const downloadCompliance = async (
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    // Nombre sugerido: Compliance-Numero.docx o similar
+    // Nombre sugerido: Compliance-Numero.pdf o similar
     link.setAttribute(
       'download',
       `Compliance-${numeroCompliance || 'Borrador'}.pdf`

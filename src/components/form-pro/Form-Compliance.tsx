@@ -61,6 +61,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { CiCircleCheck } from 'react-icons/ci';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 export function ComplianceForm() {
   const router = useRouter();
@@ -74,6 +75,7 @@ export function ComplianceForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [highestStepVisited, setHighestStepVisited] = useState(currentStep);
+  const { showLoader } = useLoaderStore();
 
   const { setFormState, clearFormState } = useFormDirtyStore();
 
@@ -1161,6 +1163,8 @@ export function ComplianceForm() {
         title={dialogContent.title}
         description={dialogContent.description}
         onConfirm={() => {
+          // ACTIVAR LOADER ANTES DE REDIRIGIR
+          showLoader();
           //setShowSuccessDialog(false);
           router.push('/dashboard/panel-de-actas/compliance');
         }}

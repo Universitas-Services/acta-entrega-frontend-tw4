@@ -17,9 +17,11 @@ import {
 import { HiDocumentArrowUp, HiDocumentArrowDown } from 'react-icons/hi2';
 import { SiSpringsecurity } from 'react-icons/si';
 import { useHeader } from '@/context/HeaderContext';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 export default function DashboardPage() {
   const { setTitle } = useHeader();
+  const { showLoader } = useLoaderStore();
 
   useEffect(() => {
     setTitle('Menú principal');
@@ -78,6 +80,7 @@ export default function DashboardPage() {
           >
             <Link
               href="/dashboard/conocenos"
+              onClick={() => showLoader()}
               className="flex items-center gap-2"
             >
               Más información

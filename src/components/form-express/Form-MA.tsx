@@ -53,6 +53,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FormFieldWithExtras } from '../FormFieldWithExtras';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 type FormData = z.infer<typeof actaMaximaAutoridadSchema>;
 type DynamicStepKey = keyof DynamicContent;
@@ -77,6 +78,7 @@ export function ActaMaximaAutoridadForm() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const { showLoader } = useLoaderStore();
 
   useEffect(() => {
     setTitle('Acta de de Entrega - Servidor Público Máxima Autoridad');
@@ -384,6 +386,8 @@ export function ActaMaximaAutoridadForm() {
               description={dialogContent.description}
               onConfirm={() => {
                 setShowSuccessDialog(false);
+                // ACTIVAR LOADER ANTES DE VOLVER AL DASHBOARD
+                showLoader();
                 // La redirección ahora ocurre cuando el usuario presiona "Entendido"
                 router.push('/dashboard');
               }}

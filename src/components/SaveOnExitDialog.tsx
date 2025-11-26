@@ -24,7 +24,7 @@ export function SaveOnExitDialog() {
 
   const isModalOpen = isOpen && type === 'saveOnExitPro';
 
-  // CAMBIO 2: Reseteamos el estado cuando el modal se cierra o abre
+  // Reseteamos el estado cuando el modal se cierra o abre
   useEffect(() => {
     if (!isModalOpen) {
       setLoadingAction(null);

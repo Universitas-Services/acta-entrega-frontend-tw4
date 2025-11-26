@@ -56,6 +56,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { BsArrowBarLeft, BsPerson } from 'react-icons/bs';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 export function SidebarPro() {
   const {
@@ -72,12 +73,14 @@ export function SidebarPro() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [openCollapsible, setOpenCollapsible] = useState<string>('');
   const [openPanelDropdown, setOpenPanelDropdown] = useState<string>('');
+  const { showLoader } = useLoaderStore();
 
   const handleLogoutClick = () => {
     openModal('logoutConfirmation', {
       title: '¿Ya te vas?',
       description: 'Estás a punto de cerrar tu sesión actual.',
       onConfirm: async () => {
+        showLoader();
         await logoutUser();
         logout();
         router.push('/login');
@@ -420,7 +423,7 @@ export function SidebarPro() {
                 </TooltipTrigger>
 
                 <DropdownMenuContent
-                  className="w-56 bg-dropdownperfil-pro"
+                  className="w-56 bg-card"
                   align="end"
                   forceMount
                   side={isDesktop ? 'right' : 'top'}

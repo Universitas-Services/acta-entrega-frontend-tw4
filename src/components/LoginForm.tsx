@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -34,6 +35,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const login = useAuthStore((state) => state.login);
   const [error, setError] = useState<string | null>(null);
+  const { showLoader } = useLoaderStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,6 +52,9 @@ export function LoginForm() {
 
       // Lee el estado 'basic' (que contiene el rol) directamente desde el store
       const { basic } = useAuthStore.getState();
+
+      // ACTIVAR LOADER ANTES DE REDIRIGIR
+      showLoader();
 
       // Determina la ruta de destino basada en el rol
       let targetRoute = '/dashboard'; // Ruta por defecto para 'USER'

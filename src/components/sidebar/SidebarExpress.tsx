@@ -50,6 +50,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 export function SidebarExpress() {
   const {
@@ -63,12 +64,14 @@ export function SidebarExpress() {
   const { basic, logout } = useAuthStore(); // Se usa 'basic'
   const { open: openModal } = useModalStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { showLoader } = useLoaderStore();
 
   const handleLogoutClick = () => {
     openModal('logoutConfirmation', {
       title: '¿Ya te vas?',
       description: 'Estás a punto de cerrar tu sesión actual.',
       onConfirm: async () => {
+        showLoader();
         await logoutUser();
         logout();
         //router.push('/login');  // la redirección se maneja en el store
@@ -80,6 +83,11 @@ export function SidebarExpress() {
     if (!isDesktop) {
       toggleMobileMenu();
     }
+  };
+
+  // FUNCIÓN AUXILIAR PARA NAVEGACIÓN LIMPIA
+  const handleLinkClick = () => {
+    handleNavigation(); // Lógica de cerrar menú móvil
   };
 
   const sidebarContent = (
@@ -125,7 +133,7 @@ export function SidebarExpress() {
                   <TooltipTrigger asChild>
                     <GuardedButton
                       href={item.href}
-                      onClick={handleNavigation}
+                      onClick={handleLinkClick}
                       variant="ghost"
                       className={cn(
                         'flex w-full items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 transition-colors text-sidebar-foreground hover:bg-sidebar-hover-bg bg-sidebar cursor-pointer overflow-hidden',
@@ -160,7 +168,7 @@ export function SidebarExpress() {
               <TooltipTrigger asChild>
                 <GuardedButton
                   href="/dashboard/acerca-de"
-                  onClick={handleNavigation}
+                  onClick={handleLinkClick}
                   variant="ghost"
                   className={cn(
                     'flex w-full bg-sidebar items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 text-sidebar-foreground hover:bg-sidebar-hover-bg cursor-pointer overflow-hidden',
@@ -294,7 +302,7 @@ export function SidebarExpress() {
                   >
                     <GuardedButton
                       href="/dashboard/perfil"
-                      onClick={handleNavigation}
+                      onClick={handleLinkClick}
                       variant="ghost"
                       className="bg-white w-full h-full justify-start px-2 py-1.5 text-sm font-normal focus-visible:ring-0 focus-visible:ring-offset-0"
                     >

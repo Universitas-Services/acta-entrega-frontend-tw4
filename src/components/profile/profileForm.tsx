@@ -33,13 +33,35 @@ import {
 
 // El esquema de validación se mantiene intacto
 const profileSchema = z.object({
-  email: z.string().optional(), // Agregado para mostrarlo
-  nombre: z.string().min(1, 'El nombre es requerido.'),
-  apellido: z.string().min(1, 'El apellido es requerido.'),
-  telefono: z.string().min(1, 'El teléfono es requerido.'),
-  institucion: z.string().min(1, 'La institución es requerida.'),
-  cargo: z.string().min(1, 'El cargo es requerido.'),
-  plazoEntregaActa: z.string().min(1, 'El plazo de entrega es requerido.'),
+  email: z.string().optional(),
+
+  // Nombres y Apellidos: Máximo 20
+  nombre: z
+    .string()
+    .min(1, 'El nombre es requerido.')
+    .max(20, 'El nombre no puede tener más de 20 caracteres.'),
+
+  apellido: z
+    .string()
+    .min(1, 'El apellido es requerido.')
+    .max(20, 'El apellido no puede tener más de 20 caracteres.'),
+
+  // Teléfono: Exactamente 11 caracteres (ni más, ni menos)
+  telefono: z
+    .string()
+    .length(11, 'El teléfono debe tener 11 dígitos.')
+    .regex(/^\d+$/, 'Solo se permiten números'),
+
+  // Institución y Cargo: Máximo 20
+  institucion: z
+    .string()
+    .min(1, 'La institución es requerida.')
+    .max(20, 'La institución no puede tener más de 20 caracteres.'),
+
+  cargo: z
+    .string()
+    .min(1, 'El cargo es requerido.')
+    .max(20, 'El cargo no puede tener más de 20 caracteres.'),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -47,6 +69,9 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 export function ProfileForm() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [originalData, setOriginalData] = useState<ProfileFormValues | null>(
+    null
+  );
 
   // Ref para evitar múltiples cargas de datos
   const hasFetchedData = useRef(false);
@@ -54,15 +79,14 @@ export function ProfileForm() {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      email: '', // Valor inicial
+      email: '',
       nombre: '',
       apellido: '',
       telefono: '',
       institucion: '',
       cargo: '',
-      plazoEntregaActa: '',
     },
-    mode: 'onChange',
+    mode: 'onSubmit',
   });
 
   // Efecto para cargar los datos directamente del servidor
@@ -78,15 +102,20 @@ export function ProfileForm() {
         const data = await getMyProfile();
 
         if (data) {
-          form.reset({
+          const formData = {
             email: data.email || '',
             nombre: data.nombre || '',
             apellido: data.apellido || '',
             telefono: data.telefono || '',
             institucion: data.profile?.institucion || '',
             cargo: data.profile?.cargo || '',
-            plazoEntregaActa: data.profile?.plazoEntregaActa || '',
-          });
+          };
+
+          // Guardamos la copia original
+          setOriginalData(formData);
+
+          // Llenamos el formulario
+          form.reset(formData);
         }
       } catch (error) {
         console.error('Error al cargar perfil:', error);
@@ -99,7 +128,7 @@ export function ProfileForm() {
     };
 
     loadUserProfile();
-  }, []);
+  }, [form]);
 
   // Función para manejar el submit del formulario
   async function onSubmit(data: ProfileFormValues) {
@@ -109,6 +138,7 @@ export function ProfileForm() {
       await updateUser({
         nombre: data.nombre,
         apellido: data.apellido,
+        telefono: data.telefono,
       });
 
       // Actualizar datos extendidos del perfil (Profile)
@@ -116,6 +146,11 @@ export function ProfileForm() {
         institucion: data.institucion,
         cargo: data.cargo,
       });
+
+      // Si guardamos con éxito, actualizamos la "copia original" con los nuevos datos
+      // para que si el usuario cancela una futura edición, vuelva a estos datos nuevos.
+      setOriginalData(data);
+      form.reset(data); // También reseteamos el estado "dirty" del form
 
       toast.success('Perfil actualizado correctamente.');
       setIsEditing(false);
@@ -183,7 +218,11 @@ export function ProfileForm() {
                 <FormItem>
                   <FormLabel>Nombre</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={!isEditing || isLoading} />
+                    <Input
+                      {...field}
+                      maxLength={20}
+                      disabled={!isEditing || isLoading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -196,7 +235,11 @@ export function ProfileForm() {
                 <FormItem>
                   <FormLabel>Apellido</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={!isEditing || isLoading} />
+                    <Input
+                      {...field}
+                      maxLength={20}
+                      disabled={!isEditing || isLoading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -209,7 +252,11 @@ export function ProfileForm() {
                 <FormItem>
                   <FormLabel>Teléfono</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={!isEditing || isLoading} />
+                    <Input
+                      {...field}
+                      maxLength={11}
+                      disabled={!isEditing || isLoading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -222,7 +269,11 @@ export function ProfileForm() {
                 <FormItem>
                   <FormLabel>Institución</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={!isEditing || isLoading} />
+                    <Input
+                      {...field}
+                      maxLength={30}
+                      disabled={!isEditing || isLoading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -235,7 +286,11 @@ export function ProfileForm() {
                 <FormItem>
                   <FormLabel>Cargo</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={!isEditing || isLoading} />
+                    <Input
+                      {...field}
+                      maxLength={20}
+                      disabled={!isEditing || isLoading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -252,7 +307,10 @@ export function ProfileForm() {
                   className="cursor-pointer"
                   onClick={() => {
                     setIsEditing(false);
-                    form.reset(form.getValues());
+                    // Reseteamos el formulario a los datos ORIGINALES guardados en el estado
+                    if (originalData) {
+                      form.reset(originalData);
+                    }
                   }}
                   disabled={isLoading}
                 >

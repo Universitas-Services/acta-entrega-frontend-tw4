@@ -167,7 +167,7 @@ export function ProfileForm() {
       <Card>
         <CardHeader>
           <Skeleton className="h-8 w-[200px] mb-2" />
-          <Skeleton className="h-4 w-[300px]" />
+          <Skeleton className="h-4 w-[220px]" />
         </CardHeader>
         <CardContent className="space-y-4">
           <Skeleton className="h-10 w-full" />

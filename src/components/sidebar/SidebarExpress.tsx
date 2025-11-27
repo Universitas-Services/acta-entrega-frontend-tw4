@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useModalStore } from '@/stores/useModalStore';
-import { logoutUser } from '@/services/authService';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { usePathname } from 'next/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -72,7 +71,7 @@ export function SidebarExpress() {
       description: 'Estás a punto de cerrar tu sesión actual.',
       onConfirm: async () => {
         showLoader();
-        await logoutUser();
+        //await logoutUser();
         logout();
         //router.push('/login');  // la redirección se maneja en el store
       },

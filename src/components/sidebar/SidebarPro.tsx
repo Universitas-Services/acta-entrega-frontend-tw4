@@ -4,9 +4,8 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useModalStore } from '@/stores/useModalStore';
-import { logoutUser } from '@/services/authService';
 import { useSidebarStore } from '@/stores/useSidebarStore';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { NavItem, NavSubItem, proNav } from '@/config/sidebar-nav';
 import { cn, getInitials } from '@/lib/utils';
@@ -69,7 +68,6 @@ export function SidebarPro() {
   const pathname = usePathname();
   const { basic, logout } = useAuthStore();
   const { open: openModal } = useModalStore();
-  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [openCollapsible, setOpenCollapsible] = useState<string>('');
   const [openPanelDropdown, setOpenPanelDropdown] = useState<string>('');
@@ -81,9 +79,9 @@ export function SidebarPro() {
       description: 'Estás a punto de cerrar tu sesión actual.',
       onConfirm: async () => {
         showLoader();
-        await logoutUser();
-        logout();
-        router.push('/login');
+        //await logoutUser();
+        logout(); // Limpia el estado de autenticación en el store
+        //router.push('/login');
       },
     });
   };

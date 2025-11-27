@@ -4,8 +4,8 @@ import { AiOutlineBook, AiOutlineFileSearch } from 'react-icons/ai';
 import { LuLayoutDashboard } from 'react-icons/lu';
 import { FiHelpCircle } from 'react-icons/fi';
 import { LiaRobotSolid } from 'react-icons/lia';
-import { FaWpforms } from 'react-icons/fa';
 import { IoCreateOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
+import { string } from 'zod';
 
 export interface NavItem {
   title: string;
@@ -14,6 +14,7 @@ export interface NavItem {
   subItems?: NavItem[];
   // 'id' o 'value' para el Collapsible/Accordion
   id: string;
+  src?: string;
 }
 
 // --- Interfaz para Sub-items (sin icono) ---

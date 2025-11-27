@@ -230,6 +230,7 @@ export function SidebarPro() {
                           {/* Botón solo con icono */}
                           <GuardedButton
                             href="#" // No navega
+                            isNavigation={false} // No es navegación
                             variant="ghost"
                             className={cn(
                               'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden justify-center rounded-none',
@@ -284,6 +285,7 @@ export function SidebarPro() {
                       {/* Botón con texto y flecha */}
                       <GuardedButton
                         href="#" // No navega
+                        isNavigation={false} // No es navegación
                         variant="ghost"
                         className={cn(
                           'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden w-full justify-between py-2 px-3 rounded-none',

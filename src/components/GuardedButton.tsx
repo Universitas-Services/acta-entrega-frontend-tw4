@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { useModalStore } from '@/stores/useModalStore';
 import { useLoaderStore } from '@/stores/useLoaderStore';
@@ -11,15 +11,18 @@ interface GuardedButtonProps
   extends React.ComponentProps<typeof Button>,
     VariantProps<typeof buttonVariants> {
   href: string;
+  isNavigation?: boolean; // Indica si el botón es para navegación (por defecto true)
 }
 
 export function GuardedButton({
   href,
   onClick,
   children,
+  isNavigation = true, // Por defecto es true, es un botón de navegación
   ...props
 }: GuardedButtonProps) {
   const router = useRouter();
+  const pathname = usePathname(); // Obtener la ruta actual
   // --- LEER EL ESTADO COMPLETO Y LAS ACCIONES ---
   const {
     isDirty,
@@ -35,6 +38,21 @@ export function GuardedButton({
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (onClick) {
       onClick(e); // Ejecuta el onClick pasado (para cerrar el sidebar móvil)
+    }
+
+    // Botones que NO son de navegación
+    // Si el botón está marcado explícitamente como no-navegación (ej. Panel de Actas),
+    // detenemos aquí. No hay loader, no hay router.push, no hay validación de formulario sucio.
+    if (!isNavigation) {
+      return;
+    }
+
+    // Detección de Misma Página
+    // Si la URL destino es idéntica a la actual, detenemos todo.
+    // Esto evita el loader infinito y recargas innecesarias.
+    if (pathname === href) {
+      e.preventDefault();
+      return;
     }
 
     // Función centralizada para navegar

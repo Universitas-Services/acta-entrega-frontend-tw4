@@ -24,33 +24,39 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import apiClient from '@/lib/axios';
-import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
 import { toast } from 'sonner';
+import { changePassword } from '@/services/authService';
 
 // El robusto esquema de validación se mantiene intacto
 const formSchema = z
   .object({
-    currentPassword: z.string().min(1, 'La contraseña actual es requerida.'),
+    currentPassword: z
+      .string()
+      .min(1, 'La contraseña actual es requerida.')
+      .max(16, 'La contraseña no puede tener más de 16 caracteres.'),
     newPassword: z
       .string()
       .min(8, 'La nueva contraseña debe tener al menos 8 caracteres.')
+      .max(16, 'La contraseña no puede tener más de 16 caracteres.')
       .regex(/[a-z]/, 'Debe contener al menos una letra minúscula.')
       .regex(/[A-Z]/, 'Debe contener al menos una letra mayúscula.')
       .regex(/[0-9]/, 'Debe contener al menos un número.')
-      .regex(/[^a-zA-Z0-9]/, 'Debe contener al menos un símbolo especial.'),
-    confirmPassword: z.string(),
+      .regex(/[^a-zA-Z0-9]/, 'Debe contener al menos un carácter especial.'),
+    confirmPassword: z
+      .string()
+      .min(8, 'Confirma tu nueva contraseña.')
+      .max(16, 'La contraseña no puede tener más de 16 caracteres.'),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: 'Las contraseñas no coinciden.',
     path: ['confirmPassword'],
   });
 
+type FormValues = z.infer<typeof formSchema>;
+
 export function ChangePasswordForm() {
-  // La lógica de estado y de formulario se mantiene
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -66,28 +72,41 @@ export function ChangePasswordForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormValues) {
+    // Verificamos si la nueva contraseña es igual a la actual antes de enviar
+    if (values.currentPassword === values.newPassword) {
+      toast.error('La nueva contraseña debe ser distinta a la actual.');
+      // Detenemos la función aquí, no se hace la llamada al servidor
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Asumimos un endpoint para cambiar la contraseña
-      await apiClient.put('/user/password/change', {
+      await changePassword({
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       });
+
       setShowSuccessDialog(true);
-      form.reset();
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        toast.error(
-          error.response.data.message || 'Error al cambiar la contraseña.'
-        );
-      } else {
-        toast.error('Ocurrió un error inesperado.');
+      form.reset(); // Limpiamos el formulario tras el éxito
+    } catch (error: unknown) {
+      console.error(error);
+      // Mostramos el mensaje de error que viene del servicio (ej. "Contraseña actual incorrecta")
+      let errorMessage = 'Error al cambiar la contraseña';
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
       }
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   }
+
+  // Clase común para los botones de "Ojo"
+  const eyeButtonClass =
+    'cursor-pointer absolute inset-y-0 right-0 h-full px-3 text-muted-foreground hover:bg-transparent hover:-translate-y-0.5 transition-transform duration-200';
 
   return (
     <>
@@ -118,13 +137,15 @@ export function ChangePasswordForm() {
                           <Input
                             type={showCurrentPassword ? 'text' : 'password'}
                             {...field}
+                            maxLength={16}
                             disabled={isLoading}
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="cursor-pointer absolute inset-y-0 right-0 h-full px-3 text-muted-foreground"
+                            tabIndex={-1} // Evita selección con Tab
+                            className={eyeButtonClass}
                             onClick={() =>
                               setShowCurrentPassword(!showCurrentPassword)
                             }
@@ -150,13 +171,14 @@ export function ChangePasswordForm() {
                           <Input
                             type={showNewPassword ? 'text' : 'password'}
                             {...field}
+                            maxLength={16}
                             disabled={isLoading}
                           />
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon"
-                            className="cursor-pointer absolute inset-y-0 right-0 h-full px-3 text-muted-foreground"
+                            tabIndex={-1} // Evita selección con Tab
+                            className={eyeButtonClass}
                             onClick={() => setShowNewPassword(!showNewPassword)}
                           >
                             {showNewPassword ? <FaEyeSlash /> : <FaEye />}
@@ -180,13 +202,15 @@ export function ChangePasswordForm() {
                           <Input
                             type={showConfirmPassword ? 'text' : 'password'}
                             {...field}
+                            maxLength={16}
                             disabled={isLoading}
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="cursor-pointer absolute inset-y-0 right-0 h-full px-3 text-muted-foreground"
+                            tabIndex={-1} // Evita selección con Tab
+                            className={eyeButtonClass}
                             onClick={() =>
                               setShowConfirmPassword(!showConfirmPassword)
                             }
@@ -215,13 +239,12 @@ export function ChangePasswordForm() {
         </Form>
       </Card>
 
-      {/* El diálogo de éxito se mantiene y funcionará como antes */}
       <SuccessAlertDialog
         isOpen={showSuccessDialog}
         onClose={() => setShowSuccessDialog(false)}
         title="¡Contraseña Actualizada!"
-        description="Tu contraseña ha sido cambiada exitosamente. Serás redirigido al menú principal."
-        onConfirm={() => router.push('/dashboard')}
+        description="Tu contraseña ha sido cambiada exitosamente."
+        onConfirm={() => setShowSuccessDialog(false)}
       />
     </>
   );

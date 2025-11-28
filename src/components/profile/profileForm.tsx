@@ -22,236 +22,280 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useState, useEffect } from 'react';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
-import { updateUser, updateProfile } from '@/services/authService';
+import {
+  updateUser,
+  updateProfile,
+  getMyProfile,
+} from '@/services/authService';
 
-// El esquema de validación
+// El esquema de validación se mantiene intacto
 const profileSchema = z.object({
-  nombre: z.string().min(1, 'El nombre es requerido.'),
-  apellido: z.string().min(1, 'El apellido es requerido.'),
-  telefono: z.string().min(1, 'El teléfono es requerido.'),
-  institucion: z.string().min(1, 'La institución es requerida.'),
-  cargo: z.string().min(1, 'El cargo es requerido.'),
-  plazoEntregaActa: z.string().min(1, 'El plazo de entrega es requerido.'),
+  email: z.string().optional(),
+
+  // Nombres y Apellidos: Máximo 20
+  nombre: z
+    .string()
+    .min(1, 'El nombre es requerido.')
+    .max(20, 'El nombre no puede tener más de 20 caracteres.'),
+
+  apellido: z
+    .string()
+    .min(1, 'El apellido es requerido.')
+    .max(20, 'El apellido no puede tener más de 20 caracteres.'),
+
+  // Teléfono: Exactamente 11 caracteres (ni más, ni menos)
+  telefono: z
+    .string()
+    .length(11, 'El teléfono debe tener 11 dígitos.')
+    .regex(/^\d+$/, 'Solo se permiten números'),
+
+  // Institución y Cargo: Máximo 20
+  institucion: z
+    .string()
+    .min(1, 'La institución es requerida.')
+    .max(20, 'La institución no puede tener más de 20 caracteres.'),
+
+  cargo: z
+    .string()
+    .min(1, 'El cargo es requerido.')
+    .max(20, 'El cargo no puede tener más de 20 caracteres.'),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-// Componente para el estado de carga
-const LoadingSkeleton = () => (
-  <Card>
-    <CardHeader>
-      <Skeleton className="h-8 w-48" />
-      <Skeleton className="h-4 w-full mt-2" />
-    </CardHeader>
-    <Separator className="my-4" />
-    <CardContent className="p-6 space-y-6">
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-    </CardContent>
-    <CardFooter className="border-t pt-6 flex justify-end">
-      <Skeleton className="h-10 w-24" />
-    </CardFooter>
-  </Card>
-);
-
 export function ProfileForm() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { user, fetchUser } = useAuthStore();
+  const [originalData, setOriginalData] = useState<ProfileFormValues | null>(
+    null
+  );
+
+  // Ref para evitar múltiples cargas de datos
+  const hasFetchedData = useRef(false);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
+      email: '',
       nombre: '',
       apellido: '',
       telefono: '',
       institucion: '',
       cargo: '',
     },
+    mode: 'onSubmit',
   });
 
-  // LÓGICA DE CARGA DE DATOS (useEffect)
+  // Efecto para cargar los datos directamente del servidor
   useEffect(() => {
-    if (user) {
-      form.reset({
-        nombre: user.nombre || '',
-        apellido: user.apellido || '',
-        telefono: user.telefono || '',
-        institucion: user.profile?.institucion || '',
-        cargo: user.profile?.cargo || '',
-        plazoEntregaActa: user.profile?.plazoEntregaActa || '',
-      });
-    }
-  }, [user, form]);
+    if (hasFetchedData.current) return;
 
-  // LÓGICA DE ENVÍO Y ACTUALIZACIÓN DE ESTADO  (onSubmit)
-  async function onSubmit(values: z.infer<typeof profileSchema>) {
+    const loadUserProfile = async () => {
+      try {
+        // Marcamos que ya hemos intentado cargar los datos
+        hasFetchedData.current = true;
+        setIsLoading(true);
+
+        const data = await getMyProfile();
+
+        if (data) {
+          const formData = {
+            email: data.email || '',
+            nombre: data.nombre || '',
+            apellido: data.apellido || '',
+            telefono: data.telefono || '',
+            institucion: data.profile?.institucion || '',
+            cargo: data.profile?.cargo || '',
+          };
+
+          // Guardamos la copia original
+          setOriginalData(formData);
+
+          // Llenamos el formulario
+          form.reset(formData);
+        }
+      } catch (error) {
+        console.error('Error al cargar perfil:', error);
+        toast.error('No se pudo cargar la información del perfil.');
+        // Si falla, permitimos reintentar en un futuro montaje si fuera necesario
+        hasFetchedData.current = false;
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserProfile();
+  }, [form]);
+
+  // Función para manejar el submit del formulario
+  async function onSubmit(data: ProfileFormValues) {
     setIsLoading(true);
     try {
-      // Actualizamos los datos del Usuario
+      // Actualizar datos básicos de usuario (User)
       await updateUser({
-        nombre: values.nombre,
-        apellido: values.apellido,
-        telefono: values.telefono,
+        nombre: data.nombre,
+        apellido: data.apellido,
+        telefono: data.telefono,
       });
 
-      // Actualizamos los datos del Perfil
+      // Actualizar datos extendidos del perfil (Profile)
       await updateProfile({
-        institucion: values.institucion,
-        cargo: values.cargo,
-        plazoEntregaActa: values.plazoEntregaActa,
+        institucion: data.institucion,
+        cargo: data.cargo,
       });
 
-      // Volvemos a cargar el usuario en el store
-      // para que los datos se actualicen en toda la app.
-      await fetchUser();
+      // Si guardamos con éxito, actualizamos la "copia original" con los nuevos datos
+      // para que si el usuario cancela una futura edición, vuelva a estos datos nuevos.
+      setOriginalData(data);
+      form.reset(data); // También reseteamos el estado "dirty" del form
 
-      toast.success('Perfil actualizado exitosamente.');
+      toast.success('Perfil actualizado correctamente.');
       setIsEditing(false);
-    } catch (error: unknown) {
-      console.error('Error al actualizar el perfil:', error);
-
-      // 👇 CORREGIDO: Añadimos un type guard
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error('Ocurrió un error desconocido.');
-      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Hubo un error al actualizar el perfil.');
     } finally {
       setIsLoading(false);
     }
   }
 
-  if (!user) {
+  if (isLoading && !form.getValues().nombre) {
     return (
       <Card>
         <CardHeader>
-          <Skeleton className="h-6 w-1/4" />
-          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-8 w-[200px] mb-2" />
+          <Skeleton className="h-4 w-[220px]" />
         </CardHeader>
-        <CardContent>
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full mt-4" />
+        <CardContent className="space-y-4">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
         </CardContent>
       </Card>
     );
   }
 
-  // ESTADO DE CARGA INICIAL CON UN SKELETON
-  if (isLoading && !isEditing) {
-    return <LoadingSkeleton />;
-  }
-
   return (
     <Card>
+      <CardHeader>
+        <CardTitle>Información Personal</CardTitle>
+        <CardDescription>
+          Actualiza tu información personal y detalles profesionales.
+        </CardDescription>
+      </CardHeader>
+      <Separator className="mb-4" />
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardHeader>
-            <CardTitle>Información del perfil</CardTitle>
-            <CardDescription>
-              Actualiza los datos de tu cuenta. El correo no puede ser
-              modificado.
-            </CardDescription>
-          </CardHeader>
+          <CardContent className="space-y-2 flex flex-col gap-5 pb-8">
+            {/* Campo Email - Solo ReadOnly */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Correo electrónico</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      readOnly
+                      disabled
+                      className="bg-muted text-muted-foreground cursor-not-allowed"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Separator className="my-4" />
-
-          <CardContent className="pt-4 pb-6">
-            {/* El 'space-y-6' crea el espaciado vertical entre cada campo del formulario */}
-            <div className="space-y-6">
-              {/* Campo de Correo (solo lectura) */}
-              <FormItem>
-                <FormLabel>Correo electrónico</FormLabel>
-                <FormControl>
-                  <Input value={user?.email || ''} disabled readOnly />
-                </FormControl>
-              </FormItem>
-
-              {/* El resto de los campos ahora están en una sola columna */}
-              <FormField
-                name="nombre"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={!isEditing || isLoading} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="apellido"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Apellido</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={!isEditing || isLoading} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="telefono"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Teléfono</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={!isEditing || isLoading} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="institucion"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Institución</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={!isEditing || isLoading} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="cargo"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cargo</FormLabel>
-                    <FormControl>
-                      <Input {...field} disabled={!isEditing || isLoading} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="nombre"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      maxLength={20}
+                      disabled={!isEditing || isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="apellido"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Apellido</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      maxLength={20}
+                      disabled={!isEditing || isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="telefono"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Teléfono</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      maxLength={11}
+                      disabled={!isEditing || isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="institucion"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Institución</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      maxLength={30}
+                      disabled={!isEditing || isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="cargo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cargo</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      maxLength={20}
+                      disabled={!isEditing || isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
 
           <CardFooter className="flex justify-end gap-2 border-t pt-6">
@@ -263,8 +307,10 @@ export function ProfileForm() {
                   className="cursor-pointer"
                   onClick={() => {
                     setIsEditing(false);
-                    // Resetea el formulario a los valores originales
-                    form.reset();
+                    // Reseteamos el formulario a los datos ORIGINALES guardados en el estado
+                    if (originalData) {
+                      form.reset(originalData);
+                    }
                   }}
                   disabled={isLoading}
                 >

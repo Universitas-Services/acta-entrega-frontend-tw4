@@ -324,11 +324,30 @@ export const createActaMaximaAutoridad = async (
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
 
+    // Creamos un nuevo objeto solo con los valores válidos
+    const cleanMetadata: Record<string, unknown> = {};
+
+    Object.keys(data).forEach((key) => {
+      // Tipamos la llave para acceder a data con seguridad
+      const typedKey = key as keyof typeof data;
+      let value: unknown = data[typedKey];
+
+      // Normalización de "NO APLICA"
+      if (typeof value === 'string' && value === 'NO APLICA') {
+        value = 'NO_APLICA';
+      }
+
+      // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
+      if (value !== null && value !== undefined && value !== '') {
+        cleanMetadata[key] = value;
+      }
+    });
+
     // AÑADIMOS EL TIPO AL CUERPO
     const body = {
       type: 'MAXIMA_AUTORIDAD_GRATIS',
       nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
-      metadata: data,
+      metadata: cleanMetadata,
     };
 
     // Crear el acta
@@ -366,11 +385,30 @@ export const createActaSalientePaga = async (
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
 
+    // Creamos un nuevo objeto solo con los valores válidos
+    const cleanMetadata: Record<string, unknown> = {};
+
+    Object.keys(data).forEach((key) => {
+      // Tipamos la llave para acceder a data con seguridad
+      const typedKey = key as keyof typeof data;
+      let value: unknown = data[typedKey];
+
+      // Normalización de "NO APLICA"
+      if (typeof value === 'string' && value === 'NO APLICA') {
+        value = 'NO_APLICA';
+      }
+
+      // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
+      if (value !== null && value !== undefined && value !== '') {
+        cleanMetadata[key] = value;
+      }
+    });
+
     // AÑADIMOS EL TIPO AL CUERPO
     const body = {
       type: 'SALIENTE_GRATIS',
-      nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
-      metadata: data,
+      nombreEntidad: data.nombreOrgano,
+      metadata: cleanMetadata,
     };
 
     // Crear el acta
@@ -410,11 +448,30 @@ export const createActaEntrante = async (
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
 
+    // Creamos un nuevo objeto solo con los valores válidos
+    const cleanMetadata: Record<string, unknown> = {};
+
+    Object.keys(data).forEach((key) => {
+      // Tipamos la llave para acceder a data con seguridad
+      const typedKey = key as keyof typeof data;
+      let value: unknown = data[typedKey];
+
+      // Normalización de "NO APLICA"
+      if (typeof value === 'string' && value === 'NO APLICA') {
+        value = 'NO_APLICA';
+      }
+
+      // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
+      if (value !== null && value !== undefined && value !== '') {
+        cleanMetadata[key] = value;
+      }
+    });
+
     // AÑADIMOS EL TIPO AL CUERPO
     const body = {
       type: 'ENTRANTE_GRATIS',
       nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
-      metadata: data,
+      metadata: cleanMetadata,
     };
 
     // Crear el acta
@@ -452,10 +509,30 @@ export const createActaMaximaAutoridadPro = async (
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
 
+    // Creamos un nuevo objeto solo con los valores válidos
+    const cleanMetadata: Record<string, unknown> = {};
+
+    Object.keys(data).forEach((key) => {
+      // Tipamos la llave para acceder a data con seguridad
+      const typedKey = key as keyof typeof data;
+      let value: unknown = data[typedKey];
+
+      // Normalización de "NO APLICA"
+      if (typeof value === 'string' && value === 'NO APLICA') {
+        value = 'NO_APLICA';
+      }
+
+      // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
+      if (value !== null && value !== undefined && value !== '') {
+        cleanMetadata[key] = value;
+      }
+    });
+
+    // AÑADIMOS EL TIPO AL CUERPO
     const body = {
       type: 'MAXIMA_AUTORIDAD_PAGA',
       nombreEntidad: data.nombreOrgano,
-      metadata: data,
+      metadata: cleanMetadata,
     };
 
     const response = await apiClient.post<ActaResponse>('/actas', body, {
@@ -486,10 +563,30 @@ export const createActaSalientePro = async (
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
 
+    // Creamos un nuevo objeto solo con los valores válidos
+    const cleanMetadata: Record<string, unknown> = {};
+
+    Object.keys(data).forEach((key) => {
+      // Tipamos la llave para acceder a data con seguridad
+      const typedKey = key as keyof typeof data;
+      let value: unknown = data[typedKey];
+
+      // Normalización de "NO APLICA"
+      if (typeof value === 'string' && value === 'NO APLICA') {
+        value = 'NO_APLICA';
+      }
+
+      // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
+      if (value !== null && value !== undefined && value !== '') {
+        cleanMetadata[key] = value;
+      }
+    });
+
+    // AÑADIMOS EL TIPO AL CUERPO
     const body = {
       type: 'SALIENTE_PAGA',
       nombreEntidad: data.nombreOrgano,
-      metadata: data,
+      metadata: cleanMetadata,
     };
 
     const response = await apiClient.post<ActaResponse>('/actas', body, {
@@ -520,10 +617,30 @@ export const createActaEntrantePro = async (
       throw new Error('No estás autenticado. Por favor, inicia sesión.');
     }
 
+    // Creamos un nuevo objeto solo con los valores válidos
+    const cleanMetadata: Record<string, unknown> = {};
+
+    Object.keys(data).forEach((key) => {
+      // Tipamos la llave para acceder a data con seguridad
+      const typedKey = key as keyof typeof data;
+      let value: unknown = data[typedKey];
+
+      // Normalización de "NO APLICA"
+      if (typeof value === 'string' && value === 'NO APLICA') {
+        value = 'NO_APLICA';
+      }
+
+      // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
+      if (value !== null && value !== undefined && value !== '') {
+        cleanMetadata[key] = value;
+      }
+    });
+
+    // AÑADIMOS EL TIPO AL CUERPO
     const body = {
       type: 'ENTRANTE_PAGA',
       nombreEntidad: data.nombreOrgano,
-      metadata: data,
+      metadata: cleanMetadata,
     };
 
     const response = await apiClient.post<ActaResponse>('/actas', body, {
@@ -585,10 +702,10 @@ export const downloadCompliance = async (
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    // Nombre sugerido: Compliance-Numero.docx o similar
+    // Nombre sugerido: Compliance-Numero.pdf o similar
     link.setAttribute(
       'download',
-      `Compliance-${numeroCompliance || 'Borrador'}.docx`
+      `Compliance-${numeroCompliance || 'Borrador'}.pdf`
     );
     document.body.appendChild(link);
     link.click();

@@ -4,9 +4,8 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useModalStore } from '@/stores/useModalStore';
-import { logoutUser } from '@/services/authService';
 import { useSidebarStore } from '@/stores/useSidebarStore';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { NavItem, NavSubItem, proNav } from '@/config/sidebar-nav';
 import { cn, getInitials } from '@/lib/utils';
@@ -56,6 +55,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { BsArrowBarLeft, BsPerson } from 'react-icons/bs';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 export function SidebarPro() {
   const {
@@ -68,19 +68,20 @@ export function SidebarPro() {
   const pathname = usePathname();
   const { basic, logout } = useAuthStore();
   const { open: openModal } = useModalStore();
-  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [openCollapsible, setOpenCollapsible] = useState<string>('');
   const [openPanelDropdown, setOpenPanelDropdown] = useState<string>('');
+  const { showLoader } = useLoaderStore();
 
   const handleLogoutClick = () => {
     openModal('logoutConfirmation', {
       title: '¿Ya te vas?',
       description: 'Estás a punto de cerrar tu sesión actual.',
       onConfirm: async () => {
-        await logoutUser();
-        logout();
-        router.push('/login');
+        showLoader();
+        //await logoutUser();
+        logout(); // Limpia el estado de autenticación en el store
+        //router.push('/login');
       },
     });
   };
@@ -227,6 +228,7 @@ export function SidebarPro() {
                           {/* Botón solo con icono */}
                           <GuardedButton
                             href="#" // No navega
+                            isNavigation={false} // No es navegación
                             variant="ghost"
                             className={cn(
                               'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden justify-center rounded-none',
@@ -281,6 +283,7 @@ export function SidebarPro() {
                       {/* Botón con texto y flecha */}
                       <GuardedButton
                         href="#" // No navega
+                        isNavigation={false} // No es navegación
                         variant="ghost"
                         className={cn(
                           'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden w-full justify-between py-2 px-3 rounded-none',
@@ -420,7 +423,7 @@ export function SidebarPro() {
                 </TooltipTrigger>
 
                 <DropdownMenuContent
-                  className="w-56 bg-dropdownperfil-pro"
+                  className="w-56 bg-card"
                   align="end"
                   forceMount
                   side={isDesktop ? 'right' : 'top'}

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 interface CardProProps {
   href: string;
@@ -17,9 +18,15 @@ export function CardPro({
   description,
   className,
 }: CardProProps) {
+  const { showLoader } = useLoaderStore();
+
   return (
     // Link para que toda la tarjeta sea navegable
-    <Link href={href} className={cn('block w-full max-w-4xl', className)}>
+    <Link
+      href={href}
+      onClick={() => showLoader()}
+      className={cn('block w-full max-w-4xl', className)}
+    >
       <div
         className={cn(
           // --- Contenedor Principal y Posicionamiento ---

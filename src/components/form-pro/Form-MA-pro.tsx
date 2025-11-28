@@ -68,6 +68,7 @@ import {
 import { cn } from '@/lib/utils';
 import { CiCircleCheck } from 'react-icons/ci';
 import { Spinner } from '@/components/ui/spinner';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 // Tipado del formulario usando el schema importado
 type FormData = z.infer<typeof actaMaximaAutoridadProSchema>;
@@ -92,6 +93,7 @@ export function ActaMaximaAutoridadProForm() {
   });
   const [erroredSteps, setErroredSteps] = useState<number[]>([]);
   const [isFormGloballyValid, setIsFormGloballyValid] = useState(false);
+  const { showLoader } = useLoaderStore();
 
   // --- ESTADO PARA RASTREAR ---
   const [hasReachedStep3, setHasReachedStep3] = useState(false);
@@ -340,6 +342,8 @@ export function ActaMaximaAutoridadProForm() {
       // Pequeño delay artificial (800ms) para que el usuario lea "Guardando..."
       // Esto evita el "flickeo" rápido y da sensación de proceso robusto.
       await new Promise((resolve) => setTimeout(resolve, 800));
+
+      showLoader();
 
       // Redirección
       router.push('/dashboard/panel-de-actas/elaboracion');
@@ -1753,6 +1757,8 @@ export function ActaMaximaAutoridadProForm() {
           title={dialogContent.title}
           description={dialogContent.description}
           onConfirm={() => {
+            // ACTIVAR LOADER ANTES DE REDIRIGIR
+            showLoader();
             //setShowSuccessDialog(false);
             router.push('/dashboard/panel-de-actas/elaboracion');
           }}

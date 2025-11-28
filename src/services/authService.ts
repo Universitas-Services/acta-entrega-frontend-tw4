@@ -52,6 +52,12 @@ export interface IUser {
   profileCompleted: boolean;
 }
 
+// Tipo para el cambio de contraseña
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
+}
+
 // --- Funciones de Autenticación (Login/Logout/Refresh/Profile) ---
 
 // Usa axiosPublic
@@ -315,6 +321,29 @@ export const deleteAccount = async (
     if (isAxiosError(error) && error.response) {
       throw new Error(
         error.response.data.message || 'Error al eliminar la cuenta.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+/**
+ * Cambia la contraseña del usuario autenticado.
+ * Endpoint: POST /users/password/change
+ */
+export const changePassword = async (
+  data: ChangePasswordData
+): Promise<{ message: string }> => {
+  try {
+    const response = await apiClient.post<{ message: string }>(
+      '/users/password/change',
+      data
+    );
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al cambiar la contraseña.'
       );
     }
     throw new Error('No se pudo conectar con el servidor.');

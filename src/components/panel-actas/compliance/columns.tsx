@@ -88,8 +88,8 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
           onClick={handleViewObservations}
           title="Ver Observaciones"
         >
-          <BsEye className="h-4 w-4 mr-2" />
-          Ver
+          <BsEye className="h-4 w-4" />
+          Ver Obs
         </Button>
 
         <DropdownMenu>

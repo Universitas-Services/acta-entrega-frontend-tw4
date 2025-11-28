@@ -134,6 +134,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     // Obtenemos el REFRESH token para invalidarlo
     const tokenToInvalidate = getRefreshToken();
+    const accessToken = getAccessToken();
 
     clearAuthStorage(); // Limpiar nuestro localStorage
 
@@ -146,13 +147,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
     console.log('useAuthStore: Estado de autenticación limpiado.');
 
-    if (tokenToInvalidate) {
+    if (tokenToInvalidate && accessToken) {
       // Enviamos el refreshToken en el body
       axiosPublic
         .post(
           '/auth/logout',
-          { refreshToken: tokenToInvalidate } // El token va aquí
-          // Sin cabecera 'Authorization'
+          { refreshToken: tokenToInvalidate }, // El token va aquí
+          {
+            // INYECTAMOS EL HEADER MANUALMENTE
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
         )
         .catch((err) => {
           console.error(

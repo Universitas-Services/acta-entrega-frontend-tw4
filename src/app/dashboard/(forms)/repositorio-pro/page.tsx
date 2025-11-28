@@ -7,14 +7,14 @@ import { RepoCardPro } from '@/components/RepoCardPro';
 // Data
 const cardData = [
   {
-    imageUrl: '/repositorio/Consideraciones-generales.png',
+    imageUrl: '/repositorio-pro/Consideraciones generales.png',
     description:
       'Para garantizar un proceso de entrega-recepción transparente, te invitamos a leer detenidamente las siguientes consideraciones.',
     buttonText: 'Ingrese aquí',
     linkHref: 'https://universitas.legal/consideraciones-generales/',
   },
   {
-    imageUrl: '/repositorio/descargar-resolucion.png',
+    imageUrl: '/repositorio-pro/REPOSITORIO LEGAL.png',
     description: 'Descarga la Resolución CGR N°01-000162 de fecha 27-07-2009.',
     buttonText: 'Descarga aquí',
     linkHref:
@@ -23,49 +23,49 @@ const cardData = [
   {
     imageUrl: '/repositorio/imagen curso para APP.png',
     description:
-      'Programa esencial para la elaboración y gestión de Actas de Entrega. Profundiza en el marco jurídico clave.',
+      'Profundiza en el marco jurídico y los procedimientos clave, asegurando la transparencia y mitigación de riesgos en la administración pública.',
     buttonText: 'Más información',
     linkHref: 'https://universitas.academy/cursos/actas-de-entrega/',
   },
   {
-    imageUrl: '/repositorio/control-fiscal.png',
+    imageUrl: '/repositorio-pro/ARTICULO AGORA 1.png',
     description:
-      'Fortalece tus competencias en auditoría con las Jornadas de Control Fiscal. Ponencias y material exclusivo.',
+      'Tienes 120 días para formular observaciones a un acta recibida. Descubre en este análisis los puntos clave que debes verificar para un control fiscal efectivo.',
     buttonText: 'Ingrese aquí',
     linkHref: 'https://universitas.legal/jornadas-de-control-fiscal/',
   },
   {
-    imageUrl: '/repositorio/biblioteca-contrataciones.png',
+    imageUrl: '/repositorio-pro/ARTICULO AGORA 2.png',
     description:
-      'Optimiza tus procesos con la Biblioteca Legal de Universitas. Normativa especializada y jurisprudencia.',
+      'La Unidad de Auditoría Interna es el actor clave en la verificación. Conoce sus competencias, responsabilidades y el procedimiento que debe seguir para validar las actas.',
     buttonText: 'Ingrese aquí',
     linkHref: 'https://universitas.legal/biblioteca-contratacion-publica/',
   },
   {
-    imageUrl: '/repositorio/biblioteca-ordenanzas.png',
+    imageUrl: '/repositorio-pro/ARTICULO AGORA 3.png',
     description:
-      'Biblioteca de Ordenanzas Municipales. Explora decretos y resoluciones de cientos de municipios.',
+      'El acta de entrega es más que un requisito; es una herramienta clave del Control Interno. Descubre cómo su correcta verificación previene riesgos y fortalece la gestión.',
     buttonText: 'Ingrese aquí',
     linkHref: 'https://universitas.legal/biblioteca-de-ordenanzas-municipales/',
   },
   {
     imageUrl: '/repositorio/control-fiscal.png',
     description:
-      'Fortalece tus competencias en auditoría con las Jornadas de Control Fiscal. Ponencias y material exclusivo.',
+      'Accede a un compendio normativo completo, doctrina administrativa y jurisprudencia esencial para fortalecer el control fiscal en todos los niveles del sector público.',
     buttonText: 'Ingrese aquí',
     linkHref: 'https://universitas.legal/jornadas-de-control-fiscal/',
   },
   {
     imageUrl: '/repositorio/biblioteca-contrataciones.png',
     description:
-      'Optimiza tus procesos con la Biblioteca Legal de Universitas. Normativa especializada y jurisprudencia.',
+      'Accede a normativa especializada, doctrina administrativa y jurisprudencia clave para garantizar contrataciones públicas sostenibles, transparentes y ajustadas al interés general.',
     buttonText: 'Ingrese aquí',
     linkHref: 'https://universitas.legal/biblioteca-contratacion-publica/',
   },
   {
     imageUrl: '/repositorio/biblioteca-ordenanzas.png',
     description:
-      'Biblioteca de Ordenanzas Municipales. Explora decretos y resoluciones de cientos de municipios.',
+      'Explora y descarga decretos, acuerdos y resoluciones de cientos de municipios, con acceso abierto y colaborativo para impulsar gobiernos más transparentes, eficientes y conectados con su comunidad.',
     buttonText: 'Ingrese aquí',
     linkHref: 'https://universitas.legal/biblioteca-de-ordenanzas-municipales/',
   },

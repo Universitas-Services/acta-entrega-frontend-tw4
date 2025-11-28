@@ -31,21 +31,24 @@ const cardData = [
     description:
       'Tienes 120 días para formular observaciones a un acta recibida. Descubre en este análisis los puntos clave que debes verificar para un control fiscal efectivo.',
     buttonText: 'Ingrese aquí',
-    linkHref: '',
+    linkHref:
+      'https://agora.universitasfundacion.com/verificacion-de-acta-de-entrega/',
   },
   {
     imageUrl: '/repositorio-pro/ARTICULO AGORA 2.png',
     description:
       'La Unidad de Auditoría Interna es el actor clave en la verificación. Conoce sus competencias, responsabilidades y el procedimiento que debe seguir para validar las actas.',
     buttonText: 'Ingrese aquí',
-    linkHref: '',
+    linkHref:
+      'https://agora.universitasfundacion.com/acta-de-entrega-verificacion/',
   },
   {
     imageUrl: '/repositorio-pro/ARTICULO AGORA 3.png',
     description:
       'El acta de entrega es más que un requisito; es una herramienta clave del Control Interno. Descubre cómo su correcta verificación previene riesgos y fortalece la gestión.',
     buttonText: 'Ingrese aquí',
-    linkHref: '',
+    linkHref:
+      'https://agora.universitasfundacion.com/verificacion-acta-de-entrega/',
   },
   {
     imageUrl: '/repositorio/control-fiscal.png',

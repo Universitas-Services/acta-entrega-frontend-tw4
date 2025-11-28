@@ -7,7 +7,7 @@ import { useModalStore } from '@/stores/useModalStore';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { usePathname } from 'next/navigation';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { mainNav } from '@/config/sidebar-nav';
+import { mainNav, NavItem } from '@/config/sidebar-nav';
 import { cn, getInitials } from '@/lib/utils';
 import { FiInfo, FiUser } from 'react-icons/fi';
 import {
@@ -89,6 +89,27 @@ export function SidebarExpress() {
     handleNavigation(); // Lógica de cerrar menú móvil
   };
 
+  // --- Helper para renderizar Ícono o Imagen ---
+  const renderIcon = (item: NavItem) => {
+    if (item.src) {
+      return (
+        <div className="relative h-5 w-5 shrink-0">
+          <Image
+            src={item.src}
+            alt={item.title}
+            fill
+            className="object-contain"
+          />
+        </div>
+      );
+    }
+    if (item.icon) {
+      const Icon = item.icon;
+      return <Icon className="h-5 w-5 shrink-0" />;
+    }
+    return null;
+  };
+
   const sidebarContent = (
     <>
       <TooltipProvider key={isDesktopCollapsed ? 'collapsed' : 'expanded'}>
@@ -140,7 +161,7 @@ export function SidebarExpress() {
                         pathname === item.href && 'bg-sidebar-primary font-bold'
                       )}
                     >
-                      <item.icon className="h-5 w-5 shrink-0" />
+                      {renderIcon(item)}
                       <span
                         className={cn(
                           'grow text-left',

@@ -119,7 +119,7 @@ export default function ActasPage() {
       <div className="flex h-full w-full flex-col items-center justify-center gap-4 min-h-[calc(100vh-10rem)]">
         <Spinner className="h-12 w-12 text-primary animate-spin" />
         <p className="text-muted-foreground text-sm animate-pulse">
-          Cargando panel de actas...
+          Cargando panel de elaboración...
         </p>
       </div>
     );

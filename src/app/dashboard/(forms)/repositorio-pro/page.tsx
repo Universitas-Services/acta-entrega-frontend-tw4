@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useHeader } from '@/context/HeaderContext';
 import { RepoCardPro } from '@/components/RepoCardPro';
 
-// Data
 const cardData = [
   {
     imageUrl: '/repositorio-pro/Consideraciones generales.png',
@@ -32,21 +31,21 @@ const cardData = [
     description:
       'Tienes 120 días para formular observaciones a un acta recibida. Descubre en este análisis los puntos clave que debes verificar para un control fiscal efectivo.',
     buttonText: 'Ingrese aquí',
-    linkHref: 'https://universitas.legal/jornadas-de-control-fiscal/',
+    linkHref: '',
   },
   {
     imageUrl: '/repositorio-pro/ARTICULO AGORA 2.png',
     description:
       'La Unidad de Auditoría Interna es el actor clave en la verificación. Conoce sus competencias, responsabilidades y el procedimiento que debe seguir para validar las actas.',
     buttonText: 'Ingrese aquí',
-    linkHref: 'https://universitas.legal/biblioteca-contratacion-publica/',
+    linkHref: '',
   },
   {
     imageUrl: '/repositorio-pro/ARTICULO AGORA 3.png',
     description:
       'El acta de entrega es más que un requisito; es una herramienta clave del Control Interno. Descubre cómo su correcta verificación previene riesgos y fortalece la gestión.',
     buttonText: 'Ingrese aquí',
-    linkHref: 'https://universitas.legal/biblioteca-de-ordenanzas-municipales/',
+    linkHref: '',
   },
   {
     imageUrl: '/repositorio/control-fiscal.png',
@@ -79,13 +78,6 @@ export default function RepositorioLegalProPage() {
   }, [setTitle]);
 
   return (
-    /* ------------------------------------------------------------
-       CAMBIO APLICADO AQUÍ: 
-       Se agregó 'pb-24' (Padding Bottom grande) al contenedor principal.
-       Esto crea un espacio vacío al final de la página para que las
-       últimas tarjetas no queden pegadas al borde inferior del navegador.
-       ------------------------------------------------------------
-    */
     <div className="w-full p-4 md:p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-center mx-auto max-w-7xl">
         {cardData.map((card, index) => (

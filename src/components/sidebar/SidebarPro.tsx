@@ -105,8 +105,28 @@ export function SidebarPro() {
     }
   }, [pathname]);
 
+  // --- Helper para renderizar Ícono o Imagen ---
+  const renderIcon = (item: NavItem) => {
+    if (item.src) {
+      return (
+        <div className="relative h-5 w-5 shrink-0">
+          <Image
+            src={item.src}
+            alt={item.title}
+            fill
+            className="object-contain"
+          />
+        </div>
+      );
+    }
+    if (item.icon) {
+      const Icon = item.icon;
+      return <Icon className="h-5 w-5 shrink-0" />;
+    }
+    return null;
+  };
+
   // --- Componente de Botón de Navegación reutilizable ---
-  // Esto simplifica la lógica de renderizado
   const NavButton = ({
     item,
     className,
@@ -135,7 +155,7 @@ export function SidebarPro() {
               className // Permite pasar clases extra
             )}
           >
-            <Icon className="h-5 w-5 shrink-0" />
+            {renderIcon(item)}
             <span
               className={cn(
                 'grow text-left',
@@ -237,7 +257,7 @@ export function SidebarPro() {
                               openCollapsible === item.id && 'font-bold'
                             )}
                           >
-                            <item.icon className="h-5 w-5 shrink-0" />
+                            {renderIcon(item)}
                           </GuardedButton>
                         </DropdownMenuTrigger>
                       </TooltipTrigger>
@@ -293,7 +313,7 @@ export function SidebarPro() {
                         )}
                       >
                         <div className="flex items-center gap-3">
-                          <item.icon className="h-5 w-5 shrink-0" />
+                          {renderIcon(item)}
                           <span className="grow text-left whitespace-nowrap">
                             {item.title}
                           </span>

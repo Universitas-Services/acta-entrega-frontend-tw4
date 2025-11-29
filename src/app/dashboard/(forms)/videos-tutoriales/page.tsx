@@ -77,7 +77,7 @@ export default function RepositorioLegalProPage() {
   const { setTitle } = useHeader();
 
   useEffect(() => {
-    setTitle('Repositorio legal');
+    setTitle('Videos tutoriales');
   }, [setTitle]);
 
   return (

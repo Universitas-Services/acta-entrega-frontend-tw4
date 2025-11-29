@@ -5,14 +5,12 @@ import { LuLayoutDashboard } from 'react-icons/lu';
 import { FiHelpCircle } from 'react-icons/fi';
 import { LiaRobotSolid } from 'react-icons/lia';
 import { IoCreateOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
-import { string } from 'zod';
 
 export interface NavItem {
   title: string;
   href: string;
-  icon: IconType;
+  icon?: IconType;
   subItems?: NavItem[];
-  // 'id' o 'value' para el Collapsible/Accordion
   id: string;
   src?: string;
 }
@@ -114,5 +112,11 @@ export const proNav: NavItem[] = [
     title: 'Consultor IA',
     href: '/dashboard/consultoria',
     icon: LiaRobotSolid,
+  },
+  {
+    id: 'pro-conocenos',
+    title: 'Conócenos',
+    href: '/dashboard/conocenos-pro',
+    src: '/Icono - trazo - universitas.png',
   },
 ];

@@ -71,7 +71,7 @@ export default function AsistenteVirtualPage() {
     setIsLoading(true);
 
     try {
-      const response = await apiClient.post('/ai/detectIntent', {
+      const response = await apiClient.post('/ai/message', {
         message: input,
         sessionId: sessionId,
       });
@@ -96,8 +96,8 @@ export default function AsistenteVirtualPage() {
     <div className="h-full flex justify-center">
       <div className="flex flex-col h-full w-full max-w-4xl bg-slate-50 border rounded-lg shadow-xl">
         <div className="flex items-center p-4 border-b bg-white rounded-t-lg">
-          {/* ▼▼▼ 1. IMAGEN EN LA CABECERA ▼▼▼ */}
-          <Avatar className="h-10 w-10 mr-4">
+          {/* IMAGEN EN LA CABECERA */}
+          <Avatar className="h-10 w-10 mr-4 rounded-xl">
             <AvatarImage src="/ia/julioAI.jpg" alt="AsesorIA" />
             <AvatarFallback>IA</AvatarFallback>
           </Avatar>
@@ -116,8 +116,8 @@ export default function AsistenteVirtualPage() {
               )}
             >
               {!msg.isUser && (
-                // ▼▼▼ 2. IMAGEN EN LOS MENSAJES DEL BOT ▼▼▼
-                <Avatar className="h-8 w-8">
+                // IMAGEN EN LOS MENSAJES DEL BOT
+                <Avatar className="h-8 w-8 rounded-xl">
                   <AvatarImage src="/ia/julioAI.jpg" alt="AsesorIA" />
                   <AvatarFallback className="bg-primary-blue text-white">
                     IA
@@ -128,7 +128,7 @@ export default function AsistenteVirtualPage() {
                 className={cn(
                   'max-w-md p-3 rounded-lg shadow-sm',
                   msg.isUser
-                    ? 'bg-primary-blue text-white rounded-br-none'
+                    ? 'bg-primary-blue text-gray-800 rounded-br-none'
                     : 'bg-white text-gray-800 rounded-bl-none'
                 )}
               >

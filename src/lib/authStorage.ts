@@ -94,6 +94,8 @@ export const clearAuthStorage = () => {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     //localStorage.removeItem(USER_DATA_KEY);
     localStorage.removeItem(BASIC_USER_DATA_KEY); // Limpiar también la nueva clave
+    localStorage.removeItem('chatMessages'); // Limpiar mensajes del chat
+    localStorage.removeItem('chatSessionId'); // Limpiar ID de sesión del chat
   }
 };
 

@@ -560,7 +560,6 @@ export function ComplianceForm() {
                   name="nombreOrgano"
                   label="Nombre del órgano, entidad, oficina o dependencia de la Administración Pública"
                   maxLength={50}
-                  validationType="textOnly"
                 />
                 <FormFieldWithExtras
                   name="nombreUnidad"
@@ -1059,7 +1058,7 @@ export function ComplianceForm() {
               <div className="space-y-4">
                 <SiNoQuestion
                   name="interesProducto"
-                  label="Nos complace que haya completado su autoevaluación. ¿Le gustaría recibir información para obtener la versión Pro con acceso a funcionalidades avanzadas?"
+                  label="Su proceso de autoevaluación ha concluido exitosamente.¿Le gustaría recibir información sobre nuestra asesoría personalizada con nuestro equipo de expertos para interpretar sus resultados?"
                   options={['SI', 'NO']}
                 />
                 {/* Mensaje de finalización condicional */}
@@ -1067,15 +1066,18 @@ export function ComplianceForm() {
                   <div className="text-center p-6 mt-8 bg-gray-50 rounded-lg border border-dashed transition-opacity duration-500">
                     <CiCircleCheck className="mx-auto h-12 w-12 text-green5" />
                     <h3 className="mt-4 text-xl font-semibold text-g8">
-                      ¡Ha completado la Autoevaluación!
+                      ¡Registro Exitoso de la Autoevaluación!
                     </h3>
                     <p className="mt-2 text-sm text-gray-600">
-                      Ha llenado exitosamente el formulario. Por favor, revise
-                      los datos en los pasos anteriores usando la paginación o
-                      el botón Anterior.
+                      Para garantizar la exactitud de su información, le
+                      solicitamos <b>revisar</b> los datos registrados en las
+                      secciones previas. Puede navegar y verificar la
+                      información utilizando la <b>paginación</b> o el botón{' '}
+                      <b>Anterior</b>.
                       <br />
-                      Una vez que esté seguro, presione el botón{' '}
-                      <b>Finalizar Autoevaluación</b>.
+                      Una vez confirmada la veracidad de la información, proceda
+                      a hacer clic en el botón
+                      <b>Finalizar autoevaluación</b>.
                     </p>
                   </div>
                 )}
@@ -1150,7 +1152,7 @@ export function ComplianceForm() {
                 variant="default"
                 className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white"
               >
-                {isLoading ? 'Enviando...' : 'Finalizar Autoevaluación'}
+                {isLoading ? 'Enviando...' : 'Finalizar autoevaluación'}
               </Button>
             )}
           </div>

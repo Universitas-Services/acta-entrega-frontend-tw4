@@ -1522,12 +1522,12 @@ export function ActaSalienteProForm() {
                     <>
                       <CiCircleCheck className="mx-auto h-12 w-12 text-green5" />
                       <h3 className="mt-4 text-xl font-semibold text-g8">
-                        ¡Ha completado el formulsario!
+                        ¡Has completado el formulario!
                       </h3>
                       <p className="mt-2 text-sm text-gray-600">
                         Ha llenado exitosamente el acta de entrega. Por favor,
-                        revise los datos en los pasos anteriores usando el botón
-                        Anterior.
+                        revise los datos en los pasos anteriores usando el botón{' '}
+                        <b>Anterior.</b>
                         <br />
                         Una vez que esté seguro, presione <b>Crear acta</b> para
                         generar el documento final.

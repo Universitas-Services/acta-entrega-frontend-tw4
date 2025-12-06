@@ -129,7 +129,7 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
           <BsEye className="h-4 w-4" />
           Ver Obs
         </Button>
-
+        {/* Menú desplegable para más acciones */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
@@ -146,7 +146,7 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
               onClick={handleViewObservations}
             >
               <BsEye className="mr-2 h-4 w-4" />
-              Ver Observaciones
+              Ver observaciones
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

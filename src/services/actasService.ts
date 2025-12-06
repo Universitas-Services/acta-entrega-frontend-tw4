@@ -774,6 +774,37 @@ export const sendComplianceEmail = async (id: string) => {
 };
 
 /**
+ * 1. TRIGGER: Dispara el análisis de IA.
+ * Se llama internamente después de crear el acta.
+ */
+export const triggerComplianceAnalysis = async (id: number | string) => {
+  try {
+    // Asumimos que este endpoint inicia el proceso en background
+    await apiClient.post(`/acta-compliance/${id}/analisis-ia`);
+    console.log(`Análisis IA disparado para el acta ${id}`);
+  } catch (error) {
+    // No lanzamos error para no interrumpir el flujo del usuario,
+    // pero logueamos que el análisis automático falló al iniciarse.
+    console.error('Error al disparar el análisis de IA:', error);
+  }
+};
+
+/**
+ * 2. GET: Obtiene las observaciones ya generadas.
+ * Se usa en el Panel de Actas al abrir el Sheet.
+ */
+export const getObservacionesCompliance = async (id: number | string) => {
+  try {
+    const response = await apiClient.get(`/acta-compliance/${id}/analisis-ia`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener observaciones:', error);
+    // Si da 404 es posible que aún no existan, devolvemos null o array vacío
+    return null;
+  }
+};
+
+/**
  * Llama al endpoint /acta-compliance para GUARDAR un formulario de Compliance.
  * Mapea los datos y FILTRA los campos vacíos para no romper la validación del backend.
  */
@@ -1034,6 +1065,14 @@ export const createActaCompliance = async (
         headers: { Authorization: `Bearer ${token}` },
       }
     );
+
+    // Si se guardó con éxito, DISPARAR EL ANÁLISIS IA (Fire and forget)
+    // No usamos 'await' bloqueante estricto si tarda mucho,
+    // pero aquí lo llamamos para asegurar que el backend reciba la orden.
+    if (response.data && response.data.id) {
+      // Ejecutamos la petición sin detener el retorno de la respuesta principal
+      triggerComplianceAnalysis(response.data.id);
+    }
 
     return response.data;
   } catch (error) {

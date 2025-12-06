@@ -55,7 +55,7 @@ const cardData = [
     description:
       'Accede a un compendio normativo completo, doctrina administrativa y jurisprudencia esencial para fortalecer el control fiscal en todos los niveles del sector público.',
     buttonText: 'Ingrese aquí',
-    linkHref: 'https://universitas.legal/jornadas-de-control-fiscal/',
+    linkHref: 'https://universitas.legal/control-fiscal/',
   },
   {
     imageUrl: '/repositorio/biblioteca-contrataciones.png',

@@ -31,7 +31,7 @@ export const mainNav: NavItem[] = [
   },
   {
     id: 'main-repositorio',
-    title: 'Repositorio Legal',
+    title: 'Repositorio legal',
     href: '/dashboard/repositorio',
     icon: AiOutlineBook,
   },
@@ -43,13 +43,13 @@ export const mainNav: NavItem[] = [
   },
   {
     id: 'main-panel-actas',
-    title: 'Panel de Actas',
+    title: 'Panel de actas',
     href: '/dashboard/panel-actas',
     icon: LuLayoutDashboard,
   },
   {
     id: 'main-faq',
-    title: 'Preguntas Frecuentes',
+    title: 'Preguntas frecuentes',
     href: '/dashboard/faq',
     icon: FiHelpCircle,
   },
@@ -77,7 +77,7 @@ export const proNav: NavItem[] = [
   },
   {
     id: 'pro-panel-actas',
-    title: 'Panel de Actas',
+    title: 'Panel de actas',
     href: '#', // El padre no navega
     icon: LuLayoutDashboard,
     subItems: [
@@ -97,7 +97,7 @@ export const proNav: NavItem[] = [
   },
   {
     id: 'pro-repositorio',
-    title: 'Repositorio Legal',
+    title: 'Repositorio legal',
     href: '/dashboard/repositorio-pro',
     icon: AiOutlineBook,
   },

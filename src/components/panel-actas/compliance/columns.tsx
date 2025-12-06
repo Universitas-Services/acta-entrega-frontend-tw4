@@ -6,6 +6,7 @@ import {
   ComplianceActa,
   downloadCompliance,
   sendComplianceEmail,
+  getObservacionesCompliance,
 } from '@/services/actasService';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -39,12 +40,46 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
   // Estado para controlar la apertura del Sheet
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
+  // Estados para manejar las observaciones y la carga
+  const [observacionesData, setObservacionesData] = useState<string | null>(
+    null
+  );
+  const [isLoadingObservations, setIsLoadingObservations] = useState(false);
+
+  // Función para refrescar la tabla
   const refreshTable = () => {
     (table.options.meta as TableMeta)?.onRefresh?.();
   };
 
-  const handleViewObservations = () => {
+  // Manejo de la visualización de observaciones
+  const handleViewObservations = async () => {
+    // Abrir el Sheet inmediatamente
     setIsSheetOpen(true);
+
+    // Activar spinner (loading)
+    setIsLoadingObservations(true);
+    setObservacionesData(null); // Limpiar data previa si la hubiera
+
+    try {
+      // Intentar traer las observaciones (GET)
+      const data = await getObservacionesCompliance(acta.id);
+
+      // Aseguramos que lo que guardamos sea un string o null
+      if (typeof data === 'string') {
+        setObservacionesData(data);
+      } else if (data && typeof data === 'object') {
+        // Si por error llega un objeto, lo convertimos a string para evitar fallos
+        setObservacionesData(JSON.stringify(data, null, 2));
+      } else {
+        setObservacionesData(null);
+      }
+    } catch (error) {
+      console.error('Error cargando observaciones', error);
+      toast.error('No se pudieron cargar las observaciones.');
+    } finally {
+      // Desactivar spinner
+      setIsLoadingObservations(false);
+    }
   };
 
   const handleDownload = async () => {
@@ -75,8 +110,11 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
       <ComplianceObservationSheet
         isOpen={isSheetOpen}
         onOpenChange={setIsSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
         actaId={acta.id}
         numeroCompliance={acta.numeroCompliance || 'S/N'}
+        observaciones={observacionesData} // Data obtenida del GET
+        isLoading={isLoadingObservations} // Estado del Spinner
       />
 
       <div className="flex items-center justify-end space-x-2">

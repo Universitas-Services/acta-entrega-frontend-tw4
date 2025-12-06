@@ -7,68 +7,126 @@ import {
   SheetTitle,
   SheetDescription,
 } from '@/components/ui/sheet';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area'; // Opcional si tienes ScrollArea, si no, usaremos div nativo
-import { Separator } from '@/components/ui/separator';
+import { AlertCircle, Bot, CheckCircle } from 'lucide-react'; // Iconos sugeridos
+import { Badge } from '@/components/ui/badge';
+import { Spinner } from '@/components/ui/spinner';
 
 interface ComplianceObservationSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onClose: () => void; // Función para cerrar manualmente
   actaId: string;
   numeroCompliance: string;
+  observaciones?: string | null;
+  isLoading: boolean; // Controla el Spinner
 }
 
 export function ComplianceObservationSheet({
   isOpen,
+  onClose,
   onOpenChange,
   numeroCompliance,
+  observaciones,
+  isLoading,
 }: ComplianceObservationSheetProps) {
-  return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[400px] sm:w-[540px] flex flex-col h-full bg-white text-black">
-        {/* HEADER FIJO */}
-        <SheetHeader className="mb-4">
-          <SheetTitle className="text-xl font-bold text-primary">
-            Observaciones del Acta
-          </SheetTitle>
-          <SheetDescription className="text-sm text-muted-foreground">
-            Código:{' '}
-            <span className="font-medium text-foreground">
-              {numeroCompliance}
+  // Función auxiliar para renderizar el contenido de las observaciones
+  const renderContent = () => {
+    // 1. Caso: No hay data y no está cargando
+    if (!observaciones && !isLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center space-y-4 text-muted-foreground opacity-60">
+          <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
+            <AlertCircle className="w-10 h-10 text-gray-400" />
+          </div>
+          <p className="text-sm max-w-xs px-4">
+            Aún no hay observaciones generadas para esta acta.
+            <br />
+            <span className="text-xs italic">
+              El análisis IA se ejecuta automáticamente tras guardar. Intente
+              recargar en unos minutos.
             </span>
+          </p>
+        </div>
+      );
+    }
+
+    // 2. Caso: Data es un texto simple (String)
+    if (observaciones) {
+      return (
+        <div className="text-sm leading-relaxed text-gray-700 space-y-4 whitespace-pre-line">
+          {observaciones}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent className="w-[400px] sm:w-[600px] flex flex-col h-full bg-white shadow-xl border-l">
+        {/* HEADER */}
+        <SheetHeader className="pb-4 border-b">
+          <div className="flex items-center gap-2 text-primary mb-2">
+            <Bot className="w-5 h-5" />
+            <SheetTitle className="text-lg font-bold">
+              Análisis de observaciones
+            </SheetTitle>
+          </div>
+          <SheetDescription className="text-sm text-muted-foreground flex items-center justify-between">
+            <span>
+              Acta ID:{' '}
+              <span className="font-mono font-medium text-foreground">
+                #{numeroCompliance}
+              </span>
+            </span>
+            {isLoading && (
+              <Badge
+                variant="outline"
+                className="animate-pulse border-blue-200 text-blue-600 bg-blue-50"
+              >
+                Procesando
+              </Badge>
+            )}
           </SheetDescription>
         </SheetHeader>
 
-        <Separator />
-
-        {/* CONTENIDO ESCROLLEABLE */}
-        {/* flex-1 permite que este div ocupe el espacio restante y overflow-y-auto habilita el scroll */}
-        <div className="flex-1 overflow-y-auto py-6 pr-2">
-          {/* ESTADO VACÍO (Placeholder) */}
-          <div className="flex flex-col items-center justify-center h-full text-center space-y-4 text-muted-foreground opacity-60">
-            <div className="h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-10 h-10"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                />
-              </svg>
+        {/* CONTENIDO PRINCIPAL CON SCROLL */}
+        <ScrollArea className="flex-1 -mx-6 px-6 py-6">
+          {isLoading ? (
+            // ESTADO DE CARGA (Spinner)
+            <div className="flex flex-col items-center justify-center h-[40vh] space-y-4">
+              <Spinner className="h-10 w-10 text-primary" />
+              <div className="text-center space-y-1">
+                <p className="font-medium text-gray-900">
+                  Cargando observaciones...
+                </p>
+              </div>
             </div>
-            <p className="text-sm max-w-xs">
-              Aún no hay observaciones cargadas para esta acta de compliance.
-              <br />
-              <span className="text-xs italic">(Próximamente disponible)</span>
+          ) : (
+            // CONTENIDO REAL
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              {observaciones && (
+                <div className="mb-4 flex items-center gap-2 text-xs font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full w-fit">
+                  <CheckCircle className="w-3 h-3" />
+                  Análisis completado
+                </div>
+              )}
+              {renderContent()}
+            </div>
+          )}
+        </ScrollArea>
+
+        {/* FOOTER (Opcional, para acciones extras) */}
+        {observaciones && !isLoading && (
+          <div className="pt-4 border-t mt-auto">
+            <p className="text-[10px] text-center text-muted-foreground">
+              Este análisis fue generado por Inteligencia Artificial y debe ser
+              verificado por un experto legal.
             </p>
           </div>
-        </div>
+        )}
       </SheetContent>
     </Sheet>
   );

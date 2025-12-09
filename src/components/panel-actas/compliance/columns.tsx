@@ -119,7 +119,7 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
 
       <div className="flex items-center justify-end space-x-2">
         {/* Botón directo para ver observaciones (Abre el Sheet) */}
-        <Button
+        {/*<Button
           variant="ghost"
           size="sm"
           className="cursor-pointer text-muted-foreground hover:text-primary"
@@ -128,7 +128,7 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
         >
           <BsEye className="h-4 w-4" />
           Ver Obs
-        </Button>
+        </Button>*/}
         {/* Menú desplegable para más acciones */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -141,14 +141,14 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
             align="end"
             className="bg-white text-black min-w-[160px]"
           >
-            <DropdownMenuItem
+            {/*<DropdownMenuItem
               className="cursor-pointer"
               onClick={handleViewObservations}
             >
               <BsEye className="mr-2 h-4 w-4" />
               Ver observaciones
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator />*/}
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={handleSendEmail}

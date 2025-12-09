@@ -114,10 +114,6 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
             Editar
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer">
-            Ver observaciones
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={handleSendEmail}

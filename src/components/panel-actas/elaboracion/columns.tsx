@@ -80,7 +80,6 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDelete = async () => {
     toast.promise(deleteActa(acta.id), {
       loading: 'Eliminando...',
@@ -113,13 +112,6 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
         <DropdownMenuContent align="end" className="bg-white text-black">
           <DropdownMenuItem className="cursor-pointer" onClick={handleEdit}>
             Editar
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer">
-            Ver Observaciones
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled className="cursor-pointer">
-            Generar
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

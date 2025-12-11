@@ -229,6 +229,58 @@ export function ActaSalienteProForm() {
             setIsSavedOnce(true);
             // Actualizamos la referencia para estar sincronizados
             lastSavedIdRef.current = acta.id;
+
+            // --- Validación para redirigir al primer paso incompleto ---
+            let targetStepIndex = 0;
+            for (let i = 0; i < steps.length; i++) {
+              const stepConfig = steps[i];
+              const baseFields = stepConfig.fields;
+              const currentFieldsArray: (keyof FormData)[] = Array.isArray(
+                baseFields
+              )
+                ? (baseFields as (keyof FormData)[])
+                : [];
+
+              let fieldsToValidate: (keyof FormData)[] = currentFieldsArray;
+
+              // Lógica específica para paso 9 (índice 8) - Anexos Adicionales
+              if (i === 8) {
+                const selectedKey = form.getValues('Anexo_VII');
+                if (selectedKey && selectedKey !== 'NO APLICA') {
+                  const dynamicContent =
+                    dynamicStepContent[selectedKey as keyof DynamicContent];
+                  if (dynamicContent) {
+                    if (dynamicContent.type === 'questions') {
+                      const dynamicFields = dynamicContent.questions.map(
+                        (q) => q.name
+                      );
+                      fieldsToValidate = [
+                        ...currentFieldsArray,
+                        ...dynamicFields,
+                      ];
+                    } else if (dynamicContent.type === 'textarea') {
+                      fieldsToValidate = [
+                        ...currentFieldsArray,
+                        dynamicContent.fieldName,
+                      ];
+                    }
+                  }
+                }
+              }
+
+              if (fieldsToValidate.length > 0) {
+                // Validar silenciosamente
+                const isStepValid = await form.trigger(fieldsToValidate, {
+                  shouldFocus: false,
+                });
+                if (!isStepValid) {
+                  targetStepIndex = i;
+                  break; // Encontramos el primero con error
+                }
+              }
+            }
+            setCurrentStep(targetStepIndex);
+
             toast.success('Datos cargados correctamente.');
           }
         } catch (error) {
@@ -1522,12 +1574,12 @@ export function ActaSalienteProForm() {
                     <>
                       <CiCircleCheck className="mx-auto h-12 w-12 text-green5" />
                       <h3 className="mt-4 text-xl font-semibold text-g8">
-                        ¡Ha completado el formulsario!
+                        ¡Has completado el formulario!
                       </h3>
                       <p className="mt-2 text-sm text-gray-600">
                         Ha llenado exitosamente el acta de entrega. Por favor,
-                        revise los datos en los pasos anteriores usando el botón
-                        Anterior.
+                        revise los datos en los pasos anteriores usando el botón{' '}
+                        <b>Anterior.</b>
                         <br />
                         Una vez que esté seguro, presione <b>Crear acta</b> para
                         generar el documento final.

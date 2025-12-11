@@ -10,7 +10,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button'; // Eliminado buttonVariants que no se usaba
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,11 +18,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 import { FiEdit } from 'react-icons/fi';
 import { BsThreeDots } from 'react-icons/bs';
 import { LuArrowUpDown } from 'react-icons/lu';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 // Definimos una interfaz para el meta de la tabla (lo que pasas en data-table.tsx)
 interface TableMeta {
@@ -38,7 +45,10 @@ interface ActionsCellProps {
 // --- COMPONENTE INTERNO PARA LAS ACCIONES (SOLUCIÓN AL ERROR DE HOOKS) ---
 const ActionsCell = ({ row, table }: ActionsCellProps) => {
   const acta = row.original;
-  const router = useRouter(); // Ahora sí podemos usar el hook aquí
+  const router = useRouter(); // Ahora sí podemos usar el hook
+
+  // Verificamos si el acta está completa (default false si no viene)
+  const isCompleted = !!acta.isCompleted;
 
   const refreshTable = () => {
     // Hacemos un cast seguro al meta que definimos arriba
@@ -114,15 +124,64 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
             Editar
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={handleSendEmail}
-          >
-            Enviar
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer" onClick={handleDownload}>
-            Descargar
-          </DropdownMenuItem>
+          <TooltipProvider>
+            {/* ITEM: ENVIAR */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {/* Usamos un div wrapper o aplicamos eventos manualmente porque disabled previene eventos */}
+                <div className="w-full outline-none">
+                  <DropdownMenuItem
+                    className={cn(
+                      'cursor-pointer w-full',
+                      !isCompleted && 'opacity-50 cursor-not-allowed'
+                    )}
+                    onClick={(e) => {
+                      if (!isCompleted) {
+                        e.preventDefault();
+                        return;
+                      }
+                      handleSendEmail();
+                    }}
+                  >
+                    Enviar
+                  </DropdownMenuItem>
+                </div>
+              </TooltipTrigger>
+              {!isCompleted && (
+                <TooltipContent side="left">
+                  <p>Completa el formulario para habilitar</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+
+            {/* ITEM: DESCARGAR */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="w-full outline-none">
+                  <DropdownMenuItem
+                    className={cn(
+                      'cursor-pointer w-full',
+                      !isCompleted && 'opacity-50 cursor-not-allowed'
+                    )}
+                    onClick={(e) => {
+                      if (!isCompleted) {
+                        e.preventDefault();
+                        return;
+                      }
+                      handleDownload();
+                    }}
+                  >
+                    Descargar
+                  </DropdownMenuItem>
+                </div>
+              </TooltipTrigger>
+              {!isCompleted && (
+                <TooltipContent side="left">
+                  <p>Completa el formulario para habilitar</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

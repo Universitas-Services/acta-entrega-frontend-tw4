@@ -57,6 +57,7 @@ export interface Acta {
   metadata: ActaMetadata;
   createdAt: string;
   updatedAt: string;
+  isCompleted: boolean; // Indica si el acta está completa
 }
 
 export interface ComplianceActa {
@@ -253,10 +254,33 @@ export const updateActa = async (
     const token = localStorage.getItem('accessToken');
     if (!token) throw new Error('No token found');
 
+    // --- CORRECCIÓN: LIMPIEZA DE DATOS ---
+    // Filtramos los valores vacíos para evitar enviar strings vacíos ""
+    // que el backend podría interpretar erróneamente como "completados".
+    const cleanMetadata: Record<string, unknown> = {};
+
+    Object.keys(data).forEach((key) => {
+      // Tipamos la llave para acceder de forma segura
+      const typedKey = key as keyof typeof data;
+      let value: unknown = data[typedKey];
+
+      // Normalización de "NO APLICA" (Por consistencia con el create)
+      if (typeof value === 'string' && value === 'NO APLICA') {
+        value = 'NO_APLICA';
+      }
+
+      // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
+      if (value !== null && value !== undefined && value !== '') {
+        cleanMetadata[key] = value;
+      }
+    });
+
     // El backend espera que los campos del formulario estén dentro de "metadata".
     // Además, actualizamos "nombreEntidad" si viene "nombreOrgano" en los datos.
     const body = {
-      metadata: data,
+      metadata: cleanMetadata,
+      // Ojo: data.nombreOrgano podría venir undefined si no se tocó en el form,
+      // así que accedemos a cleanMetadata o verificamos antes.
       ...(data.nombreOrgano && { nombreEntidad: data.nombreOrgano }),
     };
 

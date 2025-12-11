@@ -238,7 +238,7 @@ export function ActaSalienteProForm() {
               const currentFieldsArray: (keyof FormData)[] = Array.isArray(
                 baseFields
               )
-                ? baseFields
+                ? (baseFields as (keyof FormData)[])
                 : [];
 
               let fieldsToValidate: (keyof FormData)[] = currentFieldsArray;

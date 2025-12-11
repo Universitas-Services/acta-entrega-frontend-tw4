@@ -275,6 +275,8 @@ export function ActaSalienteProForm() {
                 });
                 if (!isStepValid) {
                   targetStepIndex = i;
+                  // Limpiamos los errores para que no se muestren al usuario al entrar
+                  form.clearErrors(fieldsToValidate);
                   break; // Encontramos el primero con error
                 }
               }

@@ -262,12 +262,12 @@ export const updateActa = async (
     Object.keys(data).forEach((key) => {
       // Tipamos la llave para acceder de forma segura
       const typedKey = key as keyof typeof data;
-      let value: unknown = data[typedKey];
+      const value: unknown = data[typedKey];
 
       // Normalización de "NO APLICA" (Por consistencia con el create)
-      if (typeof value === 'string' && value === 'NO APLICA') {
+      /*if (typeof value === 'string' && value === 'NO APLICA') {
         value = 'NO_APLICA';
-      }
+      }*/
 
       // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
       if (value !== null && value !== undefined && value !== '') {
@@ -354,12 +354,12 @@ export const createActaMaximaAutoridad = async (
     Object.keys(data).forEach((key) => {
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
-      let value: unknown = data[typedKey];
+      const value: unknown = data[typedKey];
 
       // Normalización de "NO APLICA"
-      if (typeof value === 'string' && value === 'NO APLICA') {
+      /*if (typeof value === 'string' && value === 'NO APLICA') {
         value = 'NO_APLICA';
-      }
+      }*/
 
       // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
       if (value !== null && value !== undefined && value !== '') {
@@ -415,12 +415,12 @@ export const createActaSalientePaga = async (
     Object.keys(data).forEach((key) => {
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
-      let value: unknown = data[typedKey];
+      const value: unknown = data[typedKey];
 
       // Normalización de "NO APLICA"
-      if (typeof value === 'string' && value === 'NO APLICA') {
+      /*if (typeof value === 'string' && value === 'NO APLICA') {
         value = 'NO_APLICA';
-      }
+      }*/
 
       // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
       if (value !== null && value !== undefined && value !== '') {
@@ -478,12 +478,12 @@ export const createActaEntrante = async (
     Object.keys(data).forEach((key) => {
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
-      let value: unknown = data[typedKey];
+      const value: unknown = data[typedKey];
 
       // Normalización de "NO APLICA"
-      if (typeof value === 'string' && value === 'NO APLICA') {
+      /*if (typeof value === 'string' && value === 'NO APLICA') {
         value = 'NO_APLICA';
-      }
+      }*/
 
       // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
       if (value !== null && value !== undefined && value !== '') {
@@ -539,12 +539,12 @@ export const createActaMaximaAutoridadPro = async (
     Object.keys(data).forEach((key) => {
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
-      let value: unknown = data[typedKey];
+      const value: unknown = data[typedKey];
 
       // Normalización de "NO APLICA"
-      if (typeof value === 'string' && value === 'NO APLICA') {
+      /*if (typeof value === 'string' && value === 'NO APLICA') {
         value = 'NO_APLICA';
-      }
+      }*/
 
       // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
       if (value !== null && value !== undefined && value !== '') {
@@ -593,12 +593,12 @@ export const createActaSalientePro = async (
     Object.keys(data).forEach((key) => {
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
-      let value: unknown = data[typedKey];
+      const value: unknown = data[typedKey];
 
       // Normalización de "NO APLICA"
-      if (typeof value === 'string' && value === 'NO APLICA') {
+      /*if (typeof value === 'string' && value === 'NO APLICA') {
         value = 'NO_APLICA';
-      }
+      }*/
 
       // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
       if (value !== null && value !== undefined && value !== '') {
@@ -647,12 +647,12 @@ export const createActaEntrantePro = async (
     Object.keys(data).forEach((key) => {
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
-      let value: unknown = data[typedKey];
+      const value: unknown = data[typedKey];
 
       // Normalización de "NO APLICA"
-      if (typeof value === 'string' && value === 'NO APLICA') {
+      /*if (typeof value === 'string' && value === 'NO APLICA') {
         value = 'NO_APLICA';
-      }
+      }*/
 
       // Solo guardamos el valor si NO es null, NO es undefined y NO es string vacío
       if (value !== null && value !== undefined && value !== '') {

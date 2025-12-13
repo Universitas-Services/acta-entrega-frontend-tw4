@@ -181,7 +181,7 @@ export function ProfileForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Información Personal</CardTitle>
+        <CardTitle>Información personal</CardTitle>
         <CardDescription>
           Actualiza tu información personal y detalles profesionales.
         </CardDescription>

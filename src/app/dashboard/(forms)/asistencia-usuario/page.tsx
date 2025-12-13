@@ -10,7 +10,7 @@ import { BsFillQuestionSquareFill } from 'react-icons/bs';
 const proCardsData = [
   {
     id: 'preguntas-frecuentes',
-    title: 'Preguntas Frecuentes',
+    title: 'Preguntas frecuentes',
     description:
       'Resuelve tus dudas sobre el funcionamiento de la aplicación, el proceso de gestión y los pasos clave que debes seguir. Encuentra respuestas rápidas y útiles para optimizar tu ruta.',
     href: '/dashboard/faq-pro',
@@ -40,7 +40,7 @@ export default function ActasProDashboardPage() {
   const { setTitle } = useHeader();
 
   useEffect(() => {
-    setTitle('Asistencia al Usuario');
+    setTitle('Asistencia al usuario');
   }, [setTitle]);
 
   return (

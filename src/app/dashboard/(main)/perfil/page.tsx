@@ -30,7 +30,7 @@ export default function PerfilPage() {
   const [activeTab, setActiveTab] = useState<ProfileTab>('edit');
 
   useEffect(() => {
-    setTitle('Gestión de Perfil');
+    setTitle('Gestión de perfil');
   }, [setTitle]);
 
   const renderContent = () => {

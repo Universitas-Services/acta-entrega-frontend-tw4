@@ -994,7 +994,7 @@ export function ComplianceForm() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Anexos Adicionales (Según Tipo de Entidad)
+                        Anexos adicionales (Según Tipo de Entidad)
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}

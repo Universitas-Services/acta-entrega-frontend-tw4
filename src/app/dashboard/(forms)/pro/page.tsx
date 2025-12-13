@@ -27,7 +27,7 @@ const proCardsData = [
     id: 'ia',
     title: 'Acta de entrega MÁXIMA AUTORIDAD',
     description:
-      'Utiliza esta opción para procesos de entrega sin servidor público designado, es decir actúes como el servidor público designado para el procedimiento.',
+      'Utiliza esta opción en procesos de entrega sin servidor público designado. Es decir, cuando actúes como el servidor público designado para el procedimiento.',
     href: '/dashboard/actas-pro/ma-pro',
     icon: <SiSpringsecurity className="h-10 w-10 text-primary" />,
   },

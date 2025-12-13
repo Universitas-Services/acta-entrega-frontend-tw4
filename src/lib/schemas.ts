@@ -34,6 +34,7 @@ const cedulaRegex = /^[VE]-\d{7,8}$/;
 
 export const actaMaximaAutoridadSchemaBase = z.object({
   // --- Datos Generales ---
+  tiempoRealizacion: z.number({ message: 'Debe seleccionar una opción.' }),
   email: z
     .string()
     .min(1, 'Campo Requerido')
@@ -280,6 +281,7 @@ export const actaMaximaAutoridadProSchema =
 
 export const actaSalienteSchemaBase = z.object({
   // --- Datos Generales ---
+  tiempoRealizacion: z.number({ message: 'Debe seleccionar una opción.' }),
   email: z
     .string()
     .min(1, 'Campo Requerido')
@@ -521,6 +523,7 @@ export const actaSalienteProSchema = actaSalienteProSchemaBase.superRefine(
 
 export const actaEntranteSchemaBase = z.object({
   // --- Datos Generales ---
+  tiempoRealizacion: z.number({ message: 'Debe seleccionar una opción.' }),
   email: z
     .string()
     .min(1, 'Campo Requerido')

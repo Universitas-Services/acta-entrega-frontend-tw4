@@ -537,6 +537,8 @@ export const createActaMaximaAutoridadPro = async (
     const cleanMetadata: Record<string, unknown> = {};
 
     Object.keys(data).forEach((key) => {
+      // Excluir tiempoRealizacion del metadata (se envía como campo separado)
+      if (key === 'tiempoRealizacion') return;
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
       const value: unknown = data[typedKey];
@@ -557,6 +559,7 @@ export const createActaMaximaAutoridadPro = async (
       type: 'MAXIMA_AUTORIDAD_PAGA',
       nombreEntidad: data.nombreOrgano,
       metadata: cleanMetadata,
+      tiempoRealizacion: data.tiempoRealizacion,
     };
 
     const response = await apiClient.post<ActaResponse>('/actas', body, {
@@ -591,6 +594,9 @@ export const createActaSalientePro = async (
     const cleanMetadata: Record<string, unknown> = {};
 
     Object.keys(data).forEach((key) => {
+      // Excluir tiempoRealizacion del metadata (se envía como campo separado)
+      if (key === 'tiempoRealizacion') return;
+
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
       const value: unknown = data[typedKey];
@@ -611,6 +617,7 @@ export const createActaSalientePro = async (
       type: 'SALIENTE_PAGA',
       nombreEntidad: data.nombreOrgano,
       metadata: cleanMetadata,
+      tiempoRealizacion: data.tiempoRealizacion,
     };
 
     const response = await apiClient.post<ActaResponse>('/actas', body, {
@@ -645,6 +652,8 @@ export const createActaEntrantePro = async (
     const cleanMetadata: Record<string, unknown> = {};
 
     Object.keys(data).forEach((key) => {
+      // Excluir tiempoRealizacion del metadata (se envía como campo separado)
+      if (key === 'tiempoRealizacion') return;
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
       const value: unknown = data[typedKey];
@@ -665,6 +674,7 @@ export const createActaEntrantePro = async (
       type: 'ENTRANTE_PAGA',
       nombreEntidad: data.nombreOrgano,
       metadata: cleanMetadata,
+      tiempoRealizacion: data.tiempoRealizacion,
     };
 
     const response = await apiClient.post<ActaResponse>('/actas', body, {

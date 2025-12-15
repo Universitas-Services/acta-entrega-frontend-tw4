@@ -26,6 +26,7 @@ const proCardsData = [
     href: '/dashboard/consultoria',
     icon: <FaRobot className="h-13 w-13 text-icon-asistencia" />,
   },
+  /*
   {
     id: 'video-tutoriales',
     title: 'Video - tutoriales',
@@ -34,6 +35,7 @@ const proCardsData = [
     href: '/dashboard/videos-tutoriales',
     icon: <BsCollectionPlayFill className="h-13 w-13 text-icon-asistencia" />,
   },
+  */
 ];
 
 export default function ActasProDashboardPage() {

@@ -121,6 +121,7 @@ export function ActaMaximaAutoridadProForm() {
     resolver: zodResolver(actaMaximaAutoridadProSchema),
     shouldUnregister: false,
     defaultValues: {
+      tiempoRealizacion: undefined as unknown as number,
       email: '',
       rifOrgano: '',
       denominacionCargo: '',
@@ -1019,6 +1020,50 @@ export function ActaMaximaAutoridadProForm() {
                     </div>
                   </div>
 
+                  {/* --- Nueva Sección: Tiempo de Realización del Acta --- */}
+                  <div className="space-y-4 border rounded-lg">
+                    <div className="mb-4 p-4">
+                      <h3 className="font-bold text-lg">
+                        Tiempo de Realización del Acta
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-x-6 gap-y-4 px-4 pb-4">
+                      <FormField
+                        control={form.control}
+                        name="tiempoRealizacion"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Seleccione el tiempo de realización
+                            </FormLabel>
+                            <Select
+                              onValueChange={(value) =>
+                                field.onChange(Number(value))
+                              }
+                              value={field.value?.toString()}
+                              disabled={isLoading}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="cursor-pointer">
+                                  <SelectValue placeholder="Seleccione una opción" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent
+                                position="popper"
+                                className="bg-white z-50 max-h-60 overflow-y-auto text-black"
+                              >
+                                <SelectItem value="0">0</SelectItem>
+                                <SelectItem value="1">1</SelectItem>
+                                <SelectItem value="2">2</SelectItem>
+                                <SelectItem value="3">3</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
                   {/* --- Segunda Sección: Detalles de Suscripción --- */}
                   <div className="space-y-4 border rounded-lg">
                     <div className="mb-4 p-4">

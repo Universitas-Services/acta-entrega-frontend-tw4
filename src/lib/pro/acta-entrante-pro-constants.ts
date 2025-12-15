@@ -34,6 +34,7 @@ export const steps: StepInfo[] = [
     id: 1,
     title: 'Datos generales del Acta',
     fields: [
+      'tiempoRealizacion',
       'email',
       'rifOrgano',
       'denominacionCargo',

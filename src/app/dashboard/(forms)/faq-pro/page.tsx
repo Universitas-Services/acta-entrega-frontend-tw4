@@ -165,7 +165,7 @@ export default function FaqPage() {
   const [openSection, setOpenSection] = useState<string>('');
 
   useEffect(() => {
-    setTitle('Preguntas Frecuentes');
+    setTitle('Preguntas frecuentes');
   }, [setTitle]);
 
   return (

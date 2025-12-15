@@ -10,7 +10,7 @@ import { BsFillQuestionSquareFill } from 'react-icons/bs';
 const proCardsData = [
   {
     id: 'preguntas-frecuentes',
-    title: 'Preguntas Frecuentes',
+    title: 'Preguntas frecuentes',
     description:
       'Resuelve tus dudas sobre el funcionamiento de la aplicación, el proceso de gestión y los pasos clave que debes seguir. Encuentra respuestas rápidas y útiles para optimizar tu ruta.',
     href: '/dashboard/faq-pro',
@@ -26,6 +26,7 @@ const proCardsData = [
     href: '/dashboard/consultoria',
     icon: <FaRobot className="h-13 w-13 text-icon-asistencia" />,
   },
+  /*
   {
     id: 'video-tutoriales',
     title: 'Video - tutoriales',
@@ -34,13 +35,14 @@ const proCardsData = [
     href: '/dashboard/videos-tutoriales',
     icon: <BsCollectionPlayFill className="h-13 w-13 text-icon-asistencia" />,
   },
+  */
 ];
 
 export default function ActasProDashboardPage() {
   const { setTitle } = useHeader();
 
   useEffect(() => {
-    setTitle('Asistencia al Usuario');
+    setTitle('Asistencia al usuario');
   }, [setTitle]);
 
   return (

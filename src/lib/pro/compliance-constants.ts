@@ -190,23 +190,23 @@ export const steps: ComplianceStepInfo[] = [
 
 export const anexosAdicionalesTitulosCompliance = [
   {
-    shortTitle: 'Unidades Administradoras',
+    shortTitle: 'Unidades administradoras',
     longTitle: 'UNIDADES ADMINISTRADORAS',
   },
   {
-    shortTitle: 'Órganos o Entidades que manejan Ramos Específicos',
+    shortTitle: 'Órganos o 3ntidades que manejan Ramos específicos',
     longTitle: 'ÓRGANOS O ENTIDADES QUE MANEJAN RAMOS ESPECÍFICOS',
   },
   {
-    shortTitle: 'Órganos de Control Fiscal',
+    shortTitle: 'Órganos de control fiscal',
     longTitle: 'ÓRGANOS DE CONTROL FISCAL',
   },
   {
-    shortTitle: 'Ministerio de Finanzas',
+    shortTitle: 'Ministerio de finanzas',
     longTitle: 'MINISTERIO DE FINANZAS',
   },
   {
-    shortTitle: 'Gobernaciones, Oficinas o Dependencias de Hacienda Estadal',
+    shortTitle: 'Gobernaciones, oficinas o dependencias de hacienda estadal',
     longTitle: 'GOBERNACIONES, OFICINAS O DEPENDENCIAS DE HACIENDA ESTADAL',
   },
   {
@@ -264,7 +264,7 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
       {
         name: 'incluye_estados_bancarios_conciliados',
         label:
-          '80. ¿Se incluye Estados bancarios actualizados y conciliados a la fecha de entrega?',
+          '80. ¿Se incluye estados bancarios actualizados y conciliados a la fecha de entrega?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
@@ -324,7 +324,7 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
     questions: [
       {
         name: 'incluye_situacion_tesoro_nacional',
-        label: '87. ¿Se incluye Situación del Tesoro Nacional?',
+        label: '87. ¿Se incluye situación del Tesoro Nacional?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
@@ -336,12 +336,12 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
       {
         name: 'incluye_monto_deuda_publica_nacional',
         label:
-          '89. ¿Se incluye Monto de la deuda pública nacional interna y externa?',
+          '89. ¿Se incluye monto de la deuda pública nacional interna y externa?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
         name: 'incluye_situacion_cuentas_nacion',
-        label: '90. ¿Se incluye la Situación de las cuentas de la Nación?',
+        label: '90. ¿Se incluye la situación de las cuentas de la Nación?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
     ],
@@ -353,7 +353,7 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
     questions: [
       {
         name: 'incluye_situacion_tesoro_estadal',
-        label: '91. ¿Se incluye Situación del Tesoro Estadal?',
+        label: '91. ¿Se incluye situación del Tesoro Estadal?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
@@ -365,7 +365,7 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
       {
         name: 'incluye_situacion_cuentas_estadal',
         label:
-          '93. ¿Se incluye Situación de las cuentas del respectivo estado?',
+          '93. ¿Se incluye situación de las cuentas del respectivo estado?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
     ],
@@ -377,7 +377,7 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
     questions: [
       {
         name: 'incluye_situacion_tesoro_municipal',
-        label: '94. ¿Se incluye Situación del Tesoro Distrital o Municipal?',
+        label: '94. ¿Se incluye situación del Tesoro Distrital o Municipal?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {
@@ -389,7 +389,7 @@ export const dynamicStepContentCompliance: ComplianceDynamicContent = {
       {
         name: 'incluye_situacion_cuentas_municipal',
         label:
-          '96. ¿Se incluye Situación de las cuentas distritales o municipales?',
+          '96. ¿Se incluye situación de las cuentas distritales o municipales?',
         options: ['SI', 'NO', 'NO APLICA'],
       },
       {

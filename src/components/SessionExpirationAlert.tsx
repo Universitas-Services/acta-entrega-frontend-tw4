@@ -42,12 +42,12 @@ export function SessionExpirationAlert({
             className="cursor-pointer text-black"
           >
             <FiLogOut className="mr-2" />
-            Cerrar Sesión
+            Cerrar sesión
           </AlertDialogCancel>
           {/* Este botón solo llama a onConfirm */}
           <AlertDialogAction onClick={onConfirm} className="cursor-pointer">
             <FiRefreshCw className="mr-2" />
-            Continuar Sesión
+            Continuar sesión
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

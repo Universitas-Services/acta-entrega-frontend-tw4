@@ -9,14 +9,14 @@ const cardData = [
     imageUrl: '/conocenos/Jornadas-control-fiscal.png',
     description:
       'Transforma tu carrera y domina la vanguardia de la gestión pública con las Jornadas de Control Fiscal. Universitas Academy te brinda acceso exclusivo a los expertos más influyentes del sector.',
-    buttonText: 'Ingrese aquí',
+    buttonText: 'Ingresa aquí',
     linkHref: 'https://universitas.academy/cursos/jornadas-de-control-fiscal/',
   },
   {
     imageUrl: '/conocenos-pro/funcionario-publico.jpg',
     description:
       'Domina el marco legal que rige tu carrera. Un curso esencial sobre los derechos, deberes y responsabilidades de todo servidor público, desde el ingreso hasta el retiro.',
-    buttonText: 'Ingrese aquí',
+    buttonText: 'Ingresa aquí',
     linkHref: 'https://universitas.academy/cursos/el-funcionario-publico/',
   },
   {
@@ -45,7 +45,7 @@ const cardData = [
     imageUrl: '/conocenos/card-agora.png',
     description:
       'Ágora es un espacio diseñado para que los profesionales puedan publicar sus artículos de investigación o de opinión y noticias.',
-    buttonText: 'Ingrese aquí',
+    buttonText: 'Ingresa aquí',
     linkHref:
       'https://agora.universitasfundacion.com/category/universitas-legal/',
   },

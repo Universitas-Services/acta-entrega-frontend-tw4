@@ -182,7 +182,7 @@ export function FirstLoginPopup({
               className="w-full cursor-pointer"
               disabled={isLoading}
             >
-              {isLoading ? 'Guardando...' : 'Guardar y Continuar'}
+              {isLoading ? 'Guardando...' : 'Guardar y continuar'}
             </Button>
           </form>
         </Form>

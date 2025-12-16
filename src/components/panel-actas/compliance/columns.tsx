@@ -257,7 +257,7 @@ export const columns: ColumnDef<ComplianceActa>[] = [
 
       return (
         <div className={`pl-4 font-bold ${colorClass}`}>
-          {score !== undefined ? `${score}%` : '-'}
+          {score !== undefined ? `${score.toFixed(2)}%` : '-'}
         </div>
       );
     },

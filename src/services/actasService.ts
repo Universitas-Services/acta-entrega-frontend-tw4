@@ -352,6 +352,9 @@ export const createActaMaximaAutoridad = async (
     const cleanMetadata: Record<string, unknown> = {};
 
     Object.keys(data).forEach((key) => {
+      // Excluir tiempoRealizacion del metadata (se envía como campo separado)
+      if (key === 'tiempoRealizacion') return;
+
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
       const value: unknown = data[typedKey];
@@ -372,6 +375,7 @@ export const createActaMaximaAutoridad = async (
       type: 'MAXIMA_AUTORIDAD_GRATIS',
       nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
       metadata: cleanMetadata,
+      tiempoRealizacion: data.tiempoRealizacion,
     };
 
     // Crear el acta
@@ -413,6 +417,9 @@ export const createActaSalientePaga = async (
     const cleanMetadata: Record<string, unknown> = {};
 
     Object.keys(data).forEach((key) => {
+      // Excluir tiempoRealizacion del metadata (se envía como campo separado)
+      if (key === 'tiempoRealizacion') return;
+
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
       const value: unknown = data[typedKey];
@@ -433,6 +440,7 @@ export const createActaSalientePaga = async (
       type: 'SALIENTE_GRATIS',
       nombreEntidad: data.nombreOrgano,
       metadata: cleanMetadata,
+      tiempoRealizacion: data.tiempoRealizacion,
     };
 
     // Crear el acta
@@ -476,6 +484,9 @@ export const createActaEntrante = async (
     const cleanMetadata: Record<string, unknown> = {};
 
     Object.keys(data).forEach((key) => {
+      // Excluir tiempoRealizacion del metadata (se envía como campo separado)
+      if (key === 'tiempoRealizacion') return;
+
       // Tipamos la llave para acceder a data con seguridad
       const typedKey = key as keyof typeof data;
       const value: unknown = data[typedKey];
@@ -496,6 +507,7 @@ export const createActaEntrante = async (
       type: 'ENTRANTE_GRATIS',
       nombreEntidad: data.nombreOrgano, // Extraemos nombreOrgano
       metadata: cleanMetadata,
+      tiempoRealizacion: data.tiempoRealizacion,
     };
 
     // Crear el acta

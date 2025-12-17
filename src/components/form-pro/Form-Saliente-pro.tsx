@@ -1008,7 +1008,7 @@ export function ActaSalienteProForm() {
                     </div>
                   </div>
 
-                  {/* --- Nueva Sección: Tiempo de Realización del Acta --- */}
+                  {/* --- Tiempo de Realización del Acta --- */}
                   <div className="space-y-4 border rounded-lg">
                     <div className="mb-4 p-4">
                       <h3 className="font-bold text-lg">

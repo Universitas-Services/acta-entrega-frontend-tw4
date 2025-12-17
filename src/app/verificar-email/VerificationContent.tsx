@@ -27,7 +27,7 @@ export default function VerificationContent() {
           setError(false);
 
           setTimeout(() => {
-            router.push('/login');
+            router.replace('/login');
           }, 5000);
         } catch (err) {
           setError(true);

@@ -41,7 +41,7 @@ export default function CompliancePage() {
             className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold whitespace-nowrap w-full md:w-auto"
           >
             <a
-              href="https://api.whatsapp.com/send?phone=+584125253023&text=Hola,%20quiero%20adquirir%20Actas%20de%20Entregas%20PRO"
+              href="https://universitas.myflodesk.com/ae-pro"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center" // Asegura que el ícono esté alineado

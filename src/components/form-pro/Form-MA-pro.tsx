@@ -1015,7 +1015,7 @@ export function ActaMaximaAutoridadProForm() {
                         name="nombreOrgano"
                         label="Nombre del órgano, entidad, oficina o dependencia de la Administración Pública"
                         subtitle="Ej: Instituto Nacional de Transporte Terrestre (INTT)"
-                        maxLength={50}
+                        maxLength={150}
                       />
                     </div>
                   </div>

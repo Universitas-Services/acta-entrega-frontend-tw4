@@ -17,21 +17,22 @@
 
     /* == Colores Principales del Layout == */
     --background: oklch(
-      94.37% 0.009 247.92
+      0.9437 0.0086 247.92
     ); /* #E8EDF2 - Fondo del Dashboard */
     --foreground: oklch(
-      27.89% 0.149 263.52
-    ); /* #001A70 - Azul oscuro para texto */
+      0.2789 0.149 263.52
+    ); /* #001A70 - Azul oscuro para texto *0.2789 0.149 263.52/
 
     --input: oklch(1 0 0); /* #FFFFFF - Fondo de inputs */
+    --chillon: oklch(0.7035 0.1499 235.54);
 
     --blanco-puro: oklch(100% 0 0); /* #FFFFFF - Blanco puro */
     /* == Tarjetas (Card) == */
     --card: oklch(1 0 0); /* #FFFFFF - Fondo de tarjetas */
-    --card-foreground: oklch(0.22 0.09 265.88);
+    --card-foreground: oklch(0.3771 0.141 269.23);
 
     /* == Componente Primario (Banner "Conócenos") == */
-    --primary: oklch(27.895% 0.14913 263.534); /* #001A70 - Azul primario */
+    --primary: oklch(0.2789 0.149 263.52); /* #001A70 - Azul primario */
     --primary-foreground: oklch(
       0.98 0.01 240
     ); /* #F9FAFB - Blanco para texto */
@@ -218,6 +219,8 @@
   --color-dropdownperfil-pro: var(--dropdownperfil-pro);
 
   --color-icon-asistencia: var(--icon-asistencia);
+
+  --color-chillon: var(--chillon);
 
   --shadow-blue-soft:
     0 10px 15px -3px rgba(59, 130, 246, 0.3),

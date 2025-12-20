@@ -50,7 +50,7 @@ export function CardPro({
         <span
           className={cn(
             'absolute top-6 right-6 text-xs font-bold rounded-full px-3 py-1',
-            'bg-badge-express text-primary'
+            'bg-chillon text-primary'
           )}
         >
           PRO

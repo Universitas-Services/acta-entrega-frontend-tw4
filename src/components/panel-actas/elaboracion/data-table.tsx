@@ -302,6 +302,9 @@ export function DataTable<TData extends DataWithId, TValue>({
                       <DropdownMenuRadioItem value="DESCARGADA">
                         Descargada
                       </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="ENTREGADA">
+                        Entregada
+                      </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>

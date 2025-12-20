@@ -53,7 +53,7 @@ export interface Acta {
   numeroActa: string | null;
   nombreEntidad: string | null;
   type: string; // 'ENTRANTE_GRATIS', 'MAXIMA_AUTORIDAD_PAGA', etc.
-  status: 'GUARDADA' | 'DESCARGADA' | 'ENVIADA';
+  status: 'GUARDADA' | 'DESCARGADA' | 'ENVIADA' | 'ENTREGADA';
   metadata: ActaMetadata;
   createdAt: string;
   updatedAt: string;
@@ -214,6 +214,28 @@ export const deleteActa = async (id: string) => {
   } catch (error) {
     console.error('Error deleting acta:', error);
     throw new Error('No se pudo eliminar el acta.');
+  }
+};
+
+/**
+ * Marca un acta como ENTREGADA (PATCH /actas/:id/entregar)
+ */
+export const entregarActa = async (
+  id: string
+): Promise<{ message: string }> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('No token found');
+
+    const response = await apiClient.patch<{ message: string }>(
+      `/actas/${id}/entregar`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error entregando acta:', error);
+    throw new Error('No se pudo marcar el acta como entregada.');
   }
 };
 

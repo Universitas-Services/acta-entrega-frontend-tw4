@@ -101,7 +101,9 @@ export function LoginForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Correo electrónico</FormLabel>
+                <FormLabel className="text-primary">
+                  Correo electrónico
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Ingresa tu correo"
@@ -118,7 +120,7 @@ export function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Contraseña</FormLabel>
+                <FormLabel className="text-primary">Contraseña</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input

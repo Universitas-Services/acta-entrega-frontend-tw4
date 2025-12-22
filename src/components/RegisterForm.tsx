@@ -225,7 +225,7 @@ export function RegisterForm() {
         )}
         <div className="text-center mb-8">
           {/* Estilos de texto actualizados */}
-          <h1 className="text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-bold text-primary">
             {step === 1 ? 'Crea tu cuenta' : 'Completa tus datos'}
           </h1>
           <p className="text-muted-foreground">
@@ -287,7 +287,9 @@ export function RegisterForm() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Correo electrónico</FormLabel>
+                      <FormLabel className="text-primary">
+                        Correo electrónico
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Ingresa tu correo"
@@ -304,7 +306,7 @@ export function RegisterForm() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contraseña</FormLabel>
+                      <FormLabel className="text-primary">Contraseña</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
@@ -336,7 +338,9 @@ export function RegisterForm() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirmar contraseña</FormLabel>
+                      <FormLabel className="text-primary">
+                        Confirmar contraseña
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input

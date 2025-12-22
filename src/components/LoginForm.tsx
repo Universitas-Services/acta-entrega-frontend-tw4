@@ -101,9 +101,7 @@ export function LoginForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-primary">
-                  Correo electrónico
-                </FormLabel>
+                <FormLabel className="text-black">Correo electrónico</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Ingresa tu correo"
@@ -120,7 +118,7 @@ export function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-primary">Contraseña</FormLabel>
+                <FormLabel className="text-black">Contraseña</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
@@ -156,7 +154,7 @@ export function LoginForm() {
           </div>
           <Button
             type="submit"
-            className="w-full text-lg py-6 cursor-pointer"
+            className="w-full bg-chillon hover:bg-chillon/80 text-lg py-6 cursor-pointer"
             disabled={isLoading}
           >
             {isLoading ? 'Iniciando...' : 'Iniciar sesión'}

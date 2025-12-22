@@ -517,14 +517,14 @@ export function RegisterForm() {
               <Button
                 type="button"
                 onClick={handleNextStep}
-                className="w-full text-lg py-6 cursor-pointer"
+                className="w-full bg-chillon hover:bg-chillon/80 text-lg py-6 cursor-pointer"
               >
                 Siguiente
               </Button>
             ) : (
               <Button
                 type="submit"
-                className="w-full text-lg py-6 cursor-pointer"
+                className="w-full bg-chillon hover:bg-chillon/80 text-lg py-6 cursor-pointer"
                 disabled={isLoading}
                 onClick={(e) => {
                   if (!acceptedTerms) {

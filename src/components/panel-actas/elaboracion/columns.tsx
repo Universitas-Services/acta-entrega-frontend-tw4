@@ -6,10 +6,12 @@ import {
   downloadActa,
   resendActaEmail,
   deleteActa,
+  entregarActa,
 } from '@/services/actasService';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -41,6 +43,57 @@ interface ActionsCellProps {
   row: Row<Acta>;
   table: Table<Acta>;
 }
+
+// --- COMPONENTE INTERNO PARA EL SWITCH DE ENTREGAR ---
+const EntregarSwitch = ({ row, table }: ActionsCellProps) => {
+  const acta = row.original;
+  const isEntregada = acta.status === 'ENTREGADA';
+  const isCompleted = !!acta.isCompleted;
+
+  // Deshabilitado si ya está entregada o no está completa
+  const isDisabled = isEntregada || !isCompleted;
+
+  const refreshTable = () => {
+    (table.options.meta as TableMeta)?.onRefresh?.();
+  };
+
+  const handleEntregar = async (checked: boolean) => {
+    if (!checked || isDisabled) return;
+
+    toast.promise(entregarActa(acta.id), {
+      loading: 'Marcando como entregada...',
+      success: () => {
+        refreshTable();
+        return 'Acta marcada como entregada';
+      },
+      error: 'Error al marcar como entregada',
+    });
+  };
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-center justify-center">
+            <Switch
+              checked={isEntregada}
+              onCheckedChange={handleEntregar}
+              disabled={isDisabled}
+              className={cn(isEntregada && 'data-[state=checked]:bg-green-500')}
+            />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          {isEntregada
+            ? 'Acta ya entregada'
+            : !isCompleted
+              ? 'Complete el formulario para entregar'
+              : 'Marcar como entregada'}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 // --- COMPONENTE INTERNO PARA LAS ACCIONES (SOLUCIÓN AL ERROR DE HOOKS) ---
 const ActionsCell = ({ row, table }: ActionsCellProps) => {
@@ -274,6 +327,7 @@ export const columns: ColumnDef<Acta>[] = [
       let variant: 'default' | 'secondary' | 'destructive' | 'outline' =
         'secondary';
       let label = status;
+      let customClass = '';
 
       if (status === 'GUARDADA') {
         variant = 'secondary';
@@ -284,14 +338,28 @@ export const columns: ColumnDef<Acta>[] = [
       } else if (status === 'DESCARGADA') {
         variant = 'outline';
         label = 'Descargada';
+      } else if (status === 'ENTREGADA') {
+        variant = 'default';
+        label = 'Entregada';
+        customClass =
+          'bg-green-500 hover:bg-green-600 text-white border-green-500';
       }
 
-      return <Badge variant={variant}>{label}</Badge>;
+      return (
+        <Badge variant={variant} className={customClass}>
+          {label}
+        </Badge>
+      );
     },
   },
   {
+    id: 'entregar',
+    header: () => <div className="text-center">Entregar</div>,
+    cell: ({ row, table }) => <EntregarSwitch row={row} table={table} />,
+  },
+  {
     id: 'actions',
-    // Aquí usamos el componente que extrajimos arriba
+    header: () => null,
     cell: ({ row, table }) => <ActionsCell row={row} table={table} />,
   },
 ];

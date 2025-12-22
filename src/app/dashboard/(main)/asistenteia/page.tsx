@@ -127,7 +127,7 @@ export default function AsistenteVirtualPage() {
             className="w-full h-12 bg-button-gold hover:bg-button-gold/90 text-primary font-semibold"
           >
             <a
-              href="https://api.whatsapp.com/send?phone=+584125253023&text=Hola,%20quiero%20adquirir%20la%20versión%20PRO%20para%20activar%20el%20Consultor%20IA."
+              href="https://universitas.myflodesk.com/ae-pro"
               target="_blank"
               rel="noopener noreferrer"
             >

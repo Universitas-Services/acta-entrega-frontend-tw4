@@ -22,6 +22,8 @@ import {
   resetPassword,
 } from '@/services/authService';
 import { SuccessAlertDialog } from './SuccessAlertDialog';
+import { toast } from 'sonner';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 // --- ESQUEMAS DE VALIDACIÓN PARA CADA PASO ---
 const step1Schema = z.object({
@@ -32,30 +34,34 @@ const step2Schema = z.object({
     message: 'intrude el codigo que se a enviado al correo del paso anterior.',
   }),
 });
-const step3Schema = z
-  .object({
-    password: z
-      .string()
-      .min(8, { message: 'La contraseña debe tener al menos 8 caracteres.' })
-      .regex(/[a-z]/, {
-        message: 'Debe contener al menos una letra minúscula.',
-      })
-      .regex(/[A-Z]/, {
-        message: 'Debe contener al menos una letra mayúscula.',
-      })
-      .regex(/[0-9]/, { message: 'Debe contener al menos un número.' })
-      .regex(/[^a-zA-Z0-9]/, {
-        message: 'Debe contener al menos un símbolo especial.',
-      }),
-    confirmPassword: z.string(),
-  })
+const step3Schema = z.object({
+  password: z
+    .string()
+    .min(8, { message: 'La contraseña debe tener al menos 8 caracteres.' })
+    .max(16, { message: 'La contraseña no puede exceder 32 caracteres.' })
+    .regex(/[a-z]/, {
+      message: 'Debe contener al menos una letra minúscula.',
+    })
+    .regex(/[A-Z]/, {
+      message: 'Debe contener al menos una letra mayúscula.',
+    })
+    .regex(/[0-9]/, { message: 'Debe contener al menos un número.' })
+    .regex(/[^a-zA-Z0-9]/, {
+      message: 'Debe contener al menos un símbolo especial.',
+    }),
+  confirmPassword: z.string().min(1, { message: 'Confirma tu contraseña.' }),
+});
+
+// Esquema combinado para todo el formulario
+const formSchema = step1Schema
+  .extend(step2Schema.shape) // Unimos campos del paso 2
+  .extend(step3Schema.shape) // Unimos campos del paso 3
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Las contraseñas no coinciden.',
     path: ['confirmPassword'],
   });
 
-// -> Se crea un esquema completo para inicializar el formulario
-const formSchema = step1Schema.merge(step2Schema).merge(step3Schema);
+type FormValues = z.infer<typeof formSchema>;
 
 export function ForgotPasswordForm() {
   const router = useRouter();
@@ -67,8 +73,9 @@ export function ForgotPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const { showLoader } = useLoaderStore();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '', otp: '', password: '', confirmPassword: '' },
   });
@@ -83,6 +90,7 @@ export function ForgotPasswordForm() {
         await forgotPassword(emailValue);
         setEmail(emailValue);
         setStep(2);
+        toast.success('Correo de recuperación enviado.');
       } catch (error) {
         if (error instanceof Error) {
           setApiError(error.message);
@@ -115,19 +123,12 @@ export function ForgotPasswordForm() {
     setIsLoading(false);
   };
 
-  // ▼▼▼ CORRECCIÓN ▼▼▼
   // La función ahora pasa un objeto con ambas contraseñas al servicio.
   const onFinalSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     setApiError(null);
     try {
-      await resetPassword(
-        {
-          newPassword: data.password,
-          confirmPassword: data.confirmPassword,
-        },
-        resetToken
-      );
+      await resetPassword(email, data.password, resetToken);
       setShowSuccessDialog(true);
     } catch (error) {
       if (error instanceof Error) {
@@ -233,6 +234,7 @@ export function ForgotPasswordForm() {
                         placeholder="123456"
                         {...field}
                         disabled={isLoading}
+                        maxLength={6}
                       />
                     </FormControl>
                     <FormMessage />
@@ -259,7 +261,8 @@ export function ForgotPasswordForm() {
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 text-muted-foreground cursor-pointer"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground cursor-pointer"
+                            tabIndex={-1}
                           >
                             {showPassword ? (
                               <FaEyeSlash size={20} />
@@ -293,6 +296,7 @@ export function ForgotPasswordForm() {
                               setShowConfirmPassword(!showConfirmPassword)
                             }
                             className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground cursor-pointer"
+                            tabIndex={-1}
                           >
                             {showConfirmPassword ? (
                               <FaEyeSlash size={20} />
@@ -342,13 +346,15 @@ export function ForgotPasswordForm() {
         </Form>
       </div>
 
-      {/* ▼▼▼ PASO 3.2: PEGA EL NUEVO COMPONENTE AQUÍ AFUERA ▼▼▼ */}
       <SuccessAlertDialog
         isOpen={showSuccessDialog}
         onClose={() => setShowSuccessDialog(false)}
         title="¡Contraseña actualizada!"
         description="Tu contraseña ha sido actualizada con éxito. Ahora serás redirigido para iniciar sesión."
-        onConfirm={() => router.push('/login')}
+        onConfirm={() => {
+          showLoader();
+          router.replace('/login');
+        }}
       />
     </>
   );

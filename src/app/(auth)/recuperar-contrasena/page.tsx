@@ -1,4 +1,3 @@
-// src/app/recuperar-contrasena/page.tsx
 import { ForgotPasswordForm } from '@/components/ForgotPasswordForm';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';

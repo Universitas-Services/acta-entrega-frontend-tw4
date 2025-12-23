@@ -10,8 +10,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
-// ... (interfaz sin cambios)
 interface CardProps {
   icon: React.ReactNode;
   title: string;
@@ -32,8 +32,10 @@ function CardComponent({
   gratis = false,
 }: CardProps) {
   const router = useRouter();
+  const { showLoader } = useLoaderStore();
 
   const handleNavigation = () => {
+    showLoader();
     router.push(href);
   };
 

@@ -15,13 +15,13 @@ import { FiClock, FiLogOut, FiRefreshCw } from 'react-icons/fi';
 interface SessionExpirationAlertProps {
   isOpen: boolean;
   onConfirm: () => void;
-  onCancel: () => void;
+  onLogout: () => void;
 }
 
 export function SessionExpirationAlert({
   isOpen,
   onConfirm,
-  onCancel,
+  onLogout,
 }: SessionExpirationAlertProps) {
   return (
     <AlertDialog open={isOpen}>
@@ -36,18 +36,18 @@ export function SessionExpirationAlert({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="pt-4 gap-2">
-          {/* Este botón solo llama a onCancel */}
+          {/* Este botón solo llama a onLogout */}
           <AlertDialogCancel
-            onClick={onCancel}
+            onClick={onLogout}
             className="cursor-pointer text-black"
           >
             <FiLogOut className="mr-2" />
-            Cerrar Sesión
+            Cerrar sesión
           </AlertDialogCancel>
           {/* Este botón solo llama a onConfirm */}
           <AlertDialogAction onClick={onConfirm} className="cursor-pointer">
             <FiRefreshCw className="mr-2" />
-            Continuar Sesión
+            Continuar sesión
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

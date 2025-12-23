@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, proveedor ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, proveedor ]
 
 jobs:
   # Job 1: Verificación de Calidad de Código (Linting)

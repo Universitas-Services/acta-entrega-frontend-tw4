@@ -2,10 +2,24 @@ import { create } from 'zustand';
 
 interface FormDirtyState {
   isDirty: boolean;
-  setIsDirty: (isDirty: boolean) => void;
+  isProForm: boolean;
+  hasReachedStep3: boolean;
+  actaId: string | null;
+  onSave: () => Promise<void>;
+  setFormState: (data: Partial<FormDirtyState>) => void;
+  clearFormState: () => void;
 }
 
-export const useFormDirtyStore = create<FormDirtyState>((set) => ({
+const initialState = {
   isDirty: false,
-  setIsDirty: (isDirty: boolean) => set({ isDirty }),
+  isProForm: false,
+  hasReachedStep3: false,
+  actaId: null,
+  onSave: () => Promise.resolve(), // Una función no-op por defecto
+};
+
+export const useFormDirtyStore = create<FormDirtyState>((set) => ({
+  ...initialState,
+  setFormState: (data) => set((state) => ({ ...state, ...data })),
+  clearFormState: () => set(initialState),
 }));

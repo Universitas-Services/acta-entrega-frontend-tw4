@@ -20,6 +20,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -106,6 +113,8 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsTooltip, setShowTermsTooltip] = useState(false);
 
   const form = useForm<FormFieldsOptional>({
     resolver: zodResolver(formSchemaWithOptional), // Usar schema con campos opcionales
@@ -182,7 +191,7 @@ export function RegisterForm() {
       const dataToSend = {
         email: values.email,
         password: values.password,
-        name: values.nombre!,
+        nombre: values.nombre!,
         apellido: values.apellido!,
         telefono: `${values.prefijo}${values.numeroLocal}`,
       };
@@ -220,7 +229,7 @@ export function RegisterForm() {
             {step === 1 ? 'Crea tu cuenta' : 'Completa tus datos'}
           </h1>
           <p className="text-muted-foreground">
-            Por favor, introduce tus datos para continuar.
+            Por favor introduce tus datos para continuar.
           </p>
         </div>
 
@@ -447,28 +456,56 @@ export function RegisterForm() {
                     />
                   </div>
                 </FormItem>
-              </div>
-            </div>
 
-            {/* Sección de Términos y Condiciones actualizada */}
-            <div className="text-sm bg-muted p-4 rounded-lg text-center text-muted-foreground">
-              Al crear una cuenta, aceptas los{' '}
-              <button
-                type="button"
-                onClick={() => setIsTermsOpen(true)}
-                className="font-semibold text-primary hover:underline cursor-pointer"
-              >
-                Términos y Condiciones
-              </button>{' '}
-              y la{' '}
-              <button
-                type="button"
-                onClick={() => setIsPrivacyOpen(true)}
-                className="font-semibold text-primary hover:underline cursor-pointer"
-              >
-                Política de Privacidad
-              </button>
-              .
+                {/* Sección de Términos y Condiciones - Solo en Paso 2 */}
+                <div className="flex items-center justify-center space-x-3 bg-muted p-4 rounded-lg">
+                  <TooltipProvider disableHoverableContent>
+                    <Tooltip open={showTermsTooltip}>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <Checkbox
+                            id="terms"
+                            checked={acceptedTerms}
+                            onCheckedChange={(checked) => {
+                              setAcceptedTerms(checked === true);
+                              if (checked) setShowTermsTooltip(false);
+                            }}
+                            className="data-[state=unchecked]:bg-white"
+                          />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="left">
+                        <p>
+                          Debes aceptar los Términos y Condiciones para
+                          continuar
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <label
+                    htmlFor="terms"
+                    className="text-sm text-muted-foreground cursor-pointer leading-relaxed text-center"
+                  >
+                    He leído y acepto los{' '}
+                    <button
+                      type="button"
+                      onClick={() => setIsTermsOpen(true)}
+                      className="font-semibold text-primary hover:underline cursor-pointer"
+                    >
+                      Términos y condiciones
+                    </button>{' '}
+                    y la{' '}
+                    <button
+                      type="button"
+                      onClick={() => setIsPrivacyOpen(true)}
+                      className="font-semibold text-primary hover:underline cursor-pointer"
+                    >
+                      Política de privacidad
+                    </button>
+                    .
+                  </label>
+                </div>
+              </div>
             </div>
 
             {/* Botones actualizados para usar la variante por defecto */}
@@ -485,7 +522,15 @@ export function RegisterForm() {
                 type="submit"
                 className="w-full text-lg py-6 cursor-pointer"
                 disabled={isLoading}
-                onClick={() => setIsSubmitting(true)}
+                onClick={(e) => {
+                  if (!acceptedTerms) {
+                    e.preventDefault();
+                    setShowTermsTooltip(true);
+                    setTimeout(() => setShowTermsTooltip(false), 3000);
+                    return;
+                  }
+                  setIsSubmitting(true);
+                }}
               >
                 {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
               </Button>
@@ -508,9 +553,9 @@ export function RegisterForm() {
       <SuccessAlertDialog
         isOpen={showSuccessDialog}
         onClose={() => setShowSuccessDialog(false)}
-        title="¡Registro Exitoso!"
-        description="Hemos enviado un correo para que valides tu cuenta. Por favor, revisa tu bandeja de entrada."
-        onConfirm={() => router.push('/login')}
+        title="Registro exitoso"
+        description="Hemos enviado un correo para que confirmes y actives tu cuenta. Si no lo ubicas en la bandeja de entrada, revisa en SPAM, notificaciones o promociones."
+        onConfirm={() => router.replace('/login')}
       />
       <LegalPopup
         isOpen={isTermsOpen}

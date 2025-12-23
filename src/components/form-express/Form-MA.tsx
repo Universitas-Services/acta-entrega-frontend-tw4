@@ -46,13 +46,14 @@ import {
   anexosAdicionalesTitulos,
   dynamicStepContent,
   DynamicContent,
-} from '@/lib/acta-ma-constants';
+} from '@/lib/express/acta-ma-constants';
 import { useFormDirtyStore } from '@/stores/useFormDirtyStore';
 import { useFormState } from 'react-hook-form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FormFieldWithExtras } from '../FormFieldWithExtras';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 type FormData = z.infer<typeof actaMaximaAutoridadSchema>;
 type DynamicStepKey = keyof DynamicContent;
@@ -77,6 +78,7 @@ export function ActaMaximaAutoridadForm() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const { showLoader } = useLoaderStore();
 
   useEffect(() => {
     setTitle('Acta de de Entrega - Servidor Público Máxima Autoridad');
@@ -87,6 +89,7 @@ export function ActaMaximaAutoridadForm() {
     resolver: zodResolver(actaMaximaAutoridadSchema),
     shouldUnregister: false,
     defaultValues: {
+      tiempoRealizacion: undefined as unknown as number,
       email: '',
       rifOrgano: '',
       denominacionCargo: '',
@@ -181,18 +184,26 @@ export function ActaMaximaAutoridadForm() {
 
   const selectedAnexo = watch('Anexo_VII') as DynamicStepKey;
 
-  const { setIsDirty } = useFormDirtyStore();
+  const { setFormState, clearFormState } = useFormDirtyStore();
   const { isDirty } = useFormState({ control: form.control });
 
   // useEffect para comunicar el estado del formulario al store
   useEffect(() => {
-    setIsDirty(isDirty);
+    // Usar 'setFormState'
+    // Le decimos al store que el form está "sucio", pero que NO es un formulario Pro
+    // y que NO ha llegado al paso 3.
+    setFormState({
+      isDirty: isDirty,
+      isProForm: false,
+      hasReachedStep3: false,
+    });
 
     // Función de limpieza: se ejecuta cuando el componente se desmonta
     return () => {
-      setIsDirty(false);
+      // Usar 'clearFormState' para un reseteo completo
+      clearFormState();
     };
-  }, [isDirty, setIsDirty]);
+  }, [isDirty, setFormState, clearFormState]); // Dependencias actualizadas
 
   const onSubmit = async (data: FormData) => {
     console.log('DATOS FINALES A ENVIAR:', data);
@@ -376,8 +387,10 @@ export function ActaMaximaAutoridadForm() {
               description={dialogContent.description}
               onConfirm={() => {
                 setShowSuccessDialog(false);
+                // ACTIVAR LOADER ANTES DE VOLVER AL DASHBOARD
+                showLoader();
                 // La redirección ahora ocurre cuando el usuario presiona "Entendido"
-                router.push('/dashboard');
+                router.replace('/dashboard');
               }}
             />
 
@@ -438,6 +451,51 @@ export function ActaMaximaAutoridadForm() {
                       label="Nombre del órgano, entidad, oficina o dependencia de la Administración Pública"
                       subtitle="Ej: Instituto Nacional de Transporte Terrestre (INTT)"
                       maxLength={50}
+                    />
+                  </div>
+                </div>
+
+                {/* --- Tiempo de Realización del Acta --- */}
+                <div className="space-y-4 border rounded-lg">
+                  <div className="mb-4 p-4">
+                    <h3 className="font-bold text-lg">
+                      Tiempo de Realización del Acta
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 gap-x-6 gap-y-4 px-4 pb-4">
+                    <FormField
+                      control={form.control}
+                      name="tiempoRealizacion"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Seleccione el tiempo de realización
+                          </FormLabel>
+                          <Select
+                            onValueChange={(value) =>
+                              field.onChange(Number(value))
+                            }
+                            value={field.value?.toString()}
+                            disabled={isLoading}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="cursor-pointer">
+                                <SelectValue placeholder="Seleccione una opción" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent
+                              position="popper"
+                              className="bg-white z-50 max-h-60 overflow-y-auto text-black"
+                            >
+                              <SelectItem value="0">0</SelectItem>
+                              <SelectItem value="1">1</SelectItem>
+                              <SelectItem value="2">2</SelectItem>
+                              <SelectItem value="3">3</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                 </div>

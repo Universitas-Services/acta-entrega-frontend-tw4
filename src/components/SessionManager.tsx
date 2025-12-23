@@ -3,73 +3,102 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { jwtDecode } from 'jwt-decode';
-import apiClient from '@/lib/axios';
+import { refreshToken as apiRefreshToken } from '@/services/authService';
 import { SessionExpirationAlert } from './SessionExpirationAlert';
+import {
+  getAccessToken,
+  getRefreshToken,
+  setAuthTokens,
+} from '@/lib/authStorage';
 
 export function SessionManager() {
-  const { token, setAuth, logout } = useAuthStore();
+  // Seleccionamos cada función individualmente.
+  // Esto devuelve una referencia estable y no causa un nuevo renderizado.
+  const logout = useAuthStore((state) => state.logout);
+  const checkAuthOnLoad = useAuthStore((state) => state.checkAuthOnLoad);
+
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
+  // Ejecutar checkAuthOnLoad al montar el componente
   useEffect(() => {
-    // Si no hay token, no hacemos nada.
-    if (!token) {
+    checkAuthOnLoad();
+  }, [checkAuthOnLoad]); // Esta dependencia es estable, se ejecuta 1 vez.
+
+  useEffect(() => {
+    const access_token = getAccessToken(); // Obtener access_token directamente de localStorage
+
+    if (!access_token) {
+      // Si no hay token, checkAuthOnLoad() ya se está encargando o se encargó
+      // de redirigir al login. No hacemos nada aquí.
       return;
     }
 
     let sessionTimeout: NodeJS.Timeout;
 
     try {
-      const decodedToken: { exp: number } = jwtDecode(token);
+      const decodedToken: { exp: number } = jwtDecode(access_token);
       const expirationTime = decodedToken.exp * 1000; // en milisegundos
       const currentTime = Date.now();
 
-      // El aviso se mostrará 5 minutos antes de que expire la sesión.
+      // Mostrar alerta 5 minutos antes de la expiración
       const warningTime = expirationTime - currentTime - 5 * 60 * 1000;
 
       if (warningTime > 0) {
-        // Programamos el aviso para que aparezca en el futuro.
         sessionTimeout = setTimeout(() => {
           setIsAlertOpen(true);
         }, warningTime);
-      } else {
-        // Si el token ya expiró o está a menos de 5 minutos de hacerlo, cerramos la sesión.
-        logout();
+      } else if (expirationTime < currentTime) {
+        // Si el token ya expiró, checkAuthOnLoad() debería manejar el refresh o logout.
+        // Quitamos el 'logout()' agresivo que estaba aquí para evitar
+        // que compita con la lógica de carga inicial.
+        console.warn(
+          'SessionManager: Token ya expirado, confiando en checkAuthOnLoad.'
+        );
       }
     } catch (error) {
-      console.error('Token inválido, cerrando sesión:', error);
+      console.error(
+        'Token inválido en SessionManager, cerrando sesión:',
+        error
+      );
       logout();
     }
 
-    // Esta función de limpieza es la clave.
-    // Se ejecuta cada vez que el 'token' cambia, ANTES de volver a ejecutar el efecto.
-    // Esto asegura que el temporizador antiguo siempre se destruya.
     return () => {
       clearTimeout(sessionTimeout);
     };
-  }, [token, logout]); // La dependencia [token] asegura que esto se re-ejecute.
+    // El 'logout' es estable. Agregamos 'isAlertOpen' para que este efecto
+    // se re-ejecute después de que el usuario presione "Continuar Sesión"
+    // y se obtenga un nuevo token.
+  }, [logout, isAlertOpen]);
 
   const handleConfirm = async () => {
+    const currentRefreshToken = getRefreshToken(); // Obtener refresh_token directamente de localStorage
+
+    if (!currentRefreshToken) {
+      logout();
+      return;
+    }
+
     try {
-      const response = await apiClient.post('/auth/refresh-token');
-      // Al llamar a setAuth, el 'token' en el store cambia,
-      // lo que re-activa el useEffect de arriba, creando un nuevo temporizador.
-      setAuth(response.data.token, response.data.user);
-      setIsAlertOpen(false);
+      const newTokens = await apiRefreshToken(currentRefreshToken); // Usar apiRefreshToken
+      setAuthTokens(newTokens); // Guardar nuevos tokens directamente en localStorage
+      setIsAlertOpen(false); // Cierra la alerta y dispara el useEffect anterior
     } catch {
       logout();
     }
   };
 
-  const handleCancel = () => {
-    logout();
+  const handleLogout = () => {
+    logout(); // Solo llamamos a logout
     setIsAlertOpen(false);
+    // Ya no necesitamos router.push('/login'), ProtectedRoute lo hará.
   };
 
   return (
     <SessionExpirationAlert
       isOpen={isAlertOpen}
       onConfirm={handleConfirm}
-      onCancel={handleCancel}
+      onLogout={handleLogout}
     />
   );
 }

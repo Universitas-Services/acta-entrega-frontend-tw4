@@ -10,7 +10,7 @@ const cardData = [
     description:
       'Para garantizar un proceso de entrega-recepción transparente, te invitamos a leer detenidamente las siguientes consideraciones.',
     buttonText: 'Ingrese aquí',
-    linkHref: 'https://universitas.legal/consideraciones-generales/',
+    linkHref: 'https://actadeentrega.site/aspectos-generales/',
   },
   {
     imageUrl: '/repositorio-pro/Repositorio Legal.png',

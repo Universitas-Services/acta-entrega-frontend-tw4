@@ -146,7 +146,7 @@ export function SidebarPro() {
               'flex items-center gap-3 transition-colors cursor-pointer',
               'overflow-hidden transition-all duration-300',
               'text-sidebar-foreground', // CAMBIO: Texto oscuro para fondo blanco
-              'hover:bg-sidebar-hover-bg',
+              'hover:bg-chillon/70',
               isDesktopCollapsed
                 ? 'justify-center rounded-none'
                 : 'w-full justify-start py-2 px-3 rounded-none',
@@ -186,7 +186,7 @@ export function SidebarPro() {
         className={cn(
           'w-full justify-start rounded-none py-2 cursor-pointer',
           'text-sidebar-foreground', // CAMBIO: Texto oscuro
-          'hover:bg-sidebar-hover-bg',
+          'hover:bg-chillon/70',
           // --- Estilo de sub-item ---
           'pr-3', // Indentación
           pathname === item.href &&
@@ -211,14 +211,13 @@ export function SidebarPro() {
           >
             <SidebarTrigger
               onClick={toggleDesktopCollapse}
-              className="hidden md:flex cursor-pointer"
+              className="hidden md:flex cursor-pointer hover:bg-chillon/70"
             />
-            {/* CAMBIO: Logo oscuro para fondo blanco */}
             <Image
-              src="/logo de universitas legal.svg"
+              src="/LOGO_SIN_FONDO.png"
               alt="Universitas Legal Logo"
-              width={120}
-              height={48}
+              width={80}
+              height={32}
               priority={true}
               className={cn(
                 'mr-8 object-contain',
@@ -254,7 +253,7 @@ export function SidebarPro() {
                             className={cn(
                               'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden justify-center rounded-none',
                               'text-sidebar-foreground', // CAMBIO: Texto oscuro
-                              'hover:bg-sidebar-hover-bg',
+                              'hover:bg-chillon/70',
                               openCollapsible === item.id && 'font-bold'
                             )}
                           >
@@ -309,7 +308,7 @@ export function SidebarPro() {
                         className={cn(
                           'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden w-full justify-between py-2 px-3 rounded-none',
                           'text-sidebar-foreground', // CAMBIO: Texto oscuro
-                          'hover:bg-sidebar-hover-bg',
+                          'hover:bg-chillon/70',
                           openCollapsible === item.id && ''
                         )}
                       >
@@ -455,7 +454,7 @@ export function SidebarPro() {
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 ">
                         <AvatarImage alt={basic?.nombreCompleto || 'Usuario'} />
-                        <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                        <AvatarFallback className="bg-avatar-pro text-foreground font-bold">
                           {basic ? getInitials(basic.nombreCompleto) : 'U'}
                         </AvatarFallback>
                       </Avatar>

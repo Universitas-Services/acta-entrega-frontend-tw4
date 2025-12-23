@@ -1135,8 +1135,7 @@ export function ComplianceForm() {
                   nextStep();
                 }}
                 className={cn(
-                  'text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white',
-                  // Podríamos añadir lógica de deshabilitación si isLoading
+                  'text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-chillon hover:bg-chillon/80 hover:text-white',
                   isLoading && 'pointer-events-none opacity-50'
                 )}
               >
@@ -1150,7 +1149,7 @@ export function ComplianceForm() {
                 }
                 disabled={isLoading}
                 variant="default"
-                className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white"
+                className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-chillon hover:bg-chillon/80 hover:text-white"
               >
                 {isLoading ? 'Enviando...' : 'Finalizar autoevaluación'}
               </Button>

@@ -37,7 +37,7 @@ export function CardPro({
           'items-center',
 
           // --- Efectos visuales ---
-          'bg-card shadow-sm border-2 border-primary',
+          'bg-card shadow-sm border-2 border-chillon',
           'transition-all duration-300 ease-in-out',
           'hover:shadow-lg hover:scale-[1.01]'
         )}

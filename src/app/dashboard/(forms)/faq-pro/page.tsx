@@ -14,147 +14,94 @@ import { cn } from '@/lib/utils';
 const faqDataBySection = [
   {
     sectionId: 'section-1',
-    title: 'Preguntas generales',
+    title: 'Sobre la plataforma y el servicio',
     items: [
       {
-        question: '¿Qué es "Actas de entrega"?',
+        question: '¿Qué es "Acta de Entrega"?',
         answer:
-          'Es una herramienta digital diseñada para ayudar a los servidores públicos en Venezuela a crear, gestionar y generar actas de entrega de cargos, bienes y recursos de una manera más eficiente y ordenada.',
+          'Es una solución digital avanzada diseñada para asistir a los servidores públicos en Venezuela en la generación de actas de entrega de cargos, bienes y recursos. El sistema asegura que el documento generado cumpla estrictamente con la estructura y los requisitos exigidos por la Resolución CGR N.º 01-00-0162 de fecha 27-07-2009.',
       },
       {
         question: '¿Para quién es esta aplicación?',
         answer:
-          'Está dirigida a todos los servidores públicos dentro de la República Bolivariana de Venezuela que, por sus funciones, deban participar en un proceso de entrega y recepción de un cargo, ya sea en rol de funcionario saliente, entrante o como máxima autoridad de una institución.',
+          'Está dirigida a todos los servidores públicos de la República Bolivariana de Venezuela que deban participar en un proceso de entrega y recepción (salientes, entrantes o máximas autoridades), así como a sus equipos de apoyo (abogados, secretarios o asesores) que gestionen procesos de rendición de cuentas en la Administración Pública.',
       },
       {
         question:
-          '¿Esta aplicación es una herramienta oficial del gobierno venezolano?',
+          '¿Esta App sustituye el trabajo de la Unidad de Auditoría Interna (UAI)?',
         answer:
-          'No. "Actas de entrega" es una aplicación desarrollada y proporcionada por Universitas Services C.A., una entidad privada. Actúa como una herramienta de apoyo tecnológico independiente para facilitar el cumplimiento de las normativas.',
+          'No. La plataforma es una herramienta de apoyo técnico para el servidor público, quien tiene el deber legal de elaborar el acta. La Unidad de Auditoría Interna de cada organismo sigue siendo la encargada de verificar y recibir el documento físico. La App garantiza que usted llegue a ese momento con la documentación debidamente estructurada y validada.',
+      },
+      {
+        question: '¿Necesito ser abogado para usarla?',
+        answer:
+          'No. La interfaz es intuitiva y guía al usuario paso a paso. Para dudas sobre normativas específicas, la plataforma incluye un Consultor IA que ayuda a comprender los requisitos legales y técnicos en tiempo real.',
+      },
+      {
+        question: '¿Puedo usar la App desde mi teléfono?',
+        answer:
+          'Sí. La plataforma es totalmente responsiva y funciona de manera óptima en navegadores de teléfonos móviles, tabletas, laptops y computadoras de escritorio.',
+      },
+      {
+        question: '¿Mis datos están seguros?',
+        answer:
+          'Sí. Utilizamos infraestructura de clase mundial con altos estándares de seguridad. Todas las credenciales están encriptadas. Como medida de seguridad adicional, le recomendamos no compartir su contraseña con terceros.',
+      },
+      {
+        question: '¿Es una herramienta oficial del gobierno?',
+        answer:
+          'No. Es una plataforma privada de apoyo tecnológico independiente. Su función es facilitar al servidor público el cumplimiento de las normativas de control fiscal vigentes mediante el uso de herramientas digitales de precisión.',
       },
       {
         question: '¿La aplicación ofrece asesoría legal?',
         answer:
-          'No, y es un punto muy importante. La aplicación es una herramienta tecnológica para procesar información. No proporciona asesoría legal, jurídica o normativa. Para consultas de ese tipo, debe recurrir a un profesional del derecho.',
+          'La plataforma es una herramienta de soporte técnico y normativo. El Consultor IA resuelve dudas sobre la estructura y requisitos de la resolución, pero la herramienta no sustituye el juicio de un profesional del derecho para estrategias de defensa en procedimientos administrativos complejos.',
       },
     ],
   },
   {
     sectionId: 'section-2',
-    title: 'Cuentas y versiones ',
+    title: 'Funcionalidades de la plataforma',
     items: [
       {
-        question: '¿Cómo me registro?',
-        answer:
-          'Puede crear una cuenta visitando nuestro sitio web, haciendo clic en "Registrarme" y completando el formulario inicial. Luego, deberá activar su cuenta a través de un enlace que enviaremos a su correo electrónico.',
-      },
-      {
-        question:
-          '¿Cuál es la diferencia entre la versión express (gratuita) y la pro (de pago)? ',
+        question: '¿Qué herramientas incluye mi acceso a la plataforma?',
         answer: {
           intro:
-            'La diferencia principal radica en la capacidad y las funcionalidades avanzadas.',
+            'Su acceso le otorga herramientas integrales para una gestión completa:',
           points: [
-            'Express (gratuita): Le permite generar un (1) acta por cada rol. El documento se envía a su correo y no se guarda en la app. Es ideal para un uso único o para probar la plataforma.',
-            'Pro (de pago): Le permite generar actas ilimitadas, las almacena en la nube para que pueda gestionarlas y editarlas, y le da acceso a herramientas de inteligencia artificial como un asistente virtual y un módulo de "compliance".',
+            'Edición dinámica: Guarde borradores y edite sus actas en su panel personal cuantas veces sea necesario antes de la firma.',
+            'Módulo de Compliance: Genera un reporte técnico en PDF que le alerta sobre posibles omisiones o fallas según la normativa vigente.',
+            'Consultor IA: Chat inteligente entrenado para resolver dudas sobre la elaboración del acta basándose en la Resolución N° 01-00-0162 de la CGR.',
+            'Panel de actas: Historial completo de todas sus actas guardadas, elaboradas, descargadas y el registro de sus entregas.',
           ],
         },
       },
       {
-        question: '¿Es obligatorio pasar a la versión pro?',
+        question: '¿El "Consultor IA" es un abogado real?',
         answer:
-          'No. Puede utilizar la versión express gratuita según sus limitaciones. La versión pro es una opción para usuarios que necesitan generar múltiples actas, requieren almacenamiento o desean utilizar las funcionalidades avanzadas.',
+          'No. Es una inteligencia artificial especializada en el marco jurídico venezolano. Responde preguntas técnicas sobre normas y requisitos del acta de entrega, facilitando la autogestión del usuario.',
+      },
+      {
+        question:
+          '¿La plataforma garantiza que no tendré problemas con la Contraloría?',
+        answer:
+          'La plataforma garantiza que el formato y la estructura del documento cumplen con la normativa de la CGR. Sin embargo, no valida ni se hace responsable por la veracidad o integridad de la información suministrada por el usuario, siendo esta última responsabilidad exclusiva del servidor público según la ley.',
       },
     ],
   },
   {
     sectionId: 'section-3',
-    title: 'Pagos y actualización a pro',
+    title: 'Soporte y ayuda',
     items: [
       {
-        question: '¿Cómo puedo adquirir la versión pro?',
+        question: 'Tengo un problema técnico, ¿a quién acudo?',
         answer:
-          'Dentro de la aplicación, encontrará un botón para contactar a un asesor vía WhatsApp. Esta persona le guiará a través de las opciones y el proceso de pago para activar su cuenta pro.',
+          'Puede contactarnos a través de nuestros canales de atención técnica por WhatsApp o correo electrónico de lunes a viernes en horario de oficina.',
       },
       {
-        question: '¿Qué métodos de pago aceptan?',
+        question: '¿El soporte técnico me ayuda con el contenido del acta?',
         answer:
-          'Aceptamos transferencias bancarias en bolívares y pagos electrónicos a través de plataformas seguras como PayPal y Stripe.',
-      },
-      {
-        question: '¿El pago es una suscripción mensual o anual?',
-        answer:
-          'No. La versión pro se adquiere a través de un pago único que le da acceso a todas sus funcionalidades.',
-      },
-      {
-        question: '¿Tienen una política de reembolso?',
-        answer:
-          'Sí, ofrecemos un reembolso parcial del 50% bajo condiciones muy específicas: debe solicitarlo por escrito dentro de las 24 horas posteriores al pago y no haber superado un límite de uso muy básico. Le recomendamos leer la cláusula completa en nuestros términos y condiciones.',
-      },
-    ],
-  },
-  {
-    sectionId: 'section-4',
-    title: 'Funcionalidades y uso',
-    items: [
-      {
-        question: '¿Cómo recibo los documentos que genero?',
-        answer:
-          'Los documentos se generan y alojan en Google Drive. Al finalizar, le enviamos a su correo electrónico un enlace único para que pueda acceder, descargar, imprimir o compartir su acta en formato Google Docs.',
-      },
-      {
-        question: '¿Puedo editar un acta después de haberla generado?',
-        answer: {
-          points: [
-            'En la versión express, no. Una vez generada, cualquier cambio debe hacerse en el archivo Google Docs al que accede desde el enlace.',
-            'En la versión pro, sí. Sus actas se guardan en su cuenta, permitiéndole editar la información directamente en la plataforma y volver a generar el documento actualizado.',
-          ],
-        },
-      },
-      {
-        question:
-          '¿En qué consisten las funciones de inteligencia artificial (IA)?',
-        answer:
-          'En la versión pro, la IA actúa como un asistente. Puede analizar la información para darle alertas proactivas (por ejemplo, sobre plazos) y sugerirle documentos de debida diligencia. También cuenta con un asesor virtual para responder dudas sobre el proceso.',
-      },
-      {
-        question: '¿Puedo compartir mi cuenta o mi contraseña con un colega?',
-        answer:
-          'No. Por razones de seguridad y para proteger la integridad de su información, las cuentas son estrictamente personales e intransferibles. Compartir sus credenciales está prohibido en los términos y condiciones.',
-      },
-    ],
-  },
-  {
-    sectionId: 'section-5',
-    title: 'Datos y seguridad',
-    items: [
-      {
-        question:
-          '¿Quién es el dueño de la información que yo introduzco en la aplicación?',
-        answer:
-          'Usted. El usuario es en todo momento el propietario del contenido que introduce. Nosotros solo tenemos una licencia limitada para procesar esa información y prestarle el servicio.',
-      },
-      {
-        question:
-          '¿Universitas Services C.A. revisa el contenido de mis actas?',
-        answer:
-          'No. Su información es privada. No verificamos, validamos ni revisamos la veracidad o legalidad del contenido que usted introduce. La responsabilidad sobre el contenido es exclusivamente suya.',
-      },
-      {
-        question: '¿Qué pasa con mis documentos si elimino mi cuenta?',
-        answer:
-          'Si decide eliminar su cuenta, su perfil y acceso a la plataforma serán borrados. Sin embargo, usted conservará el acceso a los documentos que ya había generado, a través de los enlaces de Google Docs que le fueron enviados a su correo electrónico..',
-      },
-    ],
-  },
-  {
-    sectionId: 'section-7',
-    title: 'Soporte y contacto',
-    items: [
-      {
-        question: '¿Cómo puedo obtener soporte técnico?',
-        answer:
-          'Para cualquier duda o problema técnico, puede contactar a nuestro equipo a través del canal de WhatsApp disponible en la aplicación o escribiéndonos a contacto@universitas.legal.',
+          'El soporte técnico se limita exclusivamente a resolver fallas de funcionamiento de la plataforma. Para dudas sobre el contenido legal o normativo, debe utilizar el Consultor IA integrado en su panel.',
       },
     ],
   },
@@ -175,7 +122,8 @@ export default function FaqPage() {
           type="single"
           collapsible
           className="w-full space-y-4"
-          onValueChange={(value) => setOpenSection(value)}
+          value={openSection}
+          onValueChange={setOpenSection}
         >
           {faqDataBySection.map((section) => (
             <AccordionItem

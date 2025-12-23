@@ -318,7 +318,7 @@ export function ProfileForm() {
                 </Button>
                 <Button
                   type="submit"
-                  className="cursor-pointer"
+                  className="cursor-pointer bg-chillon hover:bg-chillon/80"
                   disabled={!form.formState.isDirty || isLoading}
                 >
                   {isLoading ? 'Guardando...' : 'Guardar cambios'}
@@ -328,7 +328,7 @@ export function ProfileForm() {
               <Button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="cursor-pointer"
+                className="cursor-pointer bg-chillon hover:bg-chillon/80"
               >
                 Editar perfil
               </Button>

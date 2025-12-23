@@ -40,7 +40,7 @@ export function CardPro({
           'flex flex-col sm:flex-row items-start gap-x-6 gap-y-4',
 
           // --- Efectos visuales ---
-          'bg-card shadow-sm border-2 border-primary',
+          'bg-card shadow-sm border-2 border-chillon',
           'transition-all duration-300 ease-in-out',
           'hover:shadow-lg hover:scale-[1.01]'
         )}
@@ -50,7 +50,7 @@ export function CardPro({
         <span
           className={cn(
             'absolute top-6 right-6 text-xs font-bold rounded-full px-3 py-1',
-            'bg-chillon text-primary'
+            'bg-chillon text-card'
           )}
         >
           PRO

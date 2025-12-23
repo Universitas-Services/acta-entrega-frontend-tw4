@@ -1,7 +1,31 @@
 import * as z from 'zod';
-import { dynamicStepContent } from './acta-ma-constants';
-import { dynamicStepContentEntrante } from './acta-entrante-constants';
-import { dynamicStepContentSaliente } from './acta-saliente-constants';
+
+// --- IMPORTACIONES DE CONSTANTES (SEPARADAS) ---
+import {
+  dynamicStepContent as dynamicContentExpress_MA,
+  type DynamicContent as DynamicContentExpress_MA,
+} from './express/acta-ma-constants';
+import {
+  dynamicStepContentEntrante as dynamicContentExpress_Entrante,
+  type DynamicContent as DynamicContentExpress_Entrante,
+} from './express/acta-entrante-constants';
+import {
+  dynamicStepContentSaliente as dynamicContentExpress_Saliente,
+  type DynamicContent as DynamicContentExpress_Saliente,
+} from './express/acta-saliente-constants';
+
+import {
+  dynamicStepContent as dynamicContentPro_MA,
+  type DynamicContent as DynamicContentPro_MA,
+} from './pro/acta-ma-pro-constants';
+import {
+  dynamicStepContent as dynamicContentPro_Entrante,
+  type DynamicContent as DynamicContentPro_Entrante,
+} from './pro/acta-entrante-pro-constants';
+import {
+  dynamicStepContent as dynamicContentPro_Saliente,
+  type DynamicContent as DynamicContentPro_Saliente,
+} from './pro/acta-saliente-pro-constants';
 
 // Expresión regular para RIF (ej: G-20000000-0)
 const rifRegex = /^[GJE]-\d{8}-\d{1}$/;
@@ -10,6 +34,10 @@ const cedulaRegex = /^[VE]-\d{7,8}$/;
 
 export const actaMaximaAutoridadSchemaBase = z.object({
   // --- Datos Generales ---
+  tiempoRealizacion: z
+    .number({ message: 'Debe seleccionar una opción.' })
+    .int({ message: 'Debe ser un número entero.' })
+    .min(0, 'Debe ser mayor o igual a 0'),
   email: z
     .string()
     .min(1, 'Campo Requerido')
@@ -169,48 +197,97 @@ export const actaMaximaAutoridadSchemaBase = z.object({
   deficienciasActa: z.string().optional(),
 });
 
-// ESQUEMA FINAL: Aplicamos la validación inteligente con superRefine
-export const actaMaximaAutoridadSchema =
-  actaMaximaAutoridadSchemaBase.superRefine((data, ctx) => {
-    const selectedAnexo = data.Anexo_VII;
+// --- Refine para MA EXPRESS ---
+const dynamicRefine_MA_Express = (
+  data: z.infer<typeof actaMaximaAutoridadSchemaBase>,
+  ctx: z.RefinementCtx
+) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
 
-    if (!selectedAnexo || selectedAnexo === 'NO APLICA') {
-      return; // Si no hay anexo seleccionado o es "NO APLICA", la validación para esta parte es exitosa.
-    }
+  const anexoContent =
+    dynamicContentExpress_MA[
+      selectedAnexo as keyof DynamicContentExpress_MA // <-- TIPO CORREGIDO
+    ];
+  if (!anexoContent) return;
 
-    const anexoContent =
-      dynamicStepContent[selectedAnexo as keyof typeof dynamicStepContent];
-
-    if (!anexoContent) return; // Si por alguna razón la selección no coincide, no validamos.
-
-    if (anexoContent.type === 'questions') {
-      anexoContent.questions.forEach((q) => {
-        const fieldName = q.name as keyof typeof data;
-        if (!data[fieldName]) {
-          // Si la respuesta es vacía, null, o undefined
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: [fieldName],
-            message: 'Debe seleccionar una opción.',
-          });
-        }
-      });
-    } else if (anexoContent.type === 'textarea') {
-      const fieldName = anexoContent.fieldName;
-      if (!data[fieldName] || (data[fieldName] as string).trim() === '') {
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: [fieldName],
-          message: 'Este campo es requerido según su selección.',
+          message: 'Debe seleccionar una opción.',
         });
       }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof typeof data;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
     }
-  });
+  }
+};
+
+// --- Refine para MA PRO ---
+const actaMaximaAutoridadProSchemaBase = actaMaximaAutoridadSchemaBase.omit({
+  interesProducto: true,
+});
+type ProFormDataMA = z.infer<typeof actaMaximaAutoridadProSchemaBase>;
+
+const dynamicRefine_MA_Pro = (data: ProFormDataMA, ctx: z.RefinementCtx) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
+
+  const anexoContent =
+    dynamicContentPro_MA[selectedAnexo as keyof DynamicContentPro_MA]; // <-- TIPO CORREGIDO
+  if (!anexoContent) return;
+
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [fieldName],
+          message: 'Debe seleccionar una opción.',
+        });
+      }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof ProFormDataMA;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
+    }
+  }
+};
+
+// --- Exportaciones de Schemas MA ---
+export const actaMaximaAutoridadSchema =
+  actaMaximaAutoridadSchemaBase.superRefine(dynamicRefine_MA_Express);
+
+export const actaMaximaAutoridadProSchema =
+  actaMaximaAutoridadProSchemaBase.superRefine(dynamicRefine_MA_Pro);
 
 // --- Esquema para Acta Saliente ---
 
 export const actaSalienteSchemaBase = z.object({
   // --- Datos Generales ---
+  tiempoRealizacion: z
+    .number({ message: 'Debe seleccionar una opción.' })
+    .int({ message: 'Debe ser un número entero.' })
+    .min(0, 'Debe ser mayor o igual a 0'),
   email: z
     .string()
     .min(1, 'Campo Requerido')
@@ -361,51 +438,101 @@ export const actaSalienteSchemaBase = z.object({
   deficienciasActa: z.string().optional(),
 });
 
-// ESQUEMA FINAL: Aplicamos la validación inteligente con superRefine
-export const actaSalienteSchema = actaSalienteSchemaBase.superRefine(
-  (data, ctx) => {
-    const selectedAnexo = data.Anexo_VII;
+// --- Refine para Saliente EXPRESS ---
+const dynamicRefine_Saliente_Express = (
+  data: z.infer<typeof actaSalienteSchemaBase>,
+  ctx: z.RefinementCtx
+) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
+  const anexoContent =
+    dynamicContentExpress_Saliente[
+      selectedAnexo as keyof DynamicContentExpress_Saliente // <-- TIPO CORREGIDO
+    ];
+  if (!anexoContent) return;
 
-    if (!selectedAnexo || selectedAnexo === 'NO APLICA') {
-      return; // Si no hay anexo seleccionado o es "NO APLICA", la validación para esta parte es exitosa.
-    }
-
-    const anexoContent =
-      dynamicStepContentSaliente[
-        selectedAnexo as keyof typeof dynamicStepContentSaliente
-      ];
-
-    if (!anexoContent) return; // Si por alguna razón la selección no coincide, no validamos.
-
-    if (anexoContent.type === 'questions') {
-      anexoContent.questions.forEach((q) => {
-        const fieldName = q.name as keyof typeof data;
-        if (!data[fieldName]) {
-          // Si la respuesta es vacía, null, o undefined
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: [fieldName],
-            message: 'Debe seleccionar una opción.',
-          });
-        }
-      });
-    } else if (anexoContent.type === 'textarea') {
-      const fieldName = anexoContent.fieldName;
-      if (!data[fieldName] || (data[fieldName] as string).trim() === '') {
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: [fieldName],
-          message: 'Este campo es requerido según su selección.',
+          message: 'Debe seleccionar una opción.',
         });
       }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof typeof data;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
     }
   }
+};
+
+// --- Refine para Saliente PRO ---
+const actaSalienteProSchemaBase = actaSalienteSchemaBase.omit({
+  interesProducto: true,
+});
+type ProFormDataSaliente = z.infer<typeof actaSalienteProSchemaBase>;
+
+const dynamicRefine_Saliente_Pro = (
+  data: ProFormDataSaliente,
+  ctx: z.RefinementCtx
+) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
+  const anexoContent =
+    dynamicContentPro_Saliente[
+      selectedAnexo as keyof DynamicContentPro_Saliente // <-- TIPO CORREGIDO
+    ];
+  if (!anexoContent) return;
+
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [fieldName],
+          message: 'Debe seleccionar una opción.',
+        });
+      }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof ProFormDataSaliente;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
+    }
+  }
+};
+
+// --- Exportaciones de Schemas Saliente ---
+export const actaSalienteSchema = actaSalienteSchemaBase.superRefine(
+  dynamicRefine_Saliente_Express
+);
+export const actaSalienteProSchema = actaSalienteProSchemaBase.superRefine(
+  dynamicRefine_Saliente_Pro
 );
 
 // ACTA ENTRANTE SCHEMA
 
 export const actaEntranteSchemaBase = z.object({
   // --- Datos Generales ---
+  tiempoRealizacion: z
+    .number({ message: 'Debe seleccionar una opción.' })
+    .int({ message: 'Debe ser un número entero.' })
+    .min(0, 'Debe ser mayor o igual a 0'),
   email: z
     .string()
     .min(1, 'Campo Requerido')
@@ -565,43 +692,89 @@ export const actaEntranteSchemaBase = z.object({
   deficienciasActa: z.string().optional(),
 });
 
-// ESQUEMA FINAL: Aplicamos la validación inteligente con superRefine
-export const actaEntranteSchema = actaEntranteSchemaBase.superRefine(
-  (data, ctx) => {
-    const selectedAnexo = data.Anexo_VII;
+// --- Refine para Entrante EXPRESS ---
+const dynamicRefine_Entrante_Express = (
+  data: z.infer<typeof actaEntranteSchemaBase>,
+  ctx: z.RefinementCtx
+) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
+  const anexoContent =
+    dynamicContentExpress_Entrante[
+      selectedAnexo as keyof DynamicContentExpress_Entrante // <-- TIPO CORREGIDO
+    ];
+  if (!anexoContent) return;
 
-    if (!selectedAnexo || selectedAnexo === 'NO APLICA') {
-      return; // Si no hay anexo seleccionado o es "NO APLICA", la validación para esta parte es exitosa.
-    }
-
-    const anexoContent =
-      dynamicStepContentEntrante[
-        selectedAnexo as keyof typeof dynamicStepContentEntrante
-      ];
-
-    if (!anexoContent) return; // Si por alguna razón la selección no coincide, no validamos.
-
-    if (anexoContent.type === 'questions') {
-      anexoContent.questions.forEach((q) => {
-        const fieldName = q.name as keyof typeof data;
-        if (!data[fieldName]) {
-          // Si la respuesta es vacía, null, o undefined
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: [fieldName],
-            message: 'Debe seleccionar una opción.',
-          });
-        }
-      });
-    } else if (anexoContent.type === 'textarea') {
-      const fieldName = anexoContent.fieldName;
-      if (!data[fieldName] || (data[fieldName] as string).trim() === '') {
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: [fieldName],
-          message: 'Este campo es requerido según su selección.',
+          message: 'Debe seleccionar una opción.',
         });
       }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof typeof data;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
     }
   }
+};
+
+// --- Refine para Entrante PRO ---
+const actaEntranteProSchemaBase = actaEntranteSchemaBase.omit({
+  interesProducto: true,
+});
+type ProFormDataEntrante = z.infer<typeof actaEntranteProSchemaBase>;
+
+const dynamicRefine_Entrante_Pro = (
+  data: ProFormDataEntrante,
+  ctx: z.RefinementCtx
+) => {
+  const selectedAnexo = data.Anexo_VII;
+  if (!selectedAnexo || selectedAnexo === 'NO APLICA') return;
+  const anexoContent =
+    dynamicContentPro_Entrante[
+      selectedAnexo as keyof DynamicContentPro_Entrante // <-- TIPO CORREGIDO
+    ];
+  if (!anexoContent) return;
+
+  if (anexoContent.type === 'questions') {
+    anexoContent.questions.forEach((q) => {
+      const fieldName = q.name as keyof typeof data;
+      if (!data[fieldName]) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [fieldName],
+          message: 'Debe seleccionar una opción.',
+        });
+      }
+    });
+  } else if (anexoContent.type === 'textarea') {
+    const fieldName = anexoContent.fieldName as keyof ProFormDataEntrante;
+    const value = data[fieldName] as unknown;
+    if (typeof value !== 'string' || value.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [fieldName],
+        message: 'Este campo es requerido según su selección.',
+      });
+    }
+  }
+};
+
+// --- Exportaciones de Schemas Entrante ---
+export const actaEntranteSchema = actaEntranteSchemaBase.superRefine(
+  dynamicRefine_Entrante_Express
+);
+export const actaentranteProSchema = actaEntranteProSchemaBase.superRefine(
+  dynamicRefine_Entrante_Pro
 );

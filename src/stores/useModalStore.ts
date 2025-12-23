@@ -5,7 +5,8 @@ export type ModalType =
   | 'logoutConfirmation'
   | 'userProfileOptions'
   | 'sessionExpiration'
-  | 'unsavedChanges';
+  | 'unsavedChanges'
+  | 'saveOnExitPro';
 
 interface ModalPayload {
   title: string;
@@ -13,6 +14,8 @@ interface ModalPayload {
   content?: ReactNode;
   onConfirm: () => void;
   onCancel?: () => void;
+  onSave?: () => Promise<void>;
+  onNavigate?: () => void;
 }
 
 interface ModalStore {

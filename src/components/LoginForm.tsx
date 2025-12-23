@@ -17,8 +17,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { loginUser } from '@/services/authService';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useLoaderStore } from '@/stores/useLoaderStore';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -33,36 +33,48 @@ export function LoginForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const { setAuth } = useAuthStore();
+  const login = useAuthStore((state) => state.login);
+  const [error, setError] = useState<string | null>(null);
+  const { showLoader } = useLoaderStore();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '', password: '' },
   });
 
-  // Lógica de envío actualizada para llamar al backend
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    setApiError(null);
-
+    setError(null);
     try {
-      const response = await loginUser(values);
-      console.log('Login exitoso:', response);
+      // Espera a que el login se complete.
+      // La función 'login' en el store ya obtiene y guarda los datos básicos.
+      await login(values);
 
-      // Usamos setAuth para guardar el token y los datos del usuario globalmente
-      setAuth(response.token, response.user);
+      // Lee el estado 'basic' (que contiene el rol) directamente desde el store
+      const { basic } = useAuthStore.getState();
 
-      // Redirigimos al dashboard
-      router.replace('/dashboard');
-    } catch (error) {
-      if (error instanceof Error) {
-        setApiError(error.message);
-      } else {
-        setApiError('Ocurrió un error inesperado.');
+      // ACTIVAR LOADER ANTES DE REDIRIGIR
+      showLoader();
+
+      // Determina la ruta de destino basada en el rol
+      let targetRoute = '/dashboard'; // Ruta por defecto para 'USER'
+
+      if (basic?.role === 'PAID_USER') {
+        targetRoute = '/dashboard/pro';
       }
-    } finally {
-      setIsLoading(false);
+
+      // Usa router.replace() para navegar
+      // Esto reemplaza /login en el historial, impidiendo volver con "Atrás".
+      router.replace(targetRoute);
+    } catch (err: unknown) {
+      // Si el store lanza un error (ej. 401 Credenciales Inválidas),
+      // el 'authService' lo captura y lo muestra aquí.
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Ocurrió un error desconocido.');
+      }
+      setIsLoading(false); // Solo se ejecuta si hay un error
     }
   }
 
@@ -75,12 +87,12 @@ export function LoginForm() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {apiError && (
+          {error && (
             <div
               className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-md relative"
               role="alert"
             >
-              <span className="block sm:inline">{apiError}</span>
+              <span className="block sm:inline">{error}</span>
             </div>
           )}
 

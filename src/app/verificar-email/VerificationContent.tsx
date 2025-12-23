@@ -27,7 +27,7 @@ export default function VerificationContent() {
           setError(false);
 
           setTimeout(() => {
-            router.push('/login');
+            router.replace('/login');
           }, 5000);
         } catch (err) {
           setError(true);
@@ -53,7 +53,7 @@ export default function VerificationContent() {
     <div className="flex items-center justify-center min-h-screen bg-g1">
       <div className="w-full max-w-md p-8 space-y-6 bg-white shadow-md rounded-lg text-center">
         <h1 className="text-2xl font-bold text-g8">
-          Verificación de Correo Electrónico
+          Verificación de correo electrónico
         </h1>
         <p className={`mt-4 text-lg ${error ? 'text-red6' : 'text-green6'}`}>
           {status}
@@ -65,7 +65,7 @@ export default function VerificationContent() {
           href="/login"
           className="inline-block px-6 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 focus:outline-none focus:ring"
         >
-          Ir a Iniciar Sesión
+          Ir a iniciar sesión
         </Link>
       </div>
     </div>

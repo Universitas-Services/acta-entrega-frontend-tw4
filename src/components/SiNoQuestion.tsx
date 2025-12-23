@@ -41,7 +41,7 @@ export function SiNoQuestion<T extends FieldValues>({
   const displayTexts: { [key in Option]: string } = {
     SI: 'Sí',
     NO: 'No',
-    'NO APLICA': 'No Aplica',
+    'NO APLICA': 'No aplica',
   };
 
   return (

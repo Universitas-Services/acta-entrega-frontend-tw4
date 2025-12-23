@@ -29,7 +29,7 @@ export default function AcercaDePage() {
               Acerca de Acta de Entrega
             </h2>
             <p className="text-md text-muted-foreground italic">
-              Una solución innovadora de Universitas Services C.A.
+              Una solución innovadora del Equipo de Actas de Entrega.
             </p>
           </div>
         </div>

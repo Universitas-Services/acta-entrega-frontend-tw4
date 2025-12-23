@@ -18,7 +18,7 @@ export default function AcercaDePage() {
         <div className="flex flex-col sm:flex-row items-center text-center sm:text-left mb-6">
           <div className="relative h-[100px] w-[100px] flex-shrink-0 mb-4 sm:mb-0 sm:mr-6">
             <Image
-              src="/AZUL 250PX.svg"
+              src="/LOGO_CON_FONDO.png"
               alt="Universitas Legal Logo"
               fill // Usamos 'fill' para que la imagen llene el contenedor
               className="object-contain" // 'object-contain' para que no se deforme
@@ -26,7 +26,7 @@ export default function AcercaDePage() {
           </div>
           <div>
             <h2 className="text-3xl font-bold text-primary mb-2">
-              Acerca de Actas de Entrega
+              Acerca de Acta de Entrega
             </h2>
             <p className="text-md text-muted-foreground italic">
               Una solución innovadora de Universitas Services C.A.
@@ -40,37 +40,34 @@ export default function AcercaDePage() {
         {/* Contenido Principal */}
         <div className="space-y-4 text-g7 leading-relaxed">
           <p>
-            Actas de entrega es una innovadora plataforma digital diseñada para
-            ser el principal asistente tecnológico de los servidores públicos en
-            Venezuela. Nuestra aplicación transforma un proceso tradicionalmente
-            complejo en una experiencia de usuario simple, estructurada y
-            segura.
+            <strong>Acta de Entrega</strong> es la solución tecnológica líder
+            diseñada para asistir de manera integral a los servidores públicos
+            en Venezuela. Nuestra plataforma transforma un proceso
+            administrativo tradicionalmente complejo en una experiencia digital
+            simple, estructurada y con total seguridad jurídica.
           </p>
           <p>
-            El núcleo de nuestra plataforma es una interfaz intuitiva que guía
-            al usuario a través de formularios inteligentes, facilitando la
-            recopilación de toda la información necesaria de manera ordenada.
-            Hemos creado un ecosistema que se adapta a las distintas necesidades
-            de nuestros usuarios a través de dos versiones: una versión express,
-            ideal para generar un documento de forma rápida y directa, y una
-            versión pro, pensada para una gestión integral y a largo plazo.
+            El núcleo de nuestro sistema es una{' '}
+            <strong>interfaz inteligente</strong> que guía al usuario a través
+            de formularios dinámicos, facilitando la recopilación y organización
+            de toda la información requerida por los órganos de control fiscal.
           </p>
           <p className="p-4 bg-muted/30 border-l-4 border-primary rounded-r-lg">
-            <strong>La versión pro es el corazón de nuestra innovación.</strong>{' '}
-            Ofrece un entorno robusto con almacenamiento seguro en la nube,
-            permitiendo al usuario guardar, gestionar y editar sus documentos en
-            cualquier momento y desde cualquier lugar. Además, integramos
-            herramientas de inteligencia artificial que actúan como un asesor
-            proactivo, generando alertas y sugerencias para asegurar la debida
-            diligencia en cada paso.
+            Nuestra plataforma integra herramientas de vanguardia, como el{' '}
+            <strong>Consultor IA</strong>, un asistente normativo que actúa de
+            forma proactiva, y un <strong>Sistema de Alertas</strong>{' '}
+            automatizado que garantiza el cumplimiento de los lapsos legales de
+            3, 5 y 120 días. Además, el <strong>módulo de Compliance</strong>{' '}
+            permite realizar auditorías preventivas antes de la firma final,
+            asegurando que cada acta cumpla estrictamente con la
+            <strong>Resolución N.º 01-00-0162 de la CGR</strong>.
           </p>
           <p>
-            En Universitas Services C.A. estamos comprometidos con el desarrollo
-            de soluciones digitales profesionales. Actas de entrega es un
-            reflejo de esa visión: una aplicación potente, confiable y segura,
-            diseñada no solo para generar un documento, sino para aportar
-            tranquilidad, control y eficiencia a la importante labor de los
-            servidores públicos de nuestro país.
+            <strong>Acta de Entrega</strong> no es solo una aplicación para
+            generar documentos; es un compromiso con la transparencia, la
+            eficiencia y la seguridad jurídica. Es una herramienta potente y
+            confiable diseñada para aportar control y tranquilidad a la labor de
+            los servidores públicos de nuestro país.
           </p>
         </div>
       </div>

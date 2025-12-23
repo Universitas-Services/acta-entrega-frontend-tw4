@@ -6,18 +6,18 @@ import { RepoCardPro } from '@/components/RepoCardPro';
 
 const cardData = [
   {
-    imageUrl: '/repositorio-pro/Consideraciones generales.png',
+    imageUrl: '/repositorio-pro/Consideraciones-generales.png',
     description:
       'Para garantizar un proceso de entrega-recepción transparente, te invitamos a leer detenidamente las siguientes consideraciones.',
     buttonText: 'Ingrese aquí',
     linkHref: 'https://universitas.legal/consideraciones-generales/',
   },
   {
-    imageUrl: '/repositorio-pro/REPOSITORIO LEGAL.png',
+    imageUrl: '/repositorio-pro/Repositorio Legal.png',
     description: 'Descarga la Resolución CGR N°01-000162 de fecha 27-07-2009.',
     buttonText: 'Descarga aquí',
     linkHref:
-      'https://drive.google.com/file/d/1L5y59yCxXiOfbDyuuU3V_5RfT1qouzI-/view',
+      'https://drive.google.com/file/d/18nPMnYsMYw93Dnh67EECRuCc0AFqbslS/view?usp=sharing',
   },
   {
     imageUrl: '/repositorio/imagen curso para APP.png',
@@ -26,30 +26,7 @@ const cardData = [
     buttonText: 'Más información',
     linkHref: 'https://universitas.academy/cursos/actas-de-entrega/',
   },
-  {
-    imageUrl: '/repositorio-pro/ARTICULO AGORA 1.png',
-    description:
-      'Tienes 120 días para formular observaciones a un acta recibida. Descubre en este análisis los puntos clave que debes verificar para un control fiscal efectivo.',
-    buttonText: 'Ingrese aquí',
-    linkHref:
-      'https://agora.universitasfundacion.com/verificacion-de-acta-de-entrega/',
-  },
-  {
-    imageUrl: '/repositorio-pro/ARTICULO AGORA 2.png',
-    description:
-      'La Unidad de Auditoría Interna es el actor clave en la verificación. Conoce sus competencias, responsabilidades y el procedimiento que debe seguir para validar las actas.',
-    buttonText: 'Ingrese aquí',
-    linkHref:
-      'https://agora.universitasfundacion.com/acta-de-entrega-verificacion/',
-  },
-  {
-    imageUrl: '/repositorio-pro/ARTICULO AGORA 3.png',
-    description:
-      'El acta de entrega es más que un requisito; es una herramienta clave del Control Interno. Descubre cómo su correcta verificación previene riesgos y fortalece la gestión.',
-    buttonText: 'Ingrese aquí',
-    linkHref:
-      'https://agora.universitasfundacion.com/verificacion-acta-de-entrega/',
-  },
+
   {
     imageUrl: '/repositorio/control-fiscal.png',
     description:

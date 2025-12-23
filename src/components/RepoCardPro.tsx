@@ -26,8 +26,8 @@ export function RepoCardPro({
       className={cn(
         // Estructura Base y Tamaño Fijo
         'flex flex-col h-full w-full max-w-[380px]',
-        // Estilos Visuales: Borde Primary estático, Fondo Blanco, Redondeado
-        'bg-white border-2 border-primary rounded-3xl',
+        // Estilos Visuales: Borde Chillon estático, Fondo Blanco, Redondeado
+        'bg-white border-2 border-chillon rounded-3xl',
         // Sombra fija
         'shadow-md',
         className
@@ -50,8 +50,8 @@ export function RepoCardPro({
 
       {/* Línea Separadora Azul Estática */}
       <div className="px-5 py-4">
-        {/* Color bg-primary fijo, sin hover */}
-        <div className="h-0.5 w-full bg-primary rounded-full" />
+        {/* Color bg-chillon fijo, sin hover */}
+        <div className="h-0.5 w-full bg-chillon rounded-full" />
       </div>
 
       {/* Contenido de Texto y Botón */}
@@ -67,7 +67,7 @@ export function RepoCardPro({
         <div className="pt-2">
           <Button
             asChild
-            className="w-full h-full rounded-xl text-lg bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-sm"
+            className="w-full h-full rounded-xl text-lg bg-chillon text-primary-foreground hover:bg-chillon/90 font-bold shadow-sm"
           >
             <Link
               href={linkHref}

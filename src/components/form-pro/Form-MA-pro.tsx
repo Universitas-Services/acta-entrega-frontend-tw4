@@ -241,60 +241,65 @@ export function ActaMaximaAutoridadProForm() {
             // Actualizamos la referencia para estar sincronizados
             lastSavedIdRef.current = acta.id;
 
-            // --- Validación para redirigir al primer paso incompleto ---
-            let targetStepIndex = 0;
-            for (let i = 0; i < steps.length; i++) {
-              const stepConfig = steps[i];
-              const baseFields = stepConfig.fields;
-              const currentFieldsArray: (keyof FormData)[] = Array.isArray(
-                baseFields
-              )
-                ? baseFields
-                : [];
+            // ✅ SOLUCIÓN: Esperar a que form.reset() complete su procesamiento
+            // antes de ejecutar la validación. Esto previene la race condition
+            // donde form.trigger() se ejecuta antes de que los valores estén disponibles.
+            setTimeout(async () => {
+              // --- Validación para redirigir al primer paso incompleto ---
+              let targetStepIndex = 0;
+              for (let i = 0; i < steps.length; i++) {
+                const stepConfig = steps[i];
+                const baseFields = stepConfig.fields;
+                const currentFieldsArray: (keyof FormData)[] = Array.isArray(
+                  baseFields
+                )
+                  ? baseFields
+                  : [];
 
-              let fieldsToValidate: (keyof FormData)[] = currentFieldsArray;
+                let fieldsToValidate: (keyof FormData)[] = currentFieldsArray;
 
-              // Lógica específica para paso 9 (índice 8) - Anexos Adicionales
-              if (i === 8) {
-                const selectedKey = form.getValues('Anexo_VII');
-                if (selectedKey && selectedKey !== 'NO APLICA') {
-                  const dynamicContent =
-                    dynamicStepContent[selectedKey as keyof DynamicContent];
-                  if (dynamicContent) {
-                    if (dynamicContent.type === 'questions') {
-                      const dynamicFields = dynamicContent.questions.map(
-                        (q) => q.name
-                      );
-                      fieldsToValidate = [
-                        ...currentFieldsArray,
-                        ...dynamicFields,
-                      ];
-                    } else if (dynamicContent.type === 'textarea') {
-                      fieldsToValidate = [
-                        ...currentFieldsArray,
-                        dynamicContent.fieldName,
-                      ];
+                // Lógica específica para paso 9 (índice 8) - Anexos Adicionales
+                if (i === 8) {
+                  const selectedKey = form.getValues('Anexo_VII');
+                  if (selectedKey && selectedKey !== 'NO APLICA') {
+                    const dynamicContent =
+                      dynamicStepContent[selectedKey as keyof DynamicContent];
+                    if (dynamicContent) {
+                      if (dynamicContent.type === 'questions') {
+                        const dynamicFields = dynamicContent.questions.map(
+                          (q) => q.name
+                        );
+                        fieldsToValidate = [
+                          ...currentFieldsArray,
+                          ...dynamicFields,
+                        ];
+                      } else if (dynamicContent.type === 'textarea') {
+                        fieldsToValidate = [
+                          ...currentFieldsArray,
+                          dynamicContent.fieldName,
+                        ];
+                      }
                     }
                   }
                 }
-              }
 
-              if (fieldsToValidate.length > 0) {
-                // Validar silenciosamente
-                const isStepValid = await form.trigger(fieldsToValidate, {
-                  shouldFocus: false,
-                });
-                if (!isStepValid) {
-                  targetStepIndex = i;
-                  // Limpiamos los errores para que no se muestren al usuario al entrar
-                  form.clearErrors(fieldsToValidate);
-                  break; // Encontramos el primero con error
+                if (fieldsToValidate.length > 0) {
+                  // Validar silenciosamente
+                  const isStepValid = await form.trigger(fieldsToValidate, {
+                    shouldFocus: false,
+                  });
+                  if (!isStepValid) {
+                    targetStepIndex = i;
+                    // Limpiamos los errores para que no se muestren al usuario al entrar
+                    form.clearErrors(fieldsToValidate);
+                    break; // Encontramos el primero con error
+                  }
                 }
               }
-            }
-            setCurrentStep(targetStepIndex);
+              setCurrentStep(targetStepIndex);
 
-            toast.success('Datos cargados correctamente.');
+              toast.success('Datos cargados correctamente.');
+            }, 100); // 100ms es suficiente para que React Hook Form procese el reset
           }
         } catch (error) {
           console.error(error);
@@ -1022,10 +1027,14 @@ export function ActaMaximaAutoridadProForm() {
 
                   {/* --- Nueva Sección: Tiempo de Realización del Acta --- */}
                   <div className="space-y-4 border rounded-lg">
-                    <div className="mb-4 p-4">
+                    <div className="mb-2 p-4">
                       <h3 className="font-bold text-lg">
-                        Tiempo de Realización del Acta
+                        Plazo para realizar el acta
                       </h3>
+                      <p className="text-sm text-gray-500 italic font-bold">
+                        Artículo 4 Resolución CGR N.º 01-000162 de fecha
+                        27-07-2009
+                      </p>
                     </div>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-4 px-4 pb-4">
                       <FormField
@@ -1034,7 +1043,8 @@ export function ActaMaximaAutoridadProForm() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Seleccione el tiempo de realización
+                              Seleccione el día en que se encuentra para la
+                              entrega del acta.
                             </FormLabel>
                             <Select
                               onValueChange={(value) =>

@@ -8,7 +8,8 @@ import { Button, type buttonVariants } from '@/components/ui/button';
 import { type VariantProps } from 'class-variance-authority';
 
 interface GuardedButtonProps
-  extends React.ComponentProps<typeof Button>,
+  extends
+    React.ComponentProps<typeof Button>,
     VariantProps<typeof buttonVariants> {
   href: string;
   isNavigation?: boolean; // Indica si el botón es para navegación (por defecto true)

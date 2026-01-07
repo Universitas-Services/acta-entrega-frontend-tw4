@@ -57,7 +57,7 @@ export default function FaqPage() {
               públicos en Venezuela a generar actas de entrega de cargos, bienes
               y recursos. El sistema asegura que el documento cumpla con la
               estructura y los requisitos exigidos por la{' '}
-              <strong>Resolución CGR N.° 01-00-0162</strong>.
+              <strong>Resolución CGR N.º 01-00-0162</strong>.
             </span>
           ),
         },
@@ -128,116 +128,62 @@ export default function FaqPage() {
     },
     {
       sectionId: 'section-2',
-      title: 'Tipos de cuentas y versiones',
+      title: 'Sobre la versión PRO (suscripción anual)',
       items: [
         {
-          question: '¿Qué limitaciones tiene la versión express (gratuita)?',
-          answer: (
-            <span>
-              La versión express es de <strong>&quot;sesión única&quot;</strong>
-              . Permite generar un máximo de{' '}
-              <strong>un (1) acta por cada rol disponible</strong> (1 para
-              Saliente, 1 para Entrante y 1 para Máxima Autoridad). Importante:
-              Si cierras el navegador antes de terminar, perderás los datos
-              ingresados.
-            </span>
-          ),
-        },
-        {
-          question: '¿Qué ventajas obtengo al pasar a la versión PRO?',
+          question: '¿Qué ventajas reales tiene la suscripción PRO?',
           answer: {
-            intro:
-              'La suscripción PRO es un centro de gestión integral que ofrece:',
+            intro: 'Obtienes acceso ilimitado a herramientas avanzadas:',
             points: [
               <span key="0">
-                <strong>Edición Ilimitada:</strong> Guarda borradores y edita
-                tus actas cuantas veces quieras desde tu panel.
+                <strong>Edición ilimitada:</strong> Guarda borradores y edita
+                tus actas en el panel de actas cuantas veces quieras.
               </span>,
               <span key="1">
-                <strong>Módulo de Compliance:</strong> Un reporte técnico en{' '}
-                <strong>PDF</strong> que audita tu acta y te alerta sobre
-                omisiones legales.
+                <strong>Módulo de Compliance:</strong> Un reporte en{' '}
+                <strong>PDF</strong> que te alerta sobre omisiones o fallas
+                según la ley.
               </span>,
               <span key="2">
-                <strong>Recuperación garantizada:</strong> Tus actas quedan
-                guardadas en la nube. Si pierdes el correo, siempre podrás
-                descargarlas de nuevo.
+                <strong>Consultor IA:</strong> Chat inteligente para resolver
+                dudas generales sobre el proceso de la elaboración de acta de
+                entrega basados en la Resolución N° 01-000162 de la CGR.
               </span>,
               <span key="3">
-                <strong>Consultor IA:</strong> Chat 24/7 para resolver dudas
-                sobre la normativa de la CGR.
+                <strong>Panel de actas:</strong> Historial sin límites de todas
+                tus actas guardadas, elaboradas, descargadas y entregadas.
               </span>,
             ],
           },
         },
         {
-          question: '¿Qué pasa si pierdo el correo con el enlace de mi acta?',
-          answer: {
-            points: [
-              <span key="0">
-                <strong>En versión express:</strong> Por razones de seguridad y
-                al ser una herramienta de sesión única,{' '}
-                <strong>no podemos reenviar el acta</strong>. Si pierdes el
-                correo, deberás cargar los datos nuevamente.
-              </span>,
-              <span key="1">
-                <strong>En versión PRO:</strong> No hay riesgo. Tu acta
-                permanece en tu panel de control durante toda la vigencia de tu
-                suscripción.
-              </span>,
-            ],
-          },
-        },
-        {
-          question: '¿Es obligatorio pasar a la versión pro?',
+          question: '¿El "Consultor IA" es un abogado real?',
           answer:
-            'No. Puede utilizar la versión express según sus limitaciones. La versión pro es una opción para usuarios que necesitan generar múltiples actas, requieren almacenamiento o desean utilizar las funcionalidades avanzadas.',
+            'No. Es una inteligencia artificial entrenada con leyes venezolanas. Responde preguntas de texto sobre normas y requisitos pero no ofrece consejos de estrategia legal ni representación judicial. Si requiere de un especialista puede contratar una asesoría personalizada con nuestro equipo de expertos en la materia.',
         },
-      ],
-    },
-    {
-      sectionId: 'section-3',
-      title: 'Pagos y suscripción PRO',
-      items: [
         {
-          question: '¿Cómo activo mi cuenta PRO?',
+          question:
+            '¿La versión PRO garantiza que no tendré problemas con la Contraloría?',
           answer:
-            'El proceso es asistido vía WhatsApp. Tras enviar tu comprobante de pago (Pago Móvil, Zelle o transferencia), activamos tu cuenta manualmente.',
+            'No garantiza que el servidor público no tenga problemas con la Contraloría ya que no valida, audita ni se hace responsable por la veracidad, integridad o licitud de la información suministrada por el Usuario. La App sólo garantiza que el formato y la estructura cumplen con la normativa.',
         },
         {
-          question: '¿Cuánto tarda en activarse la cuenta?',
+          question: '¿Qué pasa si se vence mi suscripción anual?',
           answer:
-            'El proceso puede tomar entre 24 y 48 horas hábiles tras la validación del pago.',
-        },
-        {
-          question: '¿El pago es por una sola vez?',
-          answer: (
-            <span>
-              No. La versión PRO funciona bajo un modelo de{' '}
-              <strong>suscripción anual con renovación</strong>. Esto garantiza
-              que tu historial de actas esté seguro y que tengas acceso a
-              actualizaciones legales durante todo el año.
-            </span>
-          ),
-        },
-        {
-          question: '¿Emiten factura fiscal?',
-          answer: (
-            <span>
-              Sí. Somos <strong>Universitas Services C.A.</strong> y emitimos
-              factura fiscal válida en Venezuela. Debes solicitarla al equipo de
-              ventas al realizar tu pago.
-            </span>
-          ),
+            'Tienes un periodo de gracia de 30 días para descargar tus documentos. Luego de ese tiempo, la información será eliminada de nuestros servidores por seguridad.',
         },
         {
           question: '¿Tienen política de reembolso?',
           answer: (
             <span>
-              Sí. Ofrecemos un reembolso del 50% si se solicita dentro de las
-              primeras 24 horas tras el pago, siempre que no se haya generado
-              ninguna acta ni se haya usado el módulo de Compliance, de acuerdo
-              a lo establecido en nuestros {/* --- BOTÓN DE TÉRMINOS --- */}
+              Sí, protegemos tu inversión. Ofrecemos un{' '}
+              <strong>reembolso parcial del 50%</strong> si se solicita por
+              escrito dentro de las primeras 24 horas posteriores al pago,
+              siempre y cuando el usuario no haya utilizado la herramienta para
+              generar actas ni haya hecho uso del módulo de Compliance. Una vez
+              consumido el servicio principal, no aplican reembolsos. Puedes
+              ampliar esta información consultando nuestros{' '}
+              {/* --- BOTÓN DE TÉRMINOS --- */}
               <button
                 onClick={() => setIsTermsOpen(true)}
                 className="text-primary font-bold hover:underline bg-transparent border-0 cursor-pointer p-0 inline align-baseline"
@@ -252,100 +198,29 @@ export default function FaqPage() {
       ],
     },
     {
-      sectionId: 'section-4',
-      title: 'Funcionalidades y uso',
+      sectionId: 'section-3',
+      title: 'Soporte y ayuda',
       items: [
         {
-          question:
-            '¿En qué consisten las funciones de inteligencia artificial (IA)?',
-          answer:
-            'En la versión pro, la IA actúa como un asistente. Puede analizar la información para darle alertas proactivas (por ejemplo, sobre plazos) y sugerirle documentos de debida diligencia. También cuenta con un asesor virtual para responder dudas sobre el proceso.',
-        },
-        {
-          question: '¿Cuánto tiempo guardan mi información?',
-          answer: {
-            points: [
-              <span key="0">
-                <strong>Express:</strong> Guardamos una copia interna por 90
-                días para soporte técnico, luego se borra permanentemente.
-              </span>,
-              <span key="1">
-                <strong>PRO:</strong> Tus datos están disponibles durante toda
-                la suscripción. Si no renuevas, tienes un periodo de gracia de
-                30 días para descargar todo antes del borrado definitivo.
-              </span>,
-            ],
-          },
-        },
-        {
-          question: '¿Puedo compartir mi cuenta o mi contraseña con un colega?',
+          question: 'Tengo un problema técnico ¿a quién acudo?',
           answer: (
             <span>
-              No. Por razones de seguridad y para proteger la integridad de su
-              información, las cuentas son estrictamente personales e
-              intransferibles. Compartir sus credenciales está prohibido en los{' '}
-              {/* --- BOTÓN DE TÉRMINOS (2) --- */}
-              <button
-                onClick={() => setIsTermsOpen(true)}
-                className="text-primary/80 font-bold hover:underline bg-transparent border-0 cursor-pointer p-0 inline align-baseline"
-                type="button"
-              >
-                términos y condiciones
-              </button>
-              .
+              Escríbenos por WhatsApp o al correo{' '}
+              <strong>contacto@universitas.legal</strong> de lunes a viernes en
+              horario de oficina.
             </span>
           ),
         },
         {
-          question: '¿Quién es responsable de la veracidad de los datos?',
+          question: '¿El soporte técnico me ayuda con el contenido del acta?',
           answer: (
             <span>
-              El usuario. De acuerdo con el{' '}
-              <strong>Artículo 18 de la Resolución 162 de la CGR</strong>, la
-              exactitud cualitativa y cuantitativa del acta es responsabilidad
-              exclusiva del servidor público. La App facilita la estructura,
-              pero no valida si la información declarada es real.
-            </span>
-          ),
-        },
-      ],
-    },
-    {
-      sectionId: 'section-5',
-      title: 'Datos y seguridad',
-      items: [
-        {
-          question:
-            '¿Quién es el dueño de la información que yo introduzco en la aplicación?',
-          answer:
-            'Usted. El usuario es en todo momento el propietario del contenido que se introduce. Nosotros solo tenemos una licencia limitada para procesar esa información y prestarle el servicio.',
-        },
-        {
-          question:
-            '¿Universitas Services C.A. revisa el contenido de mis actas?',
-          answer:
-            'No. Su información es privada. No verificamos, validamos ni revisamos la veracidad o legalidad del contenido que usted introduce. La responsabilidad sobre el contenido es exclusivamente suya.',
-        },
-        {
-          question: '¿Qué pasa con mis documentos si elimino mi cuenta?',
-          answer:
-            'Si decide eliminar su cuenta, su perfil y acceso a la plataforma serán borrados. Sin embargo, usted conservará el acceso a los documentos que ya había generado, a través de los enlaces de Google Docs que le fueron enviados a su correo electrónico.',
-        },
-      ],
-    },
-    {
-      sectionId: 'section-6',
-      title: 'Soporte y contacto',
-      items: [
-        {
-          question: '¿Cómo obtengo soporte técnico?',
-          answer: (
-            <span>
-              A través del botón de WhatsApp en la App o escribiendo a{' '}
-              <strong>contacto@universitas.legal</strong>. Atendemos de lunes a
-              viernes en horario de oficina para problemas técnicos de acceso.
-              El soporte no incluye redacción de actas ni interpretación de
-              leyes.
+              No. El soporte técnico solo resuelve fallas de la plataforma. Para
+              dudas sobre el contenido legal, utiliza el{' '}
+              <strong>Consultor IA</strong> o solicita una{' '}
+              <strong>asesoría personalizada</strong> con uno de nuestros
+              expertos a través de WhatsApp o al correo{' '}
+              <strong>contacto@universitas.legal</strong>.
             </span>
           ),
         },
@@ -380,7 +255,7 @@ export default function FaqPage() {
               >
                 {section.title}
               </AccordionTrigger>
-              <AccordionContent className="p-6 pt-0">
+              <AccordionContent className="p-6 pt-0 pb-0">
                 <div className="space-y-4">
                   {section.items.map((item, index) => (
                     <div key={index}>

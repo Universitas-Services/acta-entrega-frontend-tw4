@@ -271,13 +271,13 @@ export function DataTable<TData extends DataWithId, TValue>({
                       <DropdownMenuRadioItem value="todos">
                         Todos
                       </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="MAXIMA_AUTORIDAD_PAGA">
+                      <DropdownMenuRadioItem value="MAXIMA_AUTORIDAD">
                         Máxima Autoridad
                       </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="ENTRANTE_PAGA">
+                      <DropdownMenuRadioItem value="ENTRANTE">
                         Servidor Entrante
                       </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="SALIENTE_PAGA">
+                      <DropdownMenuRadioItem value="SALIENTE">
                         Servidor Saliente
                       </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>

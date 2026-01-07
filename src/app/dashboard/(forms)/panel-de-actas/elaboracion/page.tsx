@@ -29,20 +29,41 @@ export default function ActasPage() {
   );
   const [isFirstLoad, setIsFirstLoad] = useState(true);
 
+  // Mapeo de tipos simplificados a sus variantes PAGA y GRATIS
+  const TYPE_MAPPING: Record<string, string[]> = {
+    MAXIMA_AUTORIDAD: ['MAXIMA_AUTORIDAD_PAGA', 'MAXIMA_AUTORIDAD_GRATIS'],
+    ENTRANTE: ['ENTRANTE_PAGA', 'ENTRANTE_GRATIS'],
+    SALIENTE: ['SALIENTE_PAGA', 'SALIENTE_GRATIS'],
+  };
+
   // Efecto para cargar datos
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
+
+        // NO enviamos el typeFilter al backend, lo manejamos en el frontend
         const response = await getMyActas({
           page: pagination.pageIndex + 1, // Convertir a 1-index para backend
           limit: pagination.pageSize,
           search: search,
-          type: typeFilter,
+          // type: typeFilter, // REMOVIDO - filtraremos en el frontend
           status: statusFilter,
         });
 
-        setData(response.data);
+        // Filtrado de tipo en el FRONTEND
+        let filteredData = response.data;
+
+        if (typeFilter && typeFilter !== 'todos') {
+          const allowedTypes = TYPE_MAPPING[typeFilter];
+          if (allowedTypes) {
+            filteredData = response.data.filter((acta) =>
+              allowedTypes.includes(acta.type)
+            );
+          }
+        }
+
+        setData(filteredData);
 
         const metaTotal = response.meta?.total;
 
@@ -93,14 +114,28 @@ export default function ActasPage() {
     const triggerFetch = async () => {
       setLoading(true);
       try {
+        // NO enviamos el typeFilter al backend
         const response = await getMyActas({
           page: pagination.pageIndex + 1,
           limit: pagination.pageSize,
           search,
-          type: typeFilter,
+          // type: typeFilter, // REMOVIDO - filtraremos en el frontend
           status: statusFilter,
         });
-        setData(response.data);
+
+        // Filtrado de tipo en el FRONTEND
+        let filteredData = response.data;
+
+        if (typeFilter && typeFilter !== 'todos') {
+          const allowedTypes = TYPE_MAPPING[typeFilter];
+          if (allowedTypes) {
+            filteredData = response.data.filter((acta) =>
+              allowedTypes.includes(acta.type)
+            );
+          }
+        }
+
+        setData(filteredData);
 
         const metaTotal = response.meta?.total;
         setTotalRecords(metaTotal || response.total || 0);

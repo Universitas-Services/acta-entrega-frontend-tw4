@@ -184,7 +184,7 @@ export const steps: ComplianceStepInfo[] = [
     id: 13, // PASO 13 (Final)
     title: 'Finalización y Envío',
     subtitle: 'Último paso antes de generar su autoevaluación.',
-    fields: ['interesProducto'],
+    fields: [],
   },
 ];
 

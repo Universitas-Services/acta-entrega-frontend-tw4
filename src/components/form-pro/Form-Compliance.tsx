@@ -196,7 +196,6 @@ export function ComplianceForm() {
       incluye_situacion_cuentas_municipal: '',
       incluye_inventario_terrenos_municipales: '',
       incluye_relacion_ingresos_venta_terrenos: '',
-      interesProducto: '', // Último paso
     },
   });
 
@@ -1056,31 +1055,23 @@ export function ComplianceForm() {
             {/* PASO 13 (Índice 12) - Final */}
             {currentStep === 12 && (
               <div className="space-y-4">
-                <SiNoQuestion
-                  name="interesProducto"
-                  label="Su proceso de autoevaluación ha concluido exitosamente.¿Le gustaría recibir información sobre nuestra asesoría personalizada con nuestro equipo de expertos para interpretar sus resultados?"
-                  options={['SI', 'NO']}
-                />
-                {/* Mensaje de finalización condicional */}
-                {form.watch('interesProducto') && ( // Mostrar si ya se respondió
-                  <div className="text-center p-6 mt-8 bg-gray-50 rounded-lg border border-dashed transition-opacity duration-500">
-                    <CiCircleCheck className="mx-auto h-12 w-12 text-green5" />
-                    <h3 className="mt-4 text-xl font-semibold text-g8">
-                      ¡Registro Exitoso de la Autoevaluación!
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-600">
-                      Para garantizar la exactitud de su información, le
-                      solicitamos <b>revisar</b> los datos registrados en las
-                      secciones previas. Puede navegar y verificar la
-                      información utilizando la <b>paginación</b> o el botón{' '}
-                      <b>Anterior</b>.
-                      <br />
-                      Una vez confirmada la veracidad de la información, proceda
-                      a hacer clic en el botón
-                      <b>Finalizar autoevaluación</b>.
-                    </p>
-                  </div>
-                )}
+                {/* Mensaje de finalización */}
+                <div className="text-center p-6 mt-8 bg-gray-50 rounded-lg border border-dashed transition-opacity duration-500">
+                  <CiCircleCheck className="mx-auto h-12 w-12 text-green5" />
+                  <h3 className="mt-4 text-xl font-semibold text-g8">
+                    ¡Registro Exitoso de la Autoevaluación!
+                  </h3>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Para garantizar la exactitud de su información, le
+                    solicitamos <b>revisar</b> los datos registrados en las
+                    secciones previas. Puede navegar y verificar la información
+                    utilizando la <b>paginación</b> o el botón <b>Anterior</b>.
+                    <br />
+                    Una vez confirmada la veracidad de la información, proceda a
+                    hacer clic en el botón
+                    <b>Finalizar autoevaluación</b>.
+                  </p>
+                </div>
               </div>
             )}
           </div>

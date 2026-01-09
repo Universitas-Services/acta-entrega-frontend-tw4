@@ -53,7 +53,7 @@ export interface Acta {
   numeroActa: string | null;
   nombreEntidad: string | null;
   type: string; // 'ENTRANTE_GRATIS', 'MAXIMA_AUTORIDAD_PAGA', etc.
-  status: 'GUARDADA' | 'DESCARGADA' | 'ENVIADA' | 'ENTREGADA';
+  status: 'GUARDADA' | 'COMPLETADA' | 'DESCARGADA' | 'ENVIADA' | 'ENTREGADA';
   metadata: ActaMetadata;
   createdAt: string;
   updatedAt: string;
@@ -126,6 +126,30 @@ export interface CompliancePaginatedResponse {
     prev?: number | null;
     next?: number | null;
   };
+}
+
+// --- INTERFACES DE OBSERVACIONES DE ELABORACIÓN ---
+
+export interface ObservacionItem {
+  criterio: string;
+  pregunta: string;
+  condicion: string;
+  respuesta: string; // "N/A", "No", "Sí", etc.
+  dato_faltante: string;
+  observacion_legal: string; // Campo adicional del backend
+}
+
+export interface ObservacionElaboracion {
+  id: string;
+  actaId: string;
+  totalHallazgos: number;
+  analisis: ObservacionItem[]; // ✅ Nombre correcto del backend (con doble 'i')
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AnalyzeActaResponse {
+  message: string;
 }
 
 /**
@@ -1155,5 +1179,103 @@ export const createActaCompliance = async (
     }
     // Si el error NO es de Axios (ej. TypeError, RangeError), cae aquí:
     throw new Error('No se pudo conectar con el servidor (Error Local).');
+  }
+};
+
+// --- FUNCIONES DE OBSERVACIONES DE ELABORACIÓN ---
+
+/**
+ * Analiza un acta con IA y genera observaciones
+ * POST /search/analyze-acta
+ */
+export const analyzeActa = async (
+  actaId: string
+): Promise<AnalyzeActaResponse> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('No token found');
+
+    const response = await apiClient.post<AnalyzeActaResponse>(
+      '/search/analyze-acta',
+      { actaId },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error analyzing acta:', error);
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al analizar el acta.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+/**
+ * Obtiene las observaciones de un acta
+ * GET /search/observaciones/{actaId}
+ */
+export const getObservacionesElaboracion = async (
+  actaId: string
+): Promise<ObservacionElaboracion> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('No token found');
+
+    const response = await apiClient.get<ObservacionElaboracion>(
+      `/search/observaciones/${actaId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching observaciones:', error);
+    if (axios.isAxiosError(error) && error.response) {
+      // Error 500 = no hay observaciones aún
+      if (error.response.status === 500) {
+        throw new Error('NO_OBSERVACIONES');
+      }
+      throw new Error(
+        error.response.data.message || 'Error al obtener observaciones.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
+  }
+};
+
+/**
+ * Regenera las observaciones de un acta
+ * POST /search/observaciones/{actaId}/regenerar
+ */
+export const regenerarObservaciones = async (
+  actaId: string
+): Promise<AnalyzeActaResponse> => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (!token) throw new Error('No token found');
+
+    const response = await apiClient.post<AnalyzeActaResponse>(
+      `/search/observaciones/${actaId}/regenerar`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error regenerating observaciones:', error);
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(
+        error.response.data.message || 'Error al regenerar observaciones.'
+      );
+    }
+    throw new Error('No se pudo conectar con el servidor.');
   }
 };

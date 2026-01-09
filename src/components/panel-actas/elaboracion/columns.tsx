@@ -30,12 +30,17 @@ import {
 import { FiEdit } from 'react-icons/fi';
 import { BsThreeDots } from 'react-icons/bs';
 import { LuArrowUpDown } from 'react-icons/lu';
+import { AiOutlineEye } from 'react-icons/ai';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { ElaboracionObsSheet } from '@/components/ElaboracionObsSheet';
+import { useState } from 'react';
 
 // Definimos una interfaz para el meta de la tabla (lo que pasas en data-table.tsx)
 interface TableMeta {
   onRefresh?: () => void;
+  generatingActas?: Set<string>;
+  startObservacionesGeneration?: (actaId: string) => void;
 }
 
 // Tipamos correctamente los props usando los tipos de la librería
@@ -92,6 +97,91 @@ const EntregarSwitch = ({ row, table }: ActionsCellProps) => {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+};
+
+// --- COMPONENTE INTERNO PARA EL BOTÓN DE OBSERVACIONES ---
+const ObservacionesCell = ({ row, table }: ActionsCellProps) => {
+  const acta = row.original;
+  const isCompleted = !!acta.isCompleted;
+  const meta = table.options.meta as TableMeta;
+
+  const isGenerating = meta.generatingActas?.has(acta.id) || false;
+
+  // Estado local para controlar el Sheet
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const handleOpenSheet = () => {
+    if (!isCompleted) return;
+    setIsSheetOpen(true);
+  };
+
+  const handleCloseSheet = () => {
+    setIsSheetOpen(false);
+  };
+
+  const handleStartGeneration = () => {
+    if (meta.startObservacionesGeneration) {
+      meta.startObservacionesGeneration(acta.id);
+    }
+  };
+
+  // Sistema de badges simplificado
+  // No hacemos GET al cargar - solo verificamos estado de generación
+  let badgeColor = 'bg-red-500'; // Por defecto rojo (pendiente)
+  const badgeVisible = isCompleted;
+
+  if (isGenerating) {
+    badgeColor = 'bg-yellow-500 animate-pulse'; // Amarillo pulsante si generando
+  }
+
+  return (
+    <>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center justify-center">
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleOpenSheet}
+                  disabled={!isCompleted}
+                  className={cn(
+                    'cursor-pointer',
+                    !isCompleted && 'opacity-50 cursor-not-allowed'
+                  )}
+                >
+                  <AiOutlineEye className="h-5 w-5" />
+                </Button>
+                {badgeVisible && (
+                  <Badge
+                    className={`absolute -top-1 -right-1 h-2 w-2 p-0 ${badgeColor} border-0`}
+                  />
+                )}
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            {!isCompleted
+              ? 'Se habilitará cuando el acta esté completada'
+              : isGenerating
+                ? 'Generando observaciones...'
+                : 'Ver/Generar observaciones'}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      {/* Sheet de Observaciones */}
+      <ElaboracionObsSheet
+        isOpen={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        onClose={handleCloseSheet}
+        actaId={acta.id}
+        numeroActa={acta.numeroActa || 'S/N'}
+        onStartGeneration={handleStartGeneration}
+      />
+    </>
   );
 };
 
@@ -356,6 +446,11 @@ export const columns: ColumnDef<Acta>[] = [
     id: 'entregar',
     header: () => <div className="text-center">Entregar</div>,
     cell: ({ row, table }) => <EntregarSwitch row={row} table={table} />,
+  },
+  {
+    id: 'observaciones',
+    header: () => <div className="text-center">Observaciones</div>,
+    cell: ({ row, table }) => <ObservacionesCell row={row} table={table} />,
   },
   {
     id: 'actions',

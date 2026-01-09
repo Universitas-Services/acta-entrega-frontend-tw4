@@ -4,10 +4,23 @@ import { useEffect, useState, useCallback } from 'react';
 import { useHeader } from '@/context/HeaderContext';
 import { columns } from '@/components/panel-actas/elaboracion/columns';
 import { DataTable } from '@/components/panel-actas/elaboracion/data-table';
-import { getMyActas, Acta } from '@/services/actasService';
+import {
+  getMyActas,
+  Acta,
+  getObservacionesElaboracion,
+} from '@/services/actasService';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import { PaginationState } from '@tanstack/react-table';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 export default function ActasPage() {
   const { setTitle } = useHeader();
@@ -28,6 +41,15 @@ export default function ActasPage() {
     undefined
   );
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [showCompletedAlert, setShowCompletedAlert] = useState(false);
+
+  // Estados para el sistema de observaciones
+  const [generatingActas, setGeneratingActas] = useState<Set<string>>(
+    new Set()
+  );
+  const [showObservacionesReadyAlert, setShowObservacionesReadyAlert] =
+    useState(false);
+  const [observacionesReadyCount, setObservacionesReadyCount] = useState(0);
 
   // Mapeo de tipos simplificados a sus variantes PAGA y GRATIS
   const TYPE_MAPPING: Record<string, string[]> = {
@@ -65,6 +87,10 @@ export default function ActasPage() {
 
         setData(filteredData);
 
+        // Detectar si hay actas completadas para mostrar el Alert Dialog
+        const hasCompletedActas = filteredData.some((acta) => acta.isCompleted);
+        setShowCompletedAlert(hasCompletedActas);
+
         const metaTotal = response.meta?.total;
 
         // Si existe meta.total lo usamos, si no, intentamos response.total, o finalmente 0
@@ -88,6 +114,47 @@ export default function ActasPage() {
     typeFilter,
     statusFilter,
   ]);
+
+  // Función para iniciar generación de observaciones
+  const startObservacionesGeneration = useCallback((actaId: string) => {
+    setGeneratingActas((prev) => {
+      const newSet = new Set(prev);
+      newSet.add(actaId);
+      return newSet;
+    });
+  }, []);
+
+  // Polling global de observaciones en segundo plano
+  useEffect(() => {
+    if (generatingActas.size === 0) return;
+
+    const interval = setInterval(async () => {
+      let completedCount = 0;
+
+      for (const actaId of generatingActas) {
+        try {
+          await getObservacionesElaboracion(actaId);
+          // Éxito: observaciones listas
+          setGeneratingActas((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(actaId);
+            return newSet;
+          });
+          completedCount++;
+        } catch (error) {
+          // Error: continuar polling
+          // Si es error NO_OBSERVACIONES, seguir esperando
+        }
+      }
+
+      if (completedCount > 0) {
+        setObservacionesReadyCount(completedCount);
+        setShowObservacionesReadyAlert(true);
+      }
+    }, 10000); // Cada 10 segundos
+
+    return () => clearInterval(interval);
+  }, [generatingActas]);
 
   useEffect(() => {
     setTitle('Panel de actas (Elaboración)');
@@ -173,7 +240,60 @@ export default function ActasPage() {
         onFilterChange={handleFilterChange}
         onRefresh={refreshData}
         isLoading={loading}
+        generatingActas={generatingActas}
+        startObservacionesGeneration={startObservacionesGeneration}
       />
+
+      {/* Alert Dialog para actas completadas */}
+      <AlertDialog
+        open={showCompletedAlert}
+        onOpenChange={setShowCompletedAlert}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Actas Finalizadas Detectadas</AlertDialogTitle>
+            <AlertDialogDescription>
+              Debes revisar las actas que estén Finalizadas, ya que puedes
+              obtener observaciones.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowCompletedAlert(false)}>
+              Ok
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Alert Dialog para observaciones listas */}
+      <AlertDialog
+        open={showObservacionesReadyAlert}
+        onOpenChange={setShowObservacionesReadyAlert}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>✅ Observaciones Generadas</AlertDialogTitle>
+            <AlertDialogDescription>
+              {observacionesReadyCount === 1
+                ? 'Las observaciones solicitadas están listas.'
+                : `Se generaron observaciones para ${observacionesReadyCount} actas.`}{' '}
+              Puedes revisarlas haciendo clic en el botón del ojo con badge
+              verde en la columna &quot;Observaciones&quot;.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => {
+                setShowObservacionesReadyAlert(false);
+                setObservacionesReadyCount(0);
+                refreshData(); // Refrescar tabla para actualizar badges
+              }}
+            >
+              Entendido
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

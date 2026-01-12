@@ -58,6 +58,7 @@ export interface Acta {
   createdAt: string;
   updatedAt: string;
   isCompleted: boolean; // Indica si el acta está completa
+  tieneObservaciones?: boolean; // Indica si el acta tiene observaciones generadas
 }
 
 export interface ComplianceActa {

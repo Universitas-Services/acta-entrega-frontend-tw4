@@ -36,7 +36,7 @@ import { cn } from '@/lib/utils';
 import { ElaboracionObsSheet } from '@/components/ElaboracionObsSheet';
 import { useState } from 'react';
 
-// Definimos una interfaz para el meta de la tabla (lo que pasas en data-table.tsx)
+// Definimos una interfaz para el meta de la tabla lo que viene del data-table
 interface TableMeta {
   onRefresh?: () => void;
   generatingActas?: Set<string>;
@@ -126,13 +126,17 @@ const ObservacionesCell = ({ row, table }: ActionsCellProps) => {
     }
   };
 
-  // Sistema de badges simplificado
-  // No hacemos GET al cargar - solo verificamos estado de generación
-  let badgeColor = 'bg-red-500'; // Por defecto rojo (pendiente)
+  // Obtener tieneObservaciones del acta
+  const tieneObservaciones = acta.tieneObservaciones || false;
+
+  // Sistema de badges con 3 colores
+  let badgeColor = 'bg-red-500'; // Por defecto rojo (pendiente de generar)
   const badgeVisible = isCompleted;
 
   if (isGenerating) {
     badgeColor = 'bg-yellow-500 animate-pulse'; // Amarillo pulsante si generando
+  } else if (tieneObservaciones) {
+    badgeColor = 'bg-green-500'; // Verde si ya tiene observaciones
   }
 
   return (
@@ -146,10 +150,11 @@ const ObservacionesCell = ({ row, table }: ActionsCellProps) => {
                   variant="ghost"
                   size="sm"
                   onClick={handleOpenSheet}
-                  disabled={!isCompleted}
+                  disabled={!isCompleted || isGenerating}
                   className={cn(
                     'cursor-pointer',
-                    !isCompleted && 'opacity-50 cursor-not-allowed'
+                    (!isCompleted || isGenerating) &&
+                      'opacity-50 cursor-not-allowed'
                   )}
                 >
                   <AiOutlineEye className="h-5 w-5" />
@@ -166,8 +171,10 @@ const ObservacionesCell = ({ row, table }: ActionsCellProps) => {
             {!isCompleted
               ? 'Se habilitará cuando el acta esté completada'
               : isGenerating
-                ? 'Generando observaciones...'
-                : 'Ver/Generar observaciones'}
+                ? 'Generando observaciones... Por favor espere'
+                : tieneObservaciones
+                  ? 'Ver observaciones'
+                  : 'Generar observaciones'}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -180,27 +187,27 @@ const ObservacionesCell = ({ row, table }: ActionsCellProps) => {
         actaId={acta.id}
         numeroActa={acta.numeroActa || 'S/N'}
         onStartGeneration={handleStartGeneration}
+        tieneObservaciones={tieneObservaciones}
       />
     </>
   );
 };
 
-// --- COMPONENTE INTERNO PARA LAS ACCIONES (SOLUCIÓN AL ERROR DE HOOKS) ---
+// --- COMPONENTE INTERNO PARA LAS ACCIONES ---
 const ActionsCell = ({ row, table }: ActionsCellProps) => {
   const acta = row.original;
-  const router = useRouter(); // Ahora sí podemos usar el hook
+  const router = useRouter();
 
   // Verificamos si el acta está completa (default false si no viene)
   const isCompleted = !!acta.isCompleted;
 
   const refreshTable = () => {
-    // Hacemos un cast seguro al meta que definimos arriba
+    // Hacemos un cast seguro al meta que se definió arriba
     (table.options.meta as TableMeta)?.onRefresh?.();
   };
 
   const handleEdit = () => {
     let route = '#';
-    // Lógica de rutas movida aquí adentro
     if (acta.type.includes('MAXIMA_AUTORIDAD'))
       route = `/dashboard/actas-pro/ma-pro?id=${acta.id}`;
     else if (acta.type.includes('ENTRANTE'))
@@ -233,17 +240,6 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
     });
   };
 
-  const handleDelete = async () => {
-    toast.promise(deleteActa(acta.id), {
-      loading: 'Eliminando...',
-      success: () => {
-        refreshTable();
-        return 'Acta eliminada';
-      },
-      error: 'Error al eliminar',
-    });
-  };
-
   return (
     <div className="flex items-center justify-end space-x-2">
       <Button
@@ -253,7 +249,7 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
         onClick={handleEdit}
       >
         <FiEdit className="h-4 w-4" />
-        Edit
+        Editar
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -271,7 +267,6 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
             {/* ITEM: ENVIAR */}
             <Tooltip>
               <TooltipTrigger asChild>
-                {/* Usamos un div wrapper o aplicamos eventos manualmente porque disabled previene eventos */}
                 <div className="w-full outline-none">
                   <DropdownMenuItem
                     className={cn(
@@ -433,6 +428,10 @@ export const columns: ColumnDef<Acta>[] = [
         label = 'Entregada';
         customClass =
           'bg-green-500 hover:bg-green-600 text-white border-green-500';
+      } else if (status === 'COMPLETADA') {
+        variant = 'default';
+        label = 'Completada';
+        customClass = 'bg-blue-800 text-white border-blue-800';
       }
 
       return (

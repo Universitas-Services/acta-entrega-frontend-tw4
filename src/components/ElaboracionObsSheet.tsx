@@ -6,9 +6,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
+  SheetFooter,
 } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { AiOutlineInfoCircle, AiOutlineRobot } from 'react-icons/ai';
+import { AiOutlineEye } from 'react-icons/ai';
 import { BsCheckCircle, BsExclamationCircle } from 'react-icons/bs';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/spinner';
@@ -29,15 +30,16 @@ interface ElaboracionObsSheetProps {
   actaId: string;
   numeroActa: string;
   onStartGeneration?: () => void;
+  tieneObservaciones?: boolean;
 }
 
 export function ElaboracionObsSheet({
   isOpen,
   onClose,
-  onOpenChange,
   actaId,
   numeroActa,
   onStartGeneration,
+  tieneObservaciones,
 }: ElaboracionObsSheetProps) {
   const [observaciones, setObservaciones] =
     useState<ObservacionElaboracion | null>(null);
@@ -48,6 +50,14 @@ export function ElaboracionObsSheet({
     if (!isOpen) return;
 
     const loadObservaciones = async () => {
+      // Si tieneObservaciones es FALSE, NO ejecutar GET
+      if (tieneObservaciones === false) {
+        setObservaciones(null);
+        setIsLoading(false);
+        return;
+      }
+
+      // Si tieneObservaciones es TRUE, ejecutar GET normalmente
       setIsLoading(true);
       try {
         const data = await getObservacionesElaboracion(actaId);
@@ -61,38 +71,44 @@ export function ElaboracionObsSheet({
     };
 
     loadObservaciones();
-  }, [isOpen, actaId]);
+  }, [isOpen, actaId, tieneObservaciones]);
 
   // Generar observaciones
-  const handleGenerate = async () => {
-    try {
-      setIsLoading(true);
-      await analyzeActa(actaId);
-      toast.success(
-        'Generación iniciada. Te notificaremos cuando esté lista (2-5 min).'
-      );
-      if (onStartGeneration) onStartGeneration();
-      onClose();
-    } catch (error) {
+  const handleGenerate = () => {
+    // Cerrar Sheet
+    onClose();
+
+    // Mostrar Toast
+    toast.success(
+      'Generación iniciada. Te notificaremos cuando esté lista (2-5 min).'
+    );
+
+    // Cambiar badge a amarillo (generando)
+    if (onStartGeneration) onStartGeneration();
+
+    // Ejecutar generación en segundo plano (sin bloquear)
+    analyzeActa(actaId).catch((error) => {
       toast.error('Error al iniciar generación de observaciones');
-      setIsLoading(false);
-    }
+    });
   };
 
   // Regenerar observaciones
-  const handleRegenerate = async () => {
-    try {
-      setIsLoading(true);
-      await regenerarObservaciones(actaId);
-      toast.success(
-        'Regeneración iniciada. Te notificaremos cuando esté lista (2-5 min).'
-      );
-      if (onStartGeneration) onStartGeneration();
-      onClose();
-    } catch (error) {
+  const handleRegenerate = () => {
+    // Cerrar Sheet
+    onClose();
+
+    // Mostrar Toast
+    toast.success(
+      'Regeneración iniciada. Te notificaremos cuando esté lista (2-5 min).'
+    );
+
+    // Cambiar badge a amarillo (generando)
+    if (onStartGeneration) onStartGeneration();
+
+    // Ejecutar regeneración en segundo plano (sin bloquear)
+    regenerarObservaciones(actaId).catch((error) => {
       toast.error('Error al regenerar observaciones');
-      setIsLoading(false);
-    }
+    });
   };
 
   // Renderizar contenido según estado
@@ -106,11 +122,34 @@ export function ElaboracionObsSheet({
           </div>
           <div className="space-y-2 max-w-xs px-4">
             <p className="text-sm text-muted-foreground">
-              Esta acta está lista para generar observaciones mediante IA.
+              Esta acta está lista para generar observaciones.
             </p>
-            <Button onClick={handleGenerate} className="mt-4">
+            <Button onClick={handleGenerate} className="mt-4 cursor-pointer">
               Generar Observaciones
             </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // Estado: Acta perfecta (observaciones existe pero analisis está vacío)
+    if (
+      observaciones &&
+      observaciones.analisis &&
+      observaciones.analisis.length === 0
+    ) {
+      return (
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center space-y-4">
+          <div className="h-24 w-24 rounded-full bg-green-100 flex items-center justify-center">
+            <BsCheckCircle className="w-12 h-12 text-green-500" />
+          </div>
+          <div className="space-y-2 max-w-xs px-4">
+            <p className="text-lg font-semibold text-green-700">
+              ¡Acta Perfecta!
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Su acta está perfecta, por lo que no tiene observaciones.
+            </p>
           </div>
         </div>
       );
@@ -142,7 +181,7 @@ export function ElaboracionObsSheet({
                 <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
                   Criterio
                 </p>
-                <p className="text-sm text-gray-800 break-words">
+                <p className="text-sm text-gray-800 wrap-break-word">
                   {obs.criterio}
                 </p>
               </div>
@@ -152,7 +191,7 @@ export function ElaboracionObsSheet({
                 <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
                   Pregunta
                 </p>
-                <p className="text-sm text-gray-800 break-words">
+                <p className="text-sm text-gray-800 wrap-break-words">
                   {obs.pregunta}
                 </p>
               </div>
@@ -162,7 +201,7 @@ export function ElaboracionObsSheet({
                 <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
                   Condición
                 </p>
-                <p className="text-sm text-gray-800 break-words">
+                <p className="text-sm text-gray-800 wrap-break-words">
                   {obs.condicion}
                 </p>
               </div>
@@ -172,7 +211,7 @@ export function ElaboracionObsSheet({
                 <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
                   Observación Legal
                 </p>
-                <p className="text-sm text-gray-800 break-words whitespace-pre-wrap">
+                <p className="text-sm text-gray-800 wrap-break-words whitespace-pre-wrap">
                   {obs.observacion_legal}
                 </p>
               </div>
@@ -192,14 +231,6 @@ export function ElaboracionObsSheet({
                     {obs.respuesta}
                   </Badge>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
-                    Dato Faltante
-                  </p>
-                  <p className="text-xs text-gray-600 break-words">
-                    {obs.dato_faltante}
-                  </p>
-                </div>
               </div>
             </div>
           ))}
@@ -212,53 +243,28 @@ export function ElaboracionObsSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="w-[400px] sm:w-[600px] flex flex-col h-full bg-white shadow-xl border-l">
-        {/* HEADER - Estructura corregida para evitar error de hidratación */}
-        <SheetHeader className="pb-4 border-b space-y-3 flex-shrink-0">
-          {/* Título y botón en la misma línea */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-primary">
-              <AiOutlineRobot className="w-5 h-5" />
-              <SheetTitle className="text-lg font-bold">
-                Observaciones de Elaboración
-              </SheetTitle>
-            </div>
-            {/* Botón Actualizar - Fuera de SheetDescription */}
-            {observaciones && !isLoading && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleRegenerate}
-                className="text-xs"
-              >
-                Actualizar Obs
-              </Button>
-            )}
+      <SheetContent className="w-100 sm:w-150 flex flex-col h-full bg-white shadow-xl border-l">
+        <SheetHeader className="pb-4 border-b space-y-3 shrink-0">
+          {/* Título */}
+          <div className="flex items-center gap-2 text-primary">
+            <AiOutlineEye className="w-5 h-5" />
+            <SheetTitle className="text-lg font-bold">
+              Observaciones de Elaboración
+            </SheetTitle>
           </div>
 
-          {/* SheetDescription solo con texto simple */}
           <SheetDescription className="text-sm text-muted-foreground">
             Acta ID:{' '}
             <span className="font-mono font-medium text-foreground">
               #{numeroActa}
             </span>
           </SheetDescription>
-
-          {/* Badge de procesando */}
-          {isLoading && (
-            <Badge
-              variant="outline"
-              className="animate-pulse border-blue-200 text-blue-600 bg-blue-50 w-fit"
-            >
-              Procesando
-            </Badge>
-          )}
         </SheetHeader>
 
-        {/* CONTENIDO PRINCIPAL CON SCROLL - Corregido */}
+        {/* CONTENIDO PRINCIPAL CON SCROLL */}
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full w-full">
-            <div className="p-6">
+            <div className="px-6 pt-0 pb-0">
               {isLoading ? (
                 // ESTADO DE CARGA (Spinner)
                 <div className="flex flex-col items-center justify-center h-[40vh] space-y-4">
@@ -275,7 +281,7 @@ export function ElaboracionObsSheet({
                   {observaciones &&
                     observaciones.analisis &&
                     observaciones.analisis.length > 0 && (
-                      <div className="flex items-center gap-2 text-xs font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full w-fit">
+                      <div className="flex items-center gap-2 text-xs font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full w-fit">
                         <BsCheckCircle className="w-3 h-3" />
                         Análisis completado
                       </div>
@@ -287,17 +293,18 @@ export function ElaboracionObsSheet({
           </ScrollArea>
         </div>
 
-        {/* FOOTER */}
+        {/* FOOTER con botón Actualizar Observación */}
         {observaciones && !isLoading && (
-          <div className="pt-4 border-t flex-shrink-0">
-            <div className="flex items-center gap-2 text-[10px] text-center text-muted-foreground px-6">
-              <AiOutlineInfoCircle className="w-3 h-3" />
-              <p>
-                Estas observaciones son preliminares y deben ser revisadas por
-                un experto.
-              </p>
-            </div>
-          </div>
+          <SheetFooter className="border-t pt-4 px-6 pb-6 shrink-0">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleRegenerate}
+              className="w-full cursor-pointer"
+            >
+              Actualizar Observación
+            </Button>
+          </SheetFooter>
         )}
       </SheetContent>
     </Sheet>

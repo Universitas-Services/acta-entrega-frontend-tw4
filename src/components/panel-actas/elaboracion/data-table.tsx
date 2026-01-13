@@ -72,6 +72,8 @@ interface DataTableProps<TData extends DataWithId, TValue> {
   onFilterChange: (type: 'type' | 'status', value: string | undefined) => void;
   onRefresh: () => void;
   isLoading?: boolean;
+  generatingActas?: Set<string>;
+  startObservacionesGeneration?: (actaId: string) => void;
 }
 
 export function DataTable<TData extends DataWithId, TValue>({
@@ -84,6 +86,8 @@ export function DataTable<TData extends DataWithId, TValue>({
   onFilterChange,
   onRefresh,
   isLoading = false,
+  generatingActas,
+  startObservacionesGeneration,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -146,6 +150,8 @@ export function DataTable<TData extends DataWithId, TValue>({
     },
     meta: {
       onRefresh,
+      generatingActas,
+      startObservacionesGeneration,
     },
   });
 

@@ -119,7 +119,7 @@ export function ActaSalienteProForm() {
     resolver: zodResolver(actaSalienteProSchema),
     shouldUnregister: false,
     defaultValues: {
-      tiempoRealizacion: undefined as unknown as number,
+      tiempoRealizacion: undefined,
       email: '',
       rifOrgano: '',
       denominacionCargo: '',
@@ -226,12 +226,16 @@ export function ActaSalienteProForm() {
           const acta = await getActaById(urlActaId);
 
           if (acta && acta.metadata) {
-            form.reset(acta.metadata);
+            form.reset({
+              ...acta.metadata,
+              tiempoRealizacion: acta.tiempoRealizacion,
+            });
+
             setIsSavedOnce(true);
             // Actualizamos la referencia para estar sincronizados
             lastSavedIdRef.current = acta.id;
 
-            // ✅ SOLUCIÓN: Esperar a que form.reset() complete su procesamiento
+            // Esperar a que form.reset() complete su procesamiento
             // antes de ejecutar la validación. Esto previene la race condition
             // donde form.trigger() se ejecuta antes de que los valores estén disponibles.
             setTimeout(async () => {
@@ -322,7 +326,14 @@ export function ActaSalienteProForm() {
 
       if (existingId) {
         // --- CASO ACTUALIZAR (PATCH) ---
-        console.log('Actualizando acta existente ID:', existingId);
+        console.log('🔍 [DEBUG] Actualizando acta ID:', existingId);
+        console.log('🔍 [DEBUG] currentData completo:', currentData);
+        console.log(
+          '🔍 [DEBUG] tiempoRealizacion en currentData:',
+          currentData.tiempoRealizacion
+        );
+        console.log('🔍 [DEBUG] Tipo:', typeof currentData.tiempoRealizacion);
+
         // Actualizar el acta existente
         response = await updateActa(existingId, currentData);
 

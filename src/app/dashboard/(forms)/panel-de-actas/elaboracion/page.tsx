@@ -133,6 +133,9 @@ export default function ActasPage() {
           const acta = data.find((a) => a.id === actaId);
           const numeroActa = acta?.numeroActa || 'S/N';
 
+          // Refrescar automáticamente el panel para actualizar badge y observaciones
+          refreshData();
+
           // Mostrar Toast personalizado con código de acta
           toast.success(`Observaciones listas para el Acta ${numeroActa}`, {
             action: {
@@ -147,7 +150,7 @@ export default function ActasPage() {
           // Continuar polling si aún no están listas
         }
       }
-    }, 10000); // Cada 10 segundos
+    }, 60000); // Cada 1 minuto
 
     return () => clearInterval(interval);
   }, [generatingActas, data]);

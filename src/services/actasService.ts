@@ -54,6 +54,7 @@ export interface Acta {
   nombreEntidad: string | null;
   type: string; // 'ENTRANTE_GRATIS', 'MAXIMA_AUTORIDAD_PAGA', etc.
   status: 'GUARDADA' | 'COMPLETADA' | 'DESCARGADA' | 'ENVIADA' | 'ENTREGADA';
+  tiempoRealizacion: number; // Campo en el root (no en metadata)
   metadata: ActaMetadata;
   createdAt: string;
   updatedAt: string;
@@ -307,6 +308,8 @@ export const updateActa = async (
     const cleanMetadata: Record<string, unknown> = {};
 
     Object.keys(data).forEach((key) => {
+      // Excluir tiempoRealizacion del metadata
+      if (key === 'tiempoRealizacion') return;
       // Tipamos la llave para acceder de forma segura
       const typedKey = key as keyof typeof data;
       const value: unknown = data[typedKey];
@@ -326,6 +329,7 @@ export const updateActa = async (
     // Además, actualizamos "nombreEntidad" si viene "nombreOrgano" en los datos.
     const body = {
       metadata: cleanMetadata,
+      tiempoRealizacion: data.tiempoRealizacion,
       // Ojo: data.nombreOrgano podría venir undefined si no se tocó en el form,
       // así que accedemos a cleanMetadata o verificamos antes.
       ...(data.nombreOrgano && { nombreEntidad: data.nombreOrgano }),

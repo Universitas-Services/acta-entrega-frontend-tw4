@@ -121,7 +121,7 @@ export function ActaMaximaAutoridadProForm() {
     resolver: zodResolver(actaMaximaAutoridadProSchema),
     shouldUnregister: false,
     defaultValues: {
-      tiempoRealizacion: undefined as unknown as number,
+      tiempoRealizacion: undefined,
       email: '',
       rifOrgano: '',
       denominacionCargo: '',
@@ -236,12 +236,15 @@ export function ActaMaximaAutoridadProForm() {
           const acta = await getActaById(urlActaId);
 
           if (acta && acta.metadata) {
-            form.reset(acta.metadata);
+            form.reset({
+              ...acta.metadata,
+              tiempoRealizacion: acta.tiempoRealizacion,
+            });
             setIsSavedOnce(true);
             // Actualizamos la referencia para estar sincronizados
             lastSavedIdRef.current = acta.id;
 
-            // ✅ SOLUCIÓN: Esperar a que form.reset() complete su procesamiento
+            // Esperar a que form.reset() complete su procesamiento
             // antes de ejecutar la validación. Esto previene la race condition
             // donde form.trigger() se ejecuta antes de que los valores estén disponibles.
             setTimeout(async () => {

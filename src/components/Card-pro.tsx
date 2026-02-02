@@ -45,20 +45,9 @@ export function CardPro({
           'hover:shadow-lg hover:scale-[1.01]'
         )}
       >
-        {/* --- Píldora "PRO" --- */}
-        {/* Se posiciona de forma absoluta con respecto al contenedor (`relative`). */}
-        <span
-          className={cn(
-            'absolute top-6 right-6 text-xs font-bold rounded-full px-3 py-1',
-            'bg-chillon text-card'
-          )}
-        >
-          PRO
-        </span>
-
         {/* --- Contenedor del Ícono --- */}
         {/* `flex-shrink-0` evita que el ícono se encoja si el texto es muy largo. */}
-        <div className="flex-shrink-0">{icon}</div>
+        <div className="shrink-0">{icon}</div>
 
         {/* --- Contenido de Texto --- */}
         {/* `pr-12` o `pr-14` añade un padding a la derecha para que el texto largo

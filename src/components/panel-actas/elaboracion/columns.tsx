@@ -5,7 +5,6 @@ import {
   Acta,
   downloadActa,
   resendActaEmail,
-  deleteActa,
   entregarActa,
 } from '@/services/actasService';
 import { useRouter } from 'next/navigation';
@@ -30,12 +29,16 @@ import {
 import { FiEdit } from 'react-icons/fi';
 import { BsThreeDots } from 'react-icons/bs';
 import { LuArrowUpDown } from 'react-icons/lu';
+import { AiOutlineEye } from 'react-icons/ai';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
-// Definimos una interfaz para el meta de la tabla (lo que pasas en data-table.tsx)
+// Definimos una interfaz para el meta de la tabla lo que viene del data-table
 interface TableMeta {
   onRefresh?: () => void;
+  generatingActas?: Set<string>;
+  startObservacionesGeneration?: (actaId: string) => void;
 }
 
 // Tipamos correctamente los props usando los tipos de la librería
@@ -95,22 +98,103 @@ const EntregarSwitch = ({ row, table }: ActionsCellProps) => {
   );
 };
 
-// --- COMPONENTE INTERNO PARA LAS ACCIONES (SOLUCIÓN AL ERROR DE HOOKS) ---
+// --- COMPONENTE INTERNO PARA EL BOTÓN DE OBSERVACIONES ---
+const ObservacionesCell = ({ row, table }: ActionsCellProps) => {
+  const acta = row.original;
+  const isCompleted = !!acta.isCompleted;
+  const meta = table.options.meta as TableMeta;
+
+  const isGenerating = meta.generatingActas?.has(acta.id) || false;
+
+  // Estado local para controlar el Sheet
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const handleOpenSheet = () => {
+    if (!isCompleted) return;
+    setIsSheetOpen(true);
+  };
+
+  const handleCloseSheet = () => {
+    setIsSheetOpen(false);
+  };
+
+  const handleStartGeneration = () => {
+    if (meta.startObservacionesGeneration) {
+      meta.startObservacionesGeneration(acta.id);
+    }
+  };
+
+  // Obtener tieneObservaciones del acta
+  const tieneObservaciones = acta.tieneObservaciones || false;
+
+  // Sistema de badges con 3 colores
+  let badgeColor = 'bg-red-500'; // Por defecto rojo (pendiente de generar)
+  const badgeVisible = isCompleted;
+
+  if (isGenerating) {
+    badgeColor = 'bg-yellow-500 animate-pulse'; // Amarillo pulsante si generando
+  } else if (tieneObservaciones) {
+    badgeColor = 'bg-green-500'; // Verde si ya tiene observaciones
+  }
+
+  return (
+    <>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center justify-center">
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleOpenSheet}
+                  disabled={!isCompleted || isGenerating}
+                  className={cn(
+                    'cursor-pointer',
+                    (!isCompleted || isGenerating) &&
+                      'opacity-50 cursor-not-allowed'
+                  )}
+                >
+                  <AiOutlineEye className="h-5 w-5" />
+                </Button>
+                {badgeVisible && (
+                  <Badge
+                    className={`absolute -top-1 -right-1 h-2 w-2 p-0 ${badgeColor} border-0`}
+                  />
+                )}
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            {!isCompleted
+              ? 'Se habilitará cuando el acta esté completada'
+              : isGenerating
+                ? 'Generando observaciones... Por favor espere'
+                : tieneObservaciones
+                  ? 'Ver observaciones'
+                  : 'Generar observaciones'}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </>
+  );
+};
+
+// --- COMPONENTE INTERNO PARA LAS ACCIONES ---
 const ActionsCell = ({ row, table }: ActionsCellProps) => {
   const acta = row.original;
-  const router = useRouter(); // Ahora sí podemos usar el hook
+  const router = useRouter();
 
   // Verificamos si el acta está completa (default false si no viene)
   const isCompleted = !!acta.isCompleted;
 
   const refreshTable = () => {
-    // Hacemos un cast seguro al meta que definimos arriba
+    // Hacemos un cast seguro al meta que se definió arriba
     (table.options.meta as TableMeta)?.onRefresh?.();
   };
 
   const handleEdit = () => {
     let route = '#';
-    // Lógica de rutas movida aquí adentro
     if (acta.type.includes('MAXIMA_AUTORIDAD'))
       route = `/dashboard/actas-pro/ma-pro?id=${acta.id}`;
     else if (acta.type.includes('ENTRANTE'))
@@ -143,17 +227,6 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
     });
   };
 
-  const handleDelete = async () => {
-    toast.promise(deleteActa(acta.id), {
-      loading: 'Eliminando...',
-      success: () => {
-        refreshTable();
-        return 'Acta eliminada';
-      },
-      error: 'Error al eliminar',
-    });
-  };
-
   return (
     <div className="flex items-center justify-end space-x-2">
       <Button
@@ -163,7 +236,7 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
         onClick={handleEdit}
       >
         <FiEdit className="h-4 w-4" />
-        Edit
+        Editar
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -181,7 +254,6 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
             {/* ITEM: ENVIAR */}
             <Tooltip>
               <TooltipTrigger asChild>
-                {/* Usamos un div wrapper o aplicamos eventos manualmente porque disabled previene eventos */}
                 <div className="w-full outline-none">
                   <DropdownMenuItem
                     className={cn(
@@ -273,7 +345,7 @@ export const columns: ColumnDef<Acta>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Número de Acta
+          Número de acta
           <LuArrowUpDown className="h-4 w-4" />
         </Button>
       );
@@ -291,7 +363,7 @@ export const columns: ColumnDef<Acta>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Nombre del Órgano
+          Nombre del órgano
           <LuArrowUpDown className="h-4 w-4" />
         </Button>
       );
@@ -303,7 +375,7 @@ export const columns: ColumnDef<Acta>[] = [
   },
   {
     accessorKey: 'type',
-    header: 'Tipo de Acta',
+    header: 'Tipo de acta',
     cell: ({ row }) => {
       const type = row.getValue('type') as string;
       let label = type;
@@ -343,6 +415,10 @@ export const columns: ColumnDef<Acta>[] = [
         label = 'Entregada';
         customClass =
           'bg-green-500 hover:bg-green-600 text-white border-green-500';
+      } else if (status === 'COMPLETADA') {
+        variant = 'default';
+        label = 'Completada';
+        customClass = 'bg-blue-800 text-white border-blue-800';
       }
 
       return (
@@ -354,7 +430,7 @@ export const columns: ColumnDef<Acta>[] = [
   },
   {
     id: 'entregar',
-    header: () => <div className="text-center">Entregar</div>,
+    header: () => <div className="text-center">Entrega</div>,
     cell: ({ row, table }) => <EntregarSwitch row={row} table={table} />,
   },
   {

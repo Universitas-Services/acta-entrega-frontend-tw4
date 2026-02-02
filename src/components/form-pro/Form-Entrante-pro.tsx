@@ -122,7 +122,7 @@ export function ActaEntranteProForm() {
     resolver: zodResolver(actaentranteProSchema),
     shouldUnregister: false,
     defaultValues: {
-      tiempoRealizacion: undefined as unknown as number,
+      tiempoRealizacion: undefined,
       email: '',
       rifOrgano: '',
       denominacionCargo: '',
@@ -237,7 +237,10 @@ export function ActaEntranteProForm() {
           const acta = await getActaById(urlActaId);
 
           if (acta && acta.metadata) {
-            form.reset(acta.metadata);
+            form.reset({
+              ...acta.metadata,
+              tiempoRealizacion: acta.tiempoRealizacion,
+            });
             setIsSavedOnce(true);
             // Actualizamos la referencia para estar sincronizados
             lastSavedIdRef.current = acta.id;
@@ -1026,10 +1029,14 @@ export function ActaEntranteProForm() {
 
                   {/* --- Nueva Sección: Tiempo de Realización del Acta --- */}
                   <div className="space-y-4 border rounded-lg">
-                    <div className="mb-4 p-4">
+                    <div className="mb-2 p-4">
                       <h3 className="font-bold text-lg">
-                        Tiempo de Realización del Acta
+                        Plazo para realizar el acta
                       </h3>
+                      <p className="text-sm text-gray-500 italic font-bold">
+                        Artículo 4 Resolución CGR N.º 01-000162 de fecha
+                        27-07-2009
+                      </p>
                     </div>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-4 px-4 pb-4">
                       <FormField
@@ -1038,7 +1045,8 @@ export function ActaEntranteProForm() {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Seleccione el tiempo de realización
+                              Seleccione el día en que se encuentra para la
+                              entrega del acta.
                             </FormLabel>
                             <Select
                               onValueChange={(value) =>
@@ -1847,7 +1855,7 @@ export function ActaEntranteProForm() {
                   variant="default"
                   className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-chillon hover:bg-chillon/80 hover:text-white"
                 >
-                  {isLoading ? 'Enviando...' : 'Crear Acta (PRO)'}
+                  {isLoading ? 'Enviando...' : 'Crear acta'}
                 </Button>
               )}
             </div>

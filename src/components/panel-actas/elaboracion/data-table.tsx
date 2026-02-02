@@ -72,6 +72,8 @@ interface DataTableProps<TData extends DataWithId, TValue> {
   onFilterChange: (type: 'type' | 'status', value: string | undefined) => void;
   onRefresh: () => void;
   isLoading?: boolean;
+  generatingActas?: Set<string>;
+  startObservacionesGeneration?: (actaId: string) => void;
 }
 
 export function DataTable<TData extends DataWithId, TValue>({
@@ -84,6 +86,8 @@ export function DataTable<TData extends DataWithId, TValue>({
   onFilterChange,
   onRefresh,
   isLoading = false,
+  generatingActas,
+  startObservacionesGeneration,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -146,6 +150,8 @@ export function DataTable<TData extends DataWithId, TValue>({
     },
     meta: {
       onRefresh,
+      generatingActas,
+      startObservacionesGeneration,
     },
   });
 
@@ -242,7 +248,7 @@ export function DataTable<TData extends DataWithId, TValue>({
 
           <div className="flex flex-wrap items-center gap-2">
             <AnimatedToggle
-              options={['Todas', 'Seleccionada']}
+              options={['Todas', 'Seleccionadas']}
               defaultSelected={viewOption}
               onValueChange={setViewOption}
             />
@@ -262,7 +268,7 @@ export function DataTable<TData extends DataWithId, TValue>({
                 <DropdownMenuLabel>Filtrar por...</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Tipo de Acta</DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger>Tipo de acta</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent className="bg-white">
                     <DropdownMenuRadioGroup
                       value={selectedType}
@@ -271,13 +277,13 @@ export function DataTable<TData extends DataWithId, TValue>({
                       <DropdownMenuRadioItem value="todos">
                         Todos
                       </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="MAXIMA_AUTORIDAD_PAGA">
+                      <DropdownMenuRadioItem value="MAXIMA_AUTORIDAD">
                         Máxima Autoridad
                       </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="ENTRANTE_PAGA">
+                      <DropdownMenuRadioItem value="ENTRANTE">
                         Servidor Entrante
                       </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="SALIENTE_PAGA">
+                      <DropdownMenuRadioItem value="SALIENTE">
                         Servidor Saliente
                       </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>

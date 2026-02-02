@@ -17,7 +17,7 @@ const cardData = [
     description:
       'Asegura que tu acta sea impecable. La versión Pro te permite detallar todos los anexos cruciales para tu protección legal. ¡Actualízate ahora y obtén la máxima tranquilidad!',
     buttonText: 'Adquirir PRO aquí',
-    linkHref: 'https://wa.link/qz9kx3',
+    linkHref: 'https://universitas.myflodesk.com/ae-pro',
   },
   {
     imageUrl: '/repositorio/imagen curso para APP.png',

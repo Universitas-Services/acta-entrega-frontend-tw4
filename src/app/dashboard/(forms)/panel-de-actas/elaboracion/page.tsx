@@ -4,7 +4,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { useHeader } from '@/context/HeaderContext';
 import { columns } from '@/components/panel-actas/elaboracion/columns';
 import { DataTable } from '@/components/panel-actas/elaboracion/data-table';
-import { getMyActas, Acta } from '@/services/actasService';
+import {
+  getMyActas,
+  Acta,
+  getObservacionesElaboracion,
+} from '@/services/actasService';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import { PaginationState } from '@tanstack/react-table';
@@ -29,20 +33,44 @@ export default function ActasPage() {
   );
   const [isFirstLoad, setIsFirstLoad] = useState(true);
 
+  // Estados para el sistema de observaciones
+  const [generatingActas, setGeneratingActas] = useState<Set<string>>(
+    new Set()
+  );
+
+  // Mapeo de tipos simplificados a sus variantes PAGA y GRATIS
+  const TYPE_MAPPING: Record<string, string[]> = {
+    MAXIMA_AUTORIDAD: ['MAXIMA_AUTORIDAD_PAGA', 'MAXIMA_AUTORIDAD_GRATIS'],
+    ENTRANTE: ['ENTRANTE_PAGA', 'ENTRANTE_GRATIS'],
+    SALIENTE: ['SALIENTE_PAGA', 'SALIENTE_GRATIS'],
+  };
+
   // Efecto para cargar datos
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
+        // NO enviamos el typeFilter
         const response = await getMyActas({
-          page: pagination.pageIndex + 1, // Convertir a 1-index para backend
+          page: pagination.pageIndex + 1, // Convertir a 1-index
           limit: pagination.pageSize,
           search: search,
-          type: typeFilter,
           status: statusFilter,
         });
 
-        setData(response.data);
+        // Filtrado de tipo
+        let filteredData = response.data;
+
+        if (typeFilter && typeFilter !== 'todos') {
+          const allowedTypes = TYPE_MAPPING[typeFilter];
+          if (allowedTypes) {
+            filteredData = response.data.filter((acta) =>
+              allowedTypes.includes(acta.type)
+            );
+          }
+        }
+
+        setData(filteredData);
 
         const metaTotal = response.meta?.total;
 
@@ -67,6 +95,57 @@ export default function ActasPage() {
     typeFilter,
     statusFilter,
   ]);
+
+  // Función para iniciar generación de observaciones
+  const startObservacionesGeneration = useCallback((actaId: string) => {
+    setGeneratingActas((prev) => {
+      const newSet = new Set(prev);
+      newSet.add(actaId);
+      return newSet;
+    });
+  }, []);
+
+  // Polling global de observaciones en segundo plano
+  useEffect(() => {
+    if (generatingActas.size === 0) return;
+
+    const interval = setInterval(async () => {
+      for (const actaId of generatingActas) {
+        try {
+          await getObservacionesElaboracion(actaId);
+
+          // Observaciones listas - remover del conjunto
+          setGeneratingActas((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(actaId);
+            return newSet;
+          });
+
+          // Encontrar el acta para obtener su número
+          const acta = data.find((a) => a.id === actaId);
+          const numeroActa = acta?.numeroActa || 'S/N';
+
+          // Refrescar automáticamente el panel para actualizar badge y observaciones
+          refreshData();
+
+          // Mostrar Toast personalizado con código de acta
+          toast.success(`Observaciones listas para el Acta ${numeroActa}`, {
+            action: {
+              label: 'OK',
+              onClick: () => {
+                refreshData(); // Refrescar para actualizar tieneObservaciones
+              },
+            },
+            duration: Infinity, // No se cierra automáticamente
+          });
+        } catch (error) {
+          // Continuar polling si aún no están listas
+        }
+      }
+    }, 60000); // Cada 1 minuto
+
+    return () => clearInterval(interval);
+  }, [generatingActas, data]);
 
   useEffect(() => {
     setTitle('Panel de actas (Elaboración)');
@@ -93,14 +172,27 @@ export default function ActasPage() {
     const triggerFetch = async () => {
       setLoading(true);
       try {
+        // NO enviamos el typeFilter
         const response = await getMyActas({
           page: pagination.pageIndex + 1,
           limit: pagination.pageSize,
           search,
-          type: typeFilter,
           status: statusFilter,
         });
-        setData(response.data);
+
+        // Filtrado de tipo
+        let filteredData = response.data;
+
+        if (typeFilter && typeFilter !== 'todos') {
+          const allowedTypes = TYPE_MAPPING[typeFilter];
+          if (allowedTypes) {
+            filteredData = response.data.filter((acta) =>
+              allowedTypes.includes(acta.type)
+            );
+          }
+        }
+
+        setData(filteredData);
 
         const metaTotal = response.meta?.total;
         setTotalRecords(metaTotal || response.total || 0);
@@ -130,7 +222,7 @@ export default function ActasPage() {
       <DataTable
         columns={columns}
         data={data}
-        // Calculamos el total de páginas basado en el totalRecords corregido
+        // Calculamos el total de páginas basado en el totalRecords
         pageCount={Math.ceil(totalRecords / pagination.pageSize)}
         pagination={pagination}
         onPaginationChange={setPagination}
@@ -138,6 +230,8 @@ export default function ActasPage() {
         onFilterChange={handleFilterChange}
         onRefresh={refreshData}
         isLoading={loading}
+        generatingActas={generatingActas}
+        startObservacionesGeneration={startObservacionesGeneration}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { IoSend } from 'react-icons/io5';
+import { RiRobot2Fill } from 'react-icons/ri';
 import apiClient from '@/lib/axios';
 import { useHeader } from '@/context/HeaderContext';
 import { cn } from '@/lib/utils';
@@ -96,11 +97,10 @@ export default function AsistenteVirtualPage() {
     <div className="h-full flex justify-center">
       <div className="flex flex-col h-full w-full max-w-4xl bg-slate-50 border rounded-lg shadow-xl">
         <div className="flex items-center p-4 border-b bg-white rounded-t-lg">
-          {/* IMAGEN EN LA CABECERA */}
-          <Avatar className="h-10 w-10 mr-4 rounded-xl">
-            <AvatarImage src="/ia/julioAI.jpg" alt="AsesorIA" />
-            <AvatarFallback>IA</AvatarFallback>
-          </Avatar>
+          {/* ICONO EN LA CABECERA */}
+          <div className="h-10 w-10 mr-4 rounded-xl flex items-center justify-center bg-primary-blue text-white">
+            <RiRobot2Fill className="h-10 w-10 text-chillon" />
+          </div>
           <h2 className="text-xl font-semibold text-gray-800">
             Consultor IA - Actas de Entrega
           </h2>
@@ -116,13 +116,10 @@ export default function AsistenteVirtualPage() {
               )}
             >
               {!msg.isUser && (
-                // IMAGEN EN LOS MENSAJES DEL BOT
-                <Avatar className="h-8 w-8 rounded-xl">
-                  <AvatarImage src="/ia/julioAI.jpg" alt="AsesorIA" />
-                  <AvatarFallback className="bg-primary-blue text-white">
-                    IA
-                  </AvatarFallback>
-                </Avatar>
+                // ICONO EN LOS MENSAJES DEL BOT
+                <div className="h-8 w-8 rounded-xl flex items-center justify-center bg-primary-blue text-white">
+                  <RiRobot2Fill className="h-10 w-10 text-chillon" />
+                </div>
               )}
               <div
                 className={cn(
@@ -138,13 +135,10 @@ export default function AsistenteVirtualPage() {
           ))}
           {isLoading && (
             <div className="flex items-start gap-4 justify-start">
-              {/* ▼▼▼ 3. IMAGEN EN EL INDICADOR "ESCRIBIENDO..." ▼▼▼ */}
-              <Avatar className="h-8 w-8 animate-pulse">
-                <AvatarImage src="/ia/julioAI.jpg" alt="AsesorIA" />
-                <AvatarFallback className="bg-primary-blue text-white">
-                  IA
-                </AvatarFallback>
-              </Avatar>
+              {/* ICONO EN EL INDICADOR "ESCRIBIENDO..." */}
+              <div className="h-8 w-8 animate-pulse rounded-xl flex items-center justify-center bg-primary-blue text-white">
+                <RiRobot2Fill className="h-5 w-5" />
+              </div>
               <div className="max-w-md p-3 rounded-lg bg-white text-gray-800 rounded-bl-none shadow-sm">
                 <p className="text-sm italic text-gray-500">Escribiendo...</p>
               </div>

@@ -13,7 +13,7 @@ const proCardsData = [
     description:
       'Inicia aquí el proceso para documentar la transferencia de tu cargo, asegurando un cierre de gestión ordenado y conforme a la normativa.',
     href: '/dashboard/actas-pro/saliente-pro',
-    icon: <HiDocumentArrowUp className="h-10 w-10 text-primary" />,
+    icon: <HiDocumentArrowUp className="h-10 w-10 text-chillon" />,
   },
   {
     id: 'compliance',
@@ -21,7 +21,7 @@ const proCardsData = [
     description:
       'Comienza a elaborar el acta para recibir tu nuevo cargo. Registra el estado de la dependencia y establece un punto de partida claro para tu gestión.',
     href: '/dashboard/actas-pro/entrante-pro',
-    icon: <HiDocumentArrowDown className="h-10 w-10 text-primary" />,
+    icon: <HiDocumentArrowDown className="h-10 w-10 text-chillon" />,
   },
   {
     id: 'ia',
@@ -29,7 +29,7 @@ const proCardsData = [
     description:
       'Utiliza esta opción en procesos de entrega sin servidor público designado. Es decir, cuando actúes como el servidor público designado para el procedimiento.',
     href: '/dashboard/actas-pro/ma-pro',
-    icon: <SiSpringsecurity className="h-10 w-10 text-primary" />,
+    icon: <SiSpringsecurity className="h-10 w-10 text-chillon" />,
   },
 ];
 

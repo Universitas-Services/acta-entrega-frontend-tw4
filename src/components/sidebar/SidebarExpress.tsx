@@ -158,7 +158,7 @@ export function SidebarExpress() {
                       className={cn(
                         'flex w-full items-center justify-start gap-3 rounded-lg py-2 pl-3 pr-4 transition-colors text-sidebar-foreground hover:bg-sidebar-hover-bg bg-sidebar cursor-pointer overflow-hidden',
                         isDesktopCollapsed && 'justify-center p-2',
-                        pathname === item.href && 'bg-sidebar-primary font-bold'
+                        pathname === item.href && 'bg-chillon font-bold'
                       )}
                     >
                       {renderIcon(item)}

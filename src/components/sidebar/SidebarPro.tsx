@@ -145,13 +145,13 @@ export function SidebarPro() {
             className={cn(
               'flex items-center gap-3 transition-colors cursor-pointer',
               'overflow-hidden transition-all duration-300',
-              'text-primary-foreground',
-              'hover:bg-sidebar-hover-bg',
+              'text-sidebar-foreground', // CAMBIO: Texto oscuro para fondo blanco
+              'hover:bg-chillon/70',
               isDesktopCollapsed
                 ? 'justify-center rounded-none'
                 : 'w-full justify-start py-2 px-3 rounded-none',
               pathname === item.href &&
-                'bg-sidebar-primary text-sidebar-foreground font-bold',
+                'bg-chillon text-sidebar-foreground font-bold', // CAMBIO: bg-chillon
               className // Permite pasar clases extra
             )}
           >
@@ -185,12 +185,12 @@ export function SidebarPro() {
         variant="ghost"
         className={cn(
           'w-full justify-start rounded-none py-2 cursor-pointer',
-          'text-primary-foreground',
-          'hover:bg-sidebar-hover-bg',
+          'text-sidebar-foreground', // CAMBIO: Texto oscuro
+          'hover:bg-chillon/70',
           // --- Estilo de sub-item ---
           'pr-3', // Indentación
           pathname === item.href &&
-            'bg-sidebar-primary text-sidebar-foreground font-bold'
+            'bg-chillon text-sidebar-foreground font-bold' // CAMBIO: bg-chillon
         )}
       >
         {/* Sin icono, solo texto */}
@@ -211,13 +211,13 @@ export function SidebarPro() {
           >
             <SidebarTrigger
               onClick={toggleDesktopCollapse}
-              className="hidden md:flex cursor-pointer"
+              className="hidden md:flex cursor-pointer hover:bg-chillon/70"
             />
             <Image
-              src="/logo de universitas legal blanco.png"
+              src="/LOGO_SIN_FONDO.png"
               alt="Universitas Legal Logo"
-              width={120}
-              height={48}
+              width={80}
+              height={32}
               priority={true}
               className={cn(
                 'mr-8 object-contain',
@@ -252,8 +252,8 @@ export function SidebarPro() {
                             variant="ghost"
                             className={cn(
                               'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden justify-center rounded-none',
-                              'text-primary-foreground',
-                              'hover:bg-sidebar-hover-bg',
+                              'text-sidebar-foreground', // CAMBIO: Texto oscuro
+                              'hover:bg-chillon/70',
                               openCollapsible === item.id && 'font-bold'
                             )}
                           >
@@ -266,12 +266,12 @@ export function SidebarPro() {
                           side="right"
                           align="start"
                           sideOffset={5}
-                          className="w-40 bg-primary text-primary-foreground border-primary-foreground/20 space-y-1"
+                          className="w-40 bg-white text-sidebar-foreground border-border space-y-1"
                         >
                           <DropdownMenuLabel className="font-semibold">
                             {item.title}
                           </DropdownMenuLabel>
-                          <DropdownMenuSeparator className="bg-primary-foreground/20" />
+                          <DropdownMenuSeparator className="bg-border" />
                           {item.subItems.map((subItem) => (
                             <DropdownMenuItem
                               asChild
@@ -307,8 +307,8 @@ export function SidebarPro() {
                         variant="ghost"
                         className={cn(
                           'flex items-center gap-3 transition-colors cursor-pointer overflow-hidden w-full justify-between py-2 px-3 rounded-none',
-                          'text-primary-foreground',
-                          'hover:bg-sidebar-hover-bg', // --- Sin 'hover:underline' ---
+                          'text-sidebar-foreground', // CAMBIO: Texto oscuro
+                          'hover:bg-chillon/70',
                           openCollapsible === item.id && ''
                         )}
                       >
@@ -330,12 +330,12 @@ export function SidebarPro() {
 
                     <CollapsibleContent
                       className={cn(
-                        'text-sm bg-blue-900/50', // Base
+                        'text-sm', // Quitamos bg-blue-900/50 para que sea limpio o usa un gris muy claro si prefieres
                         isDesktopCollapsed && 'hidden'
                       )}
                     >
                       {/* --- Estilo de sub-items con línea --- */}
-                      <div className="ml-5 pl-4 border-l border-primary-foreground/30 space-y-1 py-1">
+                      <div className="ml-5 pl-4 border-l border-border space-y-1 py-1">
                         {item.subItems.map((subItem) => (
                           <SubNavButton item={subItem} key={subItem.id} />
                         ))}
@@ -412,17 +412,17 @@ export function SidebarPro() {
                             isDesktopCollapsed && 'hidden'
                           )}
                         >
-                          <span className="text-sm font-medium whitespace-nowrap">
+                          <span className="text-sm font-medium whitespace-nowrap text-sidebar-foreground">
                             {basic?.nombreCompleto || 'Usuario'}
                           </span>
-                          <span className="text-xs  whitespace-nowrap truncate w-full">
+                          <span className="text-xs  whitespace-nowrap truncate w-full text-muted-foreground">
                             {basic?.email || ''}
                           </span>
                         </div>
                       </div>
                       <div
                         className={cn(
-                          'shrink-0',
+                          'shrink-0 text-sidebar-foreground',
                           isDesktopCollapsed && 'hidden'
                         )}
                       >
@@ -454,7 +454,7 @@ export function SidebarPro() {
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 ">
                         <AvatarImage alt={basic?.nombreCompleto || 'Usuario'} />
-                        <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+                        <AvatarFallback className="bg-avatar-pro text-foreground font-bold">
                           {basic ? getInitials(basic.nombreCompleto) : 'U'}
                         </AvatarFallback>
                       </Avatar>
@@ -477,7 +477,7 @@ export function SidebarPro() {
                       href="/dashboard/perfil"
                       onClick={handleNavigation}
                       variant="ghost"
-                      className="hover:bg-white w-full h-full justify-start px-2 py-1.5 text-sm font-normal focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="hover:bg-accent w-full h-full justify-start px-2 py-1.5 text-sm font-normal focus-visible:ring-0 focus-visible:ring-offset-0"
                     >
                       <BsPerson className="mr-2 h-4 w-4 text-foreground" />
                       <span className="text-foreground">Perfil</span>
@@ -510,7 +510,8 @@ export function SidebarPro() {
       <Sheet open={isMobileMenuOpen} onOpenChange={toggleMobileMenu}>
         <SheetContent
           side="left"
-          className="w-72 p-0 border-r-0 flex flex-col bg-primary text-primary-foreground"
+          // CAMBIO: Fondo sidebar en lugar de primary
+          className="w-72 p-0 border-r-0 flex flex-col bg-sidebar text-sidebar-foreground"
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Navegación Principal</SheetTitle>
@@ -529,7 +530,8 @@ export function SidebarPro() {
       collapsible="icon"
       className={cn(
         'hidden md:flex border-none',
-        '[&_[data-slot="sidebar-inner"]]:bg-primary [&_[data-slot="sidebar-inner"]]:text-primary-foreground',
+        // CAMBIO: Variables de sidebar en lugar de primary
+        '[&_[data-slot="sidebar-inner"]]:bg-sidebar [&_[data-slot="sidebar-inner"]]:text-sidebar-foreground',
         isDesktopCollapsed ? 'w-20' : 'w-64',
         'transition-all duration-300'
       )}

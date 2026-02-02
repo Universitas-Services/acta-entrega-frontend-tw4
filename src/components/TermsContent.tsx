@@ -2,27 +2,31 @@ export function TermsContent() {
   return (
     <div className="space-y-4 text-foreground leading-relaxed">
       <p className="text-sm text-muted-foreground">
-        <strong>Última actualización: septiembre de 2025</strong>
+        <strong>Última actualización: Diciembre de 2025</strong>
       </p>
       <p className="text-black/90">
-        Bienvenido a <strong>Actas de entrega</strong>. Le rogamos leer
+        Bienvenido a <strong>Acta de Entrega</strong>. Le rogamos leer
         detenidamente los siguientes términos y condiciones (en adelante, los
         &quot;Términos&quot;) antes de utilizar la aplicación web y/o móvil (en
         adelante, la &quot;Plataforma&quot; o el &quot;Servicio&quot;) operada
-        por <strong>Universitas Services C.A.</strong> (en adelante, la
-        &quot;Plataforma&quot; o el &quot;Servicio&quot;)
+        por el equipo de <strong>Acta de Entrega</strong> (en adelante, &quot;El
+        Proveedor&quot;).
       </p>
+
       <p className="text-black/90">
-        El <strong>acta de entrega</strong> es un documento formal que certifica
-        la situación patrimonial, financiera, funcional de un órgano u ente
-        público con ocasión de la separación o ingreso del cargo y en resguardo
-        de la delimitación de responsabilidades del servidor público que recibe
-        como del que hace entrega. Nuestra plataforma está diseñada para ayudar
-        a los servidores públicos venezolanos a generar sus actas de entrega de
-        forma rápida y organizada, asegurando que cumplan con el formato exigido
-        por la Resolución N° 01-000162 de la Contraloría General de la República
+        El acta de entrega es un documento formal que certifica la situación
+        patrimonial, financiera y funcional de un órgano u ente público con
+        ocasión de la separación o ingreso del cargo, en resguardo de la
+        delimitación de responsabilidades del servidor público. Nuestra
+        plataforma está diseñada para asistir a los servidores públicos
+        venezolanos en la generación de sus actas de forma organizada,
+        asegurando que cumplan con el formato exigido por la{' '}
+        <strong>
+          Resolución N° 01-00-000162 de la Contraloría General de la República
+        </strong>{' '}
         (en adelante, &quot;Resolución 162&quot;).
       </p>
+
       <p className="text-black/90">
         Al registrarse, acceder o utilizar la Plataforma, usted (en adelante, el
         &quot;Usuario&quot;) acepta y se compromete a cumplir con estos
@@ -31,380 +35,180 @@ export function TermsContent() {
       </p>
 
       <h3 className="font-bold text-lg text-primary pt-2">
-        1. Objeto y naturaleza del servicio
+        1. Objeto y Naturaleza del Servicio
       </h3>
-      <p className="text-black/90">
-        <strong>1.1. Definición del servicio (SaaS):</strong> La Plataforma es
-        una herramienta tecnológica de gestión documental tipo Software as a
-        Service (SaaS), diseñada para asistir a los servidores públicos en la
-        estructuración, formateo y organización de las actas de entrega,
-        basándose en los parámetros de forma establecidos en la{' '}
-        <strong>Resolución Nº 01-00-000162</strong> de la Contraloría General de
-        la República (CGR).
-      </p>
-      <p className="text-black/90">
-        <strong>
-          1.2. Descargo de responsabilidad profesional (No Legal Advice): El
-          Usuario reconoce y acepta expresamente que Universitas Services C.A.
-          no es una firma de abogados, ni un órgano de control fiscal, ni presta
-          a través de la Plataforma servicios de asesoría jurídica.
-        </strong>{' '}
-        El uso de la Plataforma, sus listas de verificación
-        (&quot;Checklists&quot;), el módulo de &quot;Consultor IA&quot; y el
-        &quot;Repositorio legal&quot; tiene fines meramente informativos,
-        instrumentales y de automatización. Ninguna funcionalidad de la App
-        sustituye el juicio profesional del Usuario ni el dictamen de un auditor
-        fiscal certificado.
-      </p>
-      <p className="text-black/90">
-        <strong>
-          1.3. Responsabilidad del sujeto obligado y limitación de veracidad:
-        </strong>{' '}
-        De conformidad con los <strong>artículos 3, 8 y 18</strong> de la
-        Resolución 162, la obligación de elaborar, suscribir y garantizar la
-        exactitud cualitativa y cuantitativa del{' '}
-        <strong>acta de entrega</strong>, así como la custodia de sus anexos,
-        recae exclusivamente en el{' '}
-        <strong>servidor público saliente o entrante</strong> en su condición de
-        sujeto obligado. El Usuario reconoce que la plataforma funciona
-        únicamente como una herramienta de facilitación técnica. En
-        consecuencia, la responsabilidad legal derivada del contenido del acta
-        permanece en cabeza del servidor público respectivo,{' '}
-        <strong>
-          independientemente de la persona que opere el sistema o introduzca los
-          datos
-        </strong>
-        . La Plataforma no garantiza, válida, audita ni se hace responsable por
-        la veracidad, integridad o licitud de la información suministrada por el
-        Usuario.
-      </p>
-
-      <h3 className="font-bold text-lg text-primary pt-2">
-        2. Cuentas, registro y seguridad
-      </h3>
-      <p className="text-black/90">
-        <strong>2.1. Aceptación expresa:</strong> Al completar el formulario de
-        registro y marcar la casilla de aceptación, el Usuario manifiesta haber
-        leído y comprendido estos Términos, otorgando su consentimiento
-        inequívoco y firma electrónica.
-      </p>
-      <p className="text-black/90">
-        <strong>2.2. Veracidad de datos:</strong> El Usuario garantiza que los
-        datos proporcionados (nombre, apellido, correo, teléfono, cargo e
-        institución) son veraces. Dado el carácter institucional del servicio,
-        el Usuario asume la responsabilidad de utilizar credenciales que esté
-        autorizado a emplear para fines administrativos.
-      </p>
-      <p className="text-black/90">
-        <strong>2.3. Uso del número telefónico:</strong> Al proporcionar su
-        número de teléfono, el Usuario autoriza a Universitas a utilizarlo para:
-        (i) validaciones de seguridad; y (ii) soporte técnico vía WhatsApp,
-        entendiendo que dicho canal es exclusivamente para asistencia técnica
-        operativa y no para consultas jurídicas.
-      </p>
-      <p className="text-black/90">
-        <strong>2.4. Seguridad de la cuenta:</strong> El Usuario es responsable
-        de resguardar sus credenciales. Queda estrictamente prohibido compartir
-        el usuario y contraseña con terceros. Cualquier actividad realizada
-        desde la cuenta del Usuario se presumirá realizada por este.
-      </p>
-
-      <h3 className="font-bold text-lg text-primary pt-2">
-        3. Modalidades de servicio y funcionalidades
-      </h3>
-
-      <p className="font-bold text-black/90 pt-2">
-        3.1. Versión Express (gratuita / básica):
-      </p>
-      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
+      <ul className="list-none space-y-4 text-black/90">
         <li>
-          <strong>Alcance limitado:</strong> Funciona exclusivamente como una
-          herramienta de formateo documental. Permite la generación de{' '}
-          <strong>un (1) acta por sesión</strong> en formato Google Docs.
-        </li>
-        <li>
-          <strong>Restricciones:</strong> Esta modalidad{' '}
-          <strong>no incluye</strong> acceso al &quot;Módulo de compliance&quot;
-          (verificación de normativa), ni al &quot;Consultor IA&quot;, ni al
-          &quot;Panel de actas&quot;.
-        </li>
-        <li>
-          <strong>Ausencia de validación:</strong> El Usuario reconoce que la
-          versión Express no verifica omisiones ni errores en la carga de datos.
-          La responsabilidad de la completitud del documento recae 100% en el
-          Usuario.
-        </li>
-        <li>
-          <strong>Almacenamiento volátil:</strong> Los datos se procesan en
-          memoria temporal para generar el archivo y se envían al correo. Una
-          vez cerrada la sesión, no existe respaldo persistente accesible por el
-          usuario en la Plataforma.
-        </li>
-      </ul>
-
-      <p className="font-bold text-black/90 pt-2">
-        3.2. Versión PRO (suscripción anual):
-      </p>
-      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
-        <li>
-          <strong>Alcance completo:</strong> Otorga acceso irrestricto al panel
-          de gestión, historial de actas (edición posterior), módulo de
-          compliance (reporte PDF de verificación) y consultor IA.
-        </li>
-        <li>
-          <strong>Persistencia:</strong> Incluye almacenamiento seguro en la
-          nube durante la vigencia del plan (1 año) más el periodo de gracia
-          estipulado.
-        </li>
-        <li>
-          <strong>Almacenamiento (Cloud):</strong> Universitas aplicará medidas
-          de seguridad estándar de la industria para proteger la integridad de
-          las actas almacenadas. Sin embargo, el Usuario reconoce que ningún
-          sistema es invulnerable y se compromete a mantener copias de seguridad
-          locales (offline) de todos los documentos críticos del Estado.
-        </li>
-      </ul>
-
-      <p className="font-bold text-black/90 pt-2">
-        3.3. Módulo de &quot;Compliance&quot; (autoevaluación - solo PRO):
-      </p>
-      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
-        <li>
-          <strong>Naturaleza:</strong> El módulo de compliance es una
-          herramienta de verificación formal basada en la normativa vigente (La
-          Resolución 162).
+          <strong>1.1. Definición del Servicio (SaaS):</strong> La Plataforma es
+          una herramienta tecnológica de gestión documental tipo{' '}
+          <em>Software as a Service</em> (SaaS), diseñada para asistir al
+          Usuario en la estructuración y organización de actas de entrega,
+          basándose en los parámetros de forma establecidos en la Resolución
+          162.
         </li>
         <li>
           <strong>
-            Limitación de garantía (&quot;Cláusula anti-marketing&quot;):
+            1.2. Descargo de responsabilidad profesional (No Legal Advice):
           </strong>{' '}
-          Aunque el material promocional pueda utilizar términos como &quot;a
-          prueba de auditorías&quot;, el Usuario reconoce que dichas expresiones
-          refieren a la <strong>integridad formal</strong> de los requisitos.{' '}
-          <strong>
-            Universitas Services C.A. no garantiza el resultado favorable de una
-            auditoría fiscal real.
-          </strong>{' '}
-          La validación positiva (&quot;check verde&quot;) indica únicamente que
-          el Usuario ha declarado poseer un requisito, no que dicho requisito
-          sea veraz o jurídicamente suficiente.
+          El Usuario reconoce que El Proveedor no es una firma de abogados ni un
+          órgano de control fiscal. El uso de la Plataforma, sus listas de
+          verificación, el módulo de &quot;Consultor IA&quot; y el repositorio
+          documental tiene fines meramente informativos e instrumentales.
+          Ninguna funcionalidad de la App sustituye el juicio profesional del
+          Usuario ni el dictamen de un auditor fiscal.
         </li>
         <li>
-          <strong>Declaración de veracidad:</strong> Al marcar &quot;Sí&quot; en
-          las preguntas de verificación (ej: &quot;¿Existe inventario de
-          bienes?&quot;), el Usuario realiza una declaración jurada digital
-          sobre la existencia de dicho soporte físico.
-        </li>
-      </ul>
-
-      <p className="font-bold text-black/90 pt-2">
-        3.4. Consultor IA (solo PRO):
-      </p>
-      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
-        <li>
-          <strong>Alcance:</strong> El &quot;Consultor IA&quot; y el término
-          &quot;Experto&quot; utilizado en la interfaz refieren a un sistema de
-          inteligencia artificial entrenado para ofrecer respuestas basadas en
-          patrones de texto.
-        </li>
-        <li>
-          <strong>Riesgo de alucinación:</strong> La IA puede generar
-          información imprecisa o desactualizada. El Usuario debe contrastar
-          cualquier sugerencia de la IA con la normativa oficial antes de tomar
-          decisiones administrativas.
+          <strong>1.3. Responsabilidad del sujeto obligado:</strong> De
+          conformidad con la Resolución 162, la obligación de elaborar,
+          suscribir y garantizar la exactitud del acta, así como la custodia de
+          sus anexos, recae exclusivamente en el servidor público (sujeto
+          obligado). La Plataforma funciona únicamente como una herramienta de
+          facilitación técnica. La veracidad de los datos introducidos es
+          responsabilidad única del Usuario.
         </li>
       </ul>
 
       <h3 className="font-bold text-lg text-primary pt-2">
-        4. Usos prohibidos y restricciones
+        2. Cuenta, Registro y Seguridad
       </h3>
-      <p className="text-black/90">
-        El Usuario se compromete a utilizar la Plataforma de manera lícita y
-        ética. Queda terminantemente prohibido:
-      </p>
-      <ol className="list-decimal list-inside space-y-2 pl-4 text-black/90">
+      <ul className="list-none space-y-4 text-black/90">
         <li>
-          <strong>Ingeniería inversa:</strong> Intentar descompilar,
-          desensamblar o realizar ingeniería inversa de cualquier software o
-          algoritmo utilizado en la Plataforma.
+          <strong>2.1. Aceptación expresa:</strong> Al completar el registro, el
+          Usuario manifiesta haber leído y comprendido estos Términos, otorgando
+          su consentimiento inequívoco.
         </li>
         <li>
-          <strong>Uso fraudulento:</strong> Utilizar la Plataforma para simular
-          actos administrativos, falsificar fechas de entrega o encubrir
-          ilícitos administrativos.
+          <strong>2.2. Veracidad de datos:</strong> El Usuario garantiza que los
+          datos proporcionados son veraces. El Usuario asume la responsabilidad
+          de utilizar credenciales autorizadas para fines administrativos.
         </li>
         <li>
-          <strong>Seguridad informática:</strong> Introducir virus, troyanos,{' '}
-          <em>ransomware</em> o cualquier código malicioso diseñado para
-          interrumpir, destruir o limitar la funcionalidad del servicio.
+          <strong>2.3. Uso de datos de contacto:</strong> El Usuario autoriza al
+          Proveedor a utilizar su número telefónico y correo para validaciones
+          de seguridad y soporte técnico operativo.
         </li>
         <li>
-          <strong>Reventa:</strong> Vender, alquilar, sublicenciar o
-          comercializar el acceso a la cuenta o los servicios de la Plataforma a
-          terceros sin autorización escrita de Universitas.
-        </li>
-        <li>
-          <strong>Contenido ofensivo:</strong> Cargar en los campos de texto
-          contenido difamatorio, obsceno, amenazante o que viole derechos de
+          <strong>2.4. Seguridad:</strong> El Usuario es responsable de
+          resguardar sus credenciales. Queda prohibido compartir el acceso con
           terceros.
         </li>
+      </ul>
+
+      <h3 className="font-bold text-lg text-primary pt-2">
+        3. Funcionalidades de la Plataforma
+      </h3>
+      <p className="text-black/90">
+        Al ser una solución de gestión integral, el acceso del Usuario incluye:
+      </p>
+      <ul className="list-none space-y-4 text-black/90">
         <li>
-          <strong>Extracción de datos:</strong> Utilizar <em>bots</em>,{' '}
-          <em>crawlers</em> o <em>scrapers</em> para extraer información del
-          repositorio legal o de la base de datos de Universitas.
+          <strong>3.1. Gestión documental:</strong> Generación, edición y
+          almacenamiento de actas de entrega en la nube durante la vigencia de
+          su suscripción.
+        </li>
+        <li>
+          <strong>3.2. Módulo de Compliance:</strong> Herramienta de
+          autoevaluación formal basada en la Resolución 162. La validación
+          positiva indica que el Usuario ha declarado poseer un requisito, no
+          que dicho requisito sea veraz o jurídicamente suficiente ante una
+          auditoría real.
+        </li>
+        <li>
+          <strong>3.3. Consultor IA:</strong> Sistema de inteligencia artificial
+          diseñado para ofrecer respuestas basadas en la normativa de control
+          fiscal. El Usuario debe contrastar cualquier sugerencia de la IA con
+          la normativa oficial antes de tomar decisiones administrativas.
+        </li>
+        <li>
+          <strong>3.4. Almacenamiento y respaldo:</strong> El Proveedor aplica
+          medidas de seguridad estándar para proteger los datos. Sin embargo, el
+          Usuario se compromete a mantener copias de seguridad locales (offline)
+          de sus documentos críticos.
+        </li>
+      </ul>
+
+      <h3 className="font-bold text-lg text-primary pt-2">
+        4. Usos Prohibidos y Restricciones
+      </h3>
+      <p className="text-black/90">Queda terminantemente prohibido:</p>
+      <ol className="list-decimal list-inside space-y-2 pl-4 text-black/90">
+        <li>
+          Realizar ingeniería inversa o intentar extraer el código fuente de la
+          Plataforma.
+        </li>
+        <li>
+          Utilizar el servicio para simular actos administrativos o encubrir
+          ilícitos.
+        </li>
+        <li>
+          Introducir códigos maliciosos o virus que afecten la operatividad del
+          sistema.
+        </li>
+        <li>
+          Revender o comercializar el acceso a la cuenta sin autorización
+          expresa.
         </li>
       </ol>
 
       <h3 className="font-bold text-lg text-primary pt-2">
-        5. Condiciones comerciales y activación
+        5. Propiedad Intelectual
       </h3>
-
-      <p className="font-bold text-black/90 pt-2">
-        5.1. Proceso de pago y activación manual:
-      </p>
-      <p className="text-black/90">
-        El Usuario reconoce que el procesamiento del pago para la versión PRO se
-        realiza de forma externa a la Plataforma (transferencias bancarias, pago
-        móvil, u otros medios acordados con el equipo de ventas).
-      </p>
-      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
+      <ul className="list-none space-y-4 text-black/90">
         <li>
-          <strong>Tiempos de activación:</strong> La actualización de la cuenta
-          de &quot;Express&quot; a &quot;PRO&quot;{' '}
-          <strong>no es automática ni inmediata</strong>. Está sujeta a la
-          verificación manual de la transacción por parte del equipo de ventas
-          de Universitas. El Usuario acepta que este proceso puede demorar hasta{' '}
-          <strong>48 horas hábiles</strong> desde el reporte del pago.
-        </li>
-      </ul>
-
-      <p className="font-bold text-black/90 pt-2">5.2. Vigencia:</p>
-      <p className="text-black/90">
-        El pago único otorga acceso a la versión PRO por un lapso de{' '}
-        <strong>un (1) año continuo</strong> contado a partir de la fecha de
-        activación en el sistema.
-      </p>
-
-      <p className="font-bold text-black/90 pt-2">
-        5.3. Política de reembolso:
-      </p>
-      <p className="text-black/90">
-        Se ofrece un reembolso parcial del 50% únicamente si se cumplen{' '}
-        <strong>todas</strong> las siguientes condiciones simultáneamente:
-      </p>
-      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
-        <li>
-          La solicitud se realiza por escrito a contacto@universitas.legal
-          dentro de las <strong>24 horas</strong> siguientes al pago.
+          <strong>5.1. Propiedad de la Plataforma:</strong> Todo el software,
+          código, algoritmos y la marca <strong>Acta de Entrega</strong> son
+          propiedad exclusiva del Proveedor o sus licenciantes.
         </li>
         <li>
-          El Usuario <strong>no ha generado más de un (1) acta</strong> en la
-          versión PRO.
-        </li>
-        <li>
-          El Usuario <strong>no ha utilizado</strong> el módulo de compliance.
-        </li>
-        <li>
-          No se realizarán reembolsos por errores del usuario en la carga de
-          datos o por disconformidad con los resultados de una auditoría real.
-        </li>
-      </ul>
-
-      <p className="font-bold text-black/90 pt-2">
-        5.4. Retención de datos y &quot;periodo de gracia&quot;:
-      </p>
-      <p className="text-black/90">
-        En caso de vencimiento de la suscripción anual:
-      </p>
-      <ul className="list-disc list-inside space-y-2 pl-4 text-black/90">
-        <li>
-          Universitas mantendrá los datos accesibles en modo{' '}
-          <strong>&quot;solo lectura&quot;</strong> por un periodo de gracia de{' '}
-          <strong>treinta (30) días continuos</strong>.
-        </li>
-        <li>
-          Transcurrido este lapso sin renovación, Universitas se reserva el
-          derecho de eliminar permanentemente los datos de sus servidores para
-          liberar recursos, sin responsabilidad alguna por la pérdida de
-          información no respaldada por el Usuario.
+          <strong>5.2. Documentación:</strong> Los textos legales disponibles en
+          la plataforma son de dominio público, pero su compilación y
+          organización dentro del sistema están protegidas por derechos de autor
+          del Proveedor.
         </li>
       </ul>
 
       <h3 className="font-bold text-lg text-primary pt-2">
-        6. Propiedad intelectual y repositorio legal
+        6. Limitación de Responsabilidad e Indemnidad
       </h3>
-      <p className="text-black/90">
-        <strong>6.1. Propiedad de la Plataforma:</strong> Todo el software,
-        código fuente, interfaces visuales, algoritmos de validación y la marca
-        &quot;Universitas Legal&quot; son propiedad exclusiva de Universitas
-        Services C.A.
-      </p>
-      <p className="text-black/90">
-        <strong>6.2. Repositorio legal:</strong> Las leyes, reglamentos y
-        gacetas oficiales disponibles en el &quot;Repositorio legal&quot; son
-        documentos de dominio público. Universitas no reclama derechos de autor
-        sobre los textos legales, pero sí sobre la compilación y organización de
-        los mismos. Universitas no garantiza que dichos textos estén
-        actualizados en tiempo real respecto a la última Gaceta Oficial.
-      </p>
-      <p className="text-black/90">
-        <strong>6.3. Servicios vinculados:</strong> La Plataforma puede contener
-        enlaces a cursos o servicios de terceros (incluyendo &quot;Universitas
-        Academy&quot;). La contratación de dichos servicios se rige por sus
-        propios términos.
-      </p>
+      <ul className="list-none space-y-4 text-black/90">
+        <li>
+          <strong>6.1. Exclusión de garantías:</strong> El servicio se
+          proporciona &quot;tal cual&quot;. El Proveedor no se hace responsable
+          por interrupciones debidas a fallas eléctricas, de internet o de
+          proveedores de infraestructura externa.
+        </li>
+        <li>
+          <strong>6.2. Limitación de daños:</strong> En ningún caso El Proveedor
+          será responsable por daños indirectos o sanciones administrativas
+          derivadas del uso o mal uso de la información cargada por el Usuario.
+        </li>
+        <li>
+          <strong>6.3. Indemnidad:</strong> El Usuario acuerda mantener indemne
+          al Proveedor frente a cualquier reclamación legal derivada de la
+          violación de estos Términos o del mal manejo de su rendición de
+          cuentas.
+        </li>
+      </ul>
 
       <h3 className="font-bold text-lg text-primary pt-2">
-        7. Limitación de responsabilidad e indemnidad
+        7. Ley Aplicable y Jurisdicción
       </h3>
-      <p className="text-black/90">
-        <strong>7.1. Exclusión de garantías:</strong> El servicio se proporciona
-        &quot;tal cual&quot; (<em>as is</em>). Universitas no garantiza que la
-        Plataforma sea ininterrumpida o libre de errores. No seremos
-        responsables por fallas debidas a cortes eléctricos nacionales,
-        interrupciones de internet, mantenimiento programado o fallos en
-        proveedores de nube (AWS/Google).
-      </p>
-      <p className="text-black/90">
-        <strong>7.2. Limitación de daños:</strong> En ningún caso Universitas
-        Services C.A., sus directores, empleados o agentes serán responsables
-        por daños indirectos, punitivos, incidentales, especiales o consecuentes
-        (incluyendo pérdida de datos, pérdida de ingresos o sanciones
-        administrativas) que surjan del uso o la imposibilidad de uso de la
-        Plataforma.
-      </p>
-      <p className="text-black/90">
-        <strong>7.3. Indemnidad:</strong> El Usuario acuerda defender,
-        indemnizar y mantener indemne a Universitas Services C.A. frente a
-        cualquier reclamación, daño, obligación, pérdida, responsabilidad, costo
-        o deuda (incluyendo honorarios de abogados) que surja de: (i) su uso y
-        acceso a la Plataforma; (ii) su violación de cualquiera de estos
-        Términos; (iii) su violación de cualquier derecho de un tercero; o (iv)
-        cualquier reclamación de que su contenido causó daño a un tercero o al
-        Estado.
-      </p>
-
-      <h3 className="font-bold text-lg text-primary pt-2">
-        8. Ley aplicable y jurisdicción
-      </h3>
-      <p className="text-black/90">
-        <strong>8.1. Legislación:</strong> Estos Términos se rigen e interpretan
-        de acuerdo con las leyes de la República Bolivariana de Venezuela.
-      </p>
-      <p className="text-black/90">
-        <strong>8.2. Resolución de disputas:</strong> Para cualquier
-        controversia derivada del uso de la Plataforma, las partes se someten a
-        la jurisdicción exclusiva de los tribunales de la ciudad de{' '}
-        <strong>Barquisimeto, Estado Lara, Venezuela</strong>, renunciando a
-        cualquier otro fuero.
-      </p>
-      <p className="text-black/90">
-        <strong>8.3. Modificaciones:</strong> Universitas se reserva el derecho
-        de modificar estos Términos en cualquier momento. Las modificaciones
-        entrarán en vigencia al momento de su publicación en la Plataforma. El
-        uso continuado del servicio tras la notificación de cambios constituye
-        la aceptación de los mismos.
-      </p>
+      <ul className="list-none space-y-4 text-black/90">
+        <li>
+          <strong>7.1. Legislación:</strong> Estos Términos se rigen por las
+          leyes de la República Bolivariana de Venezuela.
+        </li>
+        <li>
+          <strong>7.2. Resolución de Disputas:</strong> Las partes se someten a
+          la jurisdicción de los tribunales de la ciudad de Caracas, Distrito
+          Capital, Venezuela, renunciando a cualquier otro fuero.
+        </li>
+        <li>
+          <strong>7.3. Modificaciones:</strong> El Proveedor se reserva el
+          derecho de modificar estos Términos. El uso continuado del servicio
+          tras los cambios constituye la aceptación de los mismos.
+        </li>
+      </ul>
     </div>
   );
 }

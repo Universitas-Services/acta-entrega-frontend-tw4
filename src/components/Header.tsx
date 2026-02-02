@@ -34,10 +34,10 @@ export default function Header() {
             className="flex items-center bg-background hover:bg-background"
           >
             <Image
-              src="/logo de universitas legal.svg"
+              src="/LOGO_SIN_FONDO.png"
               alt="Universitas Legal Logo"
-              width={120}
-              height={48}
+              width={80}
+              height={32}
               className="object-contain"
             />
           </GuardedButton>

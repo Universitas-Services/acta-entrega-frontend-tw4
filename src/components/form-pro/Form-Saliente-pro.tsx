@@ -293,7 +293,7 @@ export function ActaSalienteProForm() {
               setCurrentStep(targetStepIndex);
 
               toast.success('Datos cargados correctamente.');
-            }, 100); // 100ms es suficiente para que React Hook Form procese el reset
+            }, 350); // 350ms es suficiente para que React Hook Form procese el reset
           }
         } catch (error) {
           console.error(error);
@@ -938,7 +938,7 @@ export function ActaSalienteProForm() {
                 size="sm"
                 onClick={handleSaveProgress}
                 disabled={isLoading}
-                className="cursor-pointer shadow-xs border bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold"
+                className="cursor-pointer shadow-xs border bg-chillon hover:bg-chillon/80 text-white font-semibold"
               >
                 <BsSave className="mr-2 h-4 w-4" />
                 {isLoading ? 'Guardando...' : 'Guardar'}
@@ -1705,7 +1705,7 @@ export function ActaSalienteProForm() {
                     nextStep();
                   }}
                   className={cn(
-                    'text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white',
+                    'text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-chillon hover:bg-chillon/80 hover:text-white',
                     isLoading && 'pointer-events-none opacity-50'
                   )}
                 >
@@ -1718,7 +1718,7 @@ export function ActaSalienteProForm() {
                   onClick={form.handleSubmit(onSubmit)}
                   disabled={isLoading || !isFormGloballyValid}
                   variant="default"
-                  className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-primary hover:bg-primary/90 hover:text-white"
+                  className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-chillon hover:bg-chillon/80 hover:text-white"
                 >
                   {isLoading ? 'Enviando...' : 'Crear Acta (PRO)'}
                 </Button>

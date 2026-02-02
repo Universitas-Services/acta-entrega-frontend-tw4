@@ -14,9 +14,7 @@ const proCardsData = [
     description:
       'Resuelve tus dudas sobre el funcionamiento de la aplicación, el proceso de gestión y los pasos clave que debes seguir. Encuentra respuestas rápidas y útiles para optimizar tu ruta.',
     href: '/dashboard/faq-pro',
-    icon: (
-      <BsFillQuestionSquareFill className="h-13 w-13 text-icon-asistencia" />
-    ),
+    icon: <BsFillQuestionSquareFill className="h-13 w-13 text-chillon" />,
   },
   {
     id: 'consultor-ia',
@@ -24,7 +22,7 @@ const proCardsData = [
     description:
       'Resuelve tus dudas al instante. Nuestro Asesor  utiliza inteligencia artificial para analizar tu caso y responder tus preguntas sobre Actas de Entrega y normativas. Además, un agente experto revisará la consulta para entregarte un reporte con observaciones profesionales.',
     href: '/dashboard/consultoria',
-    icon: <FaRobot className="h-13 w-13 text-icon-asistencia" />,
+    icon: <FaRobot className="h-13 w-13 text-chillon" />,
   },
   /*
   {

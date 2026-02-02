@@ -146,9 +146,6 @@ export const complianceSchemaBase = z.object({
   incluye_situacion_cuentas_municipal: z.string().optional(),
   incluye_inventario_terrenos_municipales: z.string().optional(),
   incluye_relacion_ingresos_venta_terrenos: z.string().optional(),
-
-  // PASO 13 (Final)
-  interesProducto: requiredOption, // Asegurarse que el nombre coincida
 });
 
 // Tipo inferido para usar en el formulario

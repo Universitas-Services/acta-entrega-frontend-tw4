@@ -113,10 +113,4 @@ export const proNav: NavItem[] = [
     href: '/dashboard/consultoria',
     icon: LiaRobotSolid,
   },
-  {
-    id: 'pro-conocenos',
-    title: 'Conócenos',
-    href: '/dashboard/conocenos-pro',
-    src: '/Icono - trazo - universitas.png',
-  },
 ];

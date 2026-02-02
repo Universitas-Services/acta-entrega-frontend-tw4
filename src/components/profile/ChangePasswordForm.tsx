@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { SuccessAlertDialog } from '../SuccessAlertDialog';
 import { toast } from 'sonner';
@@ -229,7 +228,7 @@ export function ChangePasswordForm() {
             <CardFooter className="border-t pt-6 flex justify-end">
               <Button
                 type="submit"
-                className="cursor-pointer"
+                className="cursor-pointer bg-chillon hover:bg-chillon/80"
                 disabled={isLoading}
               >
                 {isLoading ? 'Actualizando...' : 'Actualizar contraseña'}

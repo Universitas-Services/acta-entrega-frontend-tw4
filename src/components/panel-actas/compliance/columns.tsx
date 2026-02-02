@@ -1,12 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { ColumnDef, Row, Table } from '@tanstack/react-table';
 import {
   ComplianceActa,
   downloadCompliance,
   sendComplianceEmail,
-  getObservacionesCompliance,
 } from '@/services/actasService';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -15,13 +13,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { BsThreeDots, BsEye } from 'react-icons/bs';
+import { BsThreeDots } from 'react-icons/bs';
 import { LuArrowUpDown, LuSend, LuDownload } from 'react-icons/lu';
-import { ComplianceObservationSheet } from '@/components/ComplianceObservationSheet';
 import { toast } from 'sonner';
 
 // Interfaz para el meta de la tabla (para refrescar datos)
@@ -37,49 +33,10 @@ interface ActionsCellProps {
 // --- COMPONENTE DE ACCIONES INTERNO ---
 const ActionsCell = ({ row, table }: ActionsCellProps) => {
   const acta = row.original;
-  // Estado para controlar la apertura del Sheet
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-
-  // Estados para manejar las observaciones y la carga
-  const [observacionesData, setObservacionesData] = useState<string | null>(
-    null
-  );
-  const [isLoadingObservations, setIsLoadingObservations] = useState(false);
 
   // Función para refrescar la tabla
   const refreshTable = () => {
     (table.options.meta as TableMeta)?.onRefresh?.();
-  };
-
-  // Manejo de la visualización de observaciones
-  const handleViewObservations = async () => {
-    // Abrir el Sheet inmediatamente
-    setIsSheetOpen(true);
-
-    // Activar spinner (loading)
-    setIsLoadingObservations(true);
-    setObservacionesData(null); // Limpiar data previa si la hubiera
-
-    try {
-      // Intentar traer las observaciones (GET)
-      const data = await getObservacionesCompliance(acta.id);
-
-      // Aseguramos que lo que guardamos sea un string o null
-      if (typeof data === 'string') {
-        setObservacionesData(data);
-      } else if (data && typeof data === 'object') {
-        // Si por error llega un objeto, lo convertimos a string para evitar fallos
-        setObservacionesData(JSON.stringify(data, null, 2));
-      } else {
-        setObservacionesData(null);
-      }
-    } catch (error) {
-      console.error('Error cargando observaciones', error);
-      toast.error('No se pudieron cargar las observaciones.');
-    } finally {
-      // Desactivar spinner
-      setIsLoadingObservations(false);
-    }
   };
 
   const handleDownload = async () => {
@@ -106,29 +63,7 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
 
   return (
     <>
-      {/* Renderizamos el Sheet aquí, vinculado al estado local */}
-      <ComplianceObservationSheet
-        isOpen={isSheetOpen}
-        onOpenChange={setIsSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-        actaId={acta.id}
-        numeroCompliance={acta.numeroCompliance || 'S/N'}
-        observaciones={observacionesData} // Data obtenida del GET
-        isLoading={isLoadingObservations} // Estado del Spinner
-      />
-
       <div className="flex items-center justify-end space-x-2">
-        {/* Botón directo para ver observaciones (Abre el Sheet) */}
-        {/*<Button
-          variant="ghost"
-          size="sm"
-          className="cursor-pointer text-muted-foreground hover:text-primary"
-          onClick={handleViewObservations}
-          title="Ver Observaciones"
-        >
-          <BsEye className="h-4 w-4" />
-          Ver Obs
-        </Button>*/}
         {/* Menú desplegable para más acciones */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -139,16 +74,8 @@ const ActionsCell = ({ row, table }: ActionsCellProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className="bg-white text-black min-w-[160px]"
+            className="bg-white text-black min-w-40"
           >
-            {/*<DropdownMenuItem
-              className="cursor-pointer"
-              onClick={handleViewObservations}
-            >
-              <BsEye className="mr-2 h-4 w-4" />
-              Ver observaciones
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />*/}
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={handleSendEmail}
@@ -202,7 +129,7 @@ export const columns: ColumnDef<ComplianceActa>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Número de Acta
+          Número de acta
           <LuArrowUpDown className="h-4 w-4 ml-2" />
         </Button>
       );
@@ -220,7 +147,7 @@ export const columns: ColumnDef<ComplianceActa>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Nombre del Órgano
+          Nombre del órgano
           <LuArrowUpDown className="h-4 w-4 ml-2" />
         </Button>
       );
@@ -228,7 +155,7 @@ export const columns: ColumnDef<ComplianceActa>[] = [
     cell: ({ row }) => {
       const val = row.getValue('nombre_organo_entidad') as string;
       return (
-        <div className="pl-4 truncate max-w-[300px]" title={val}>
+        <div className="pl-4 truncate max-w-75" title={val}>
           {val || 'Sin Entidad'}
         </div>
       );

@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { FaArrowRight } from 'react-icons/fa6';
 
 interface RepoCardProProps {
   imageUrl: string;

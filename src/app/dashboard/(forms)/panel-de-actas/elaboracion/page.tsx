@@ -12,8 +12,6 @@ import {
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
 import { PaginationState } from '@tanstack/react-table';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { AiOutlineInfoCircle } from 'react-icons/ai';
 
 export default function ActasPage() {
   const { setTitle } = useHeader();
@@ -34,8 +32,6 @@ export default function ActasPage() {
     undefined
   );
   const [isFirstLoad, setIsFirstLoad] = useState(true);
-  const [showCompletedAlert, setShowCompletedAlert] = useState(false);
-  const [isAlertClosing, setIsAlertClosing] = useState(false);
 
   // Estados para el sistema de observaciones
   const [generatingActas, setGeneratingActas] = useState<Set<string>>(
@@ -75,10 +71,6 @@ export default function ActasPage() {
         }
 
         setData(filteredData);
-
-        // Detectar si hay actas completadas para mostrar el Alert
-        const hasCompletedActas = filteredData.some((acta) => acta.isCompleted);
-        setShowCompletedAlert(hasCompletedActas);
 
         const metaTotal = response.meta?.total;
 
@@ -158,24 +150,6 @@ export default function ActasPage() {
   useEffect(() => {
     setTitle('Panel de actas (Elaboración)');
   }, [setTitle]);
-
-  // Cerrar automáticamente el Alert después de 15 segundos
-  useEffect(() => {
-    if (showCompletedAlert) {
-      const timer = setTimeout(() => {
-        // Activar animación de salida
-        setIsAlertClosing(true);
-
-        // Después de la animación, ocultar completamente el Alert
-        setTimeout(() => {
-          setShowCompletedAlert(false);
-          setIsAlertClosing(false);
-        }, 500); // 500ms para que termine la animación
-      }, 15000); // 15 segundos
-
-      return () => clearTimeout(timer);
-    }
-  }, [showCompletedAlert]);
 
   // Usamos useCallback para que esta función no cambie de referencia en cada render.
   // Esto evita que el useEffect del DataTable se dispare innecesariamente y resetee la página.
@@ -259,28 +233,6 @@ export default function ActasPage() {
         generatingActas={generatingActas}
         startObservacionesGeneration={startObservacionesGeneration}
       />
-
-      {/* Alert para actas completadas */}
-      {showCompletedAlert && (
-        <div
-          className={`fixed top-4 right-4 z-50 w-100 transition-all duration-500 ${
-            isAlertClosing
-              ? 'animate-out slide-out-to-right fade-out'
-              : 'animate-in slide-in-from-top-2 fade-in'
-          }`}
-        >
-          <Alert className="border-blue-200 bg-blue-50">
-            <AiOutlineInfoCircle className="h-4 w-4 text-blue-600" />
-            <AlertTitle className="text-blue-900 font-semibold">
-              Actas Finalizadas Detectadas
-            </AlertTitle>
-            <AlertDescription className="text-blue-800 text-sm">
-              Debes revisar las actas que estén Finalizadas, ya que puedes
-              obtener observaciones.
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
     </div>
   );
 }

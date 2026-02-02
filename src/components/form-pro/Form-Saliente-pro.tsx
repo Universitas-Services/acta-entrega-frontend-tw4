@@ -368,7 +368,8 @@ export function ActaSalienteProForm() {
       if (isFinalSubmission) {
         setDialogContent({
           title: `¡Acta de Entrega procesada!`,
-          description: 'Su documento ha sido guardado exitosamente.',
+          description:
+            'Su documento ha sido elaborado y guardado exitosamente. Ingresa al panel de actas para editar, enviar o descargar tu acta.',
         });
         setShowSuccessDialog(true);
       }
@@ -1720,7 +1721,7 @@ export function ActaSalienteProForm() {
                   variant="default"
                   className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-chillon hover:bg-chillon/80 hover:text-white"
                 >
-                  {isLoading ? 'Enviando...' : 'Crear Acta (PRO)'}
+                  {isLoading ? 'Enviando...' : 'Crear acta'}
                 </Button>
               )}
             </div>

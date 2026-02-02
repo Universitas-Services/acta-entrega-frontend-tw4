@@ -9,7 +9,7 @@ const cardData = [
     imageUrl: '/repositorio-pro/Consideraciones-generales.png',
     description:
       'Para garantizar un proceso de entrega-recepción transparente, te invitamos a leer detenidamente las siguientes consideraciones.',
-    buttonText: 'Ingrese aquí',
+    buttonText: 'Ingresa aquí',
     linkHref: 'https://actadeentrega.site/aspectos-generales/',
   },
   {
@@ -31,21 +31,21 @@ const cardData = [
     imageUrl: '/repositorio/control-fiscal.png',
     description:
       'Accede a un compendio normativo completo, doctrina administrativa y jurisprudencia esencial para fortalecer el control fiscal en todos los niveles del sector público.',
-    buttonText: 'Ingrese aquí',
+    buttonText: 'Ingresa aquí',
     linkHref: 'https://universitas.legal/control-fiscal/',
   },
   {
     imageUrl: '/repositorio/biblioteca-contrataciones.png',
     description:
       'Accede a normativa especializada, doctrina administrativa y jurisprudencia clave para garantizar contrataciones públicas sostenibles, transparentes y ajustadas al interés general.',
-    buttonText: 'Ingrese aquí',
+    buttonText: 'Ingresa aquí',
     linkHref: 'https://universitas.legal/biblioteca-contratacion-publica/',
   },
   {
     imageUrl: '/repositorio/biblioteca-ordenanzas.png',
     description:
       'Explora y descarga decretos, acuerdos y resoluciones de cientos de municipios, con acceso abierto y colaborativo para impulsar gobiernos más transparentes, eficientes y conectados con su comunidad.',
-    buttonText: 'Ingrese aquí',
+    buttonText: 'Ingresa aquí',
     linkHref: 'https://universitas.legal/biblioteca-de-ordenanzas-municipales/',
   },
 ];

@@ -248,7 +248,7 @@ export function DataTable<TData extends DataWithId, TValue>({
 
           <div className="flex flex-wrap items-center gap-2">
             <AnimatedToggle
-              options={['Todas', 'Seleccionada']}
+              options={['Todas', 'Seleccionadas']}
               defaultSelected={viewOption}
               onValueChange={setViewOption}
             />
@@ -268,7 +268,7 @@ export function DataTable<TData extends DataWithId, TValue>({
                 <DropdownMenuLabel>Filtrar por...</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Tipo de Acta</DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger>Tipo de acta</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent className="bg-white">
                     <DropdownMenuRadioGroup
                       value={selectedType}

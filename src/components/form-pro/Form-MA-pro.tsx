@@ -1856,7 +1856,7 @@ export function ActaMaximaAutoridadProForm() {
                   variant="default"
                   className="text-white cursor-pointer shadow-lg shadow-blue-500/50 active:shadow-inner transition-all bg-chillon hover:bg-chillon/80 hover:text-white"
                 >
-                  {isLoading ? 'Enviando...' : 'Crear Acta (PRO)'}
+                  {isLoading ? 'Enviando...' : 'Crear acta'}
                 </Button>
               )}
             </div>

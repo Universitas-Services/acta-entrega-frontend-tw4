@@ -5,7 +5,6 @@ import {
   Acta,
   downloadActa,
   resendActaEmail,
-  deleteActa,
   entregarActa,
 } from '@/services/actasService';
 import { useRouter } from 'next/navigation';
@@ -33,7 +32,6 @@ import { LuArrowUpDown } from 'react-icons/lu';
 import { AiOutlineEye } from 'react-icons/ai';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { ElaboracionObsSheet } from '@/components/ElaboracionObsSheet';
 import { useState } from 'react';
 
 // Definimos una interfaz para el meta de la tabla lo que viene del data-table
@@ -178,17 +176,6 @@ const ObservacionesCell = ({ row, table }: ActionsCellProps) => {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-
-      {/* Sheet de Observaciones */}
-      <ElaboracionObsSheet
-        isOpen={isSheetOpen}
-        onOpenChange={setIsSheetOpen}
-        onClose={handleCloseSheet}
-        actaId={acta.id}
-        numeroActa={acta.numeroActa || 'S/N'}
-        onStartGeneration={handleStartGeneration}
-        tieneObservaciones={tieneObservaciones}
-      />
     </>
   );
 };
@@ -358,7 +345,7 @@ export const columns: ColumnDef<Acta>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Número de Acta
+          Número de acta
           <LuArrowUpDown className="h-4 w-4" />
         </Button>
       );
@@ -376,7 +363,7 @@ export const columns: ColumnDef<Acta>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Nombre del Órgano
+          Nombre del órgano
           <LuArrowUpDown className="h-4 w-4" />
         </Button>
       );
@@ -388,7 +375,7 @@ export const columns: ColumnDef<Acta>[] = [
   },
   {
     accessorKey: 'type',
-    header: 'Tipo de Acta',
+    header: 'Tipo de acta',
     cell: ({ row }) => {
       const type = row.getValue('type') as string;
       let label = type;
@@ -443,13 +430,8 @@ export const columns: ColumnDef<Acta>[] = [
   },
   {
     id: 'entregar',
-    header: () => <div className="text-center">Entregar</div>,
+    header: () => <div className="text-center">Entrega</div>,
     cell: ({ row, table }) => <EntregarSwitch row={row} table={table} />,
-  },
-  {
-    id: 'observaciones',
-    header: () => <div className="text-center">Observaciones</div>,
-    cell: ({ row, table }) => <ObservacionesCell row={row} table={table} />,
   },
   {
     id: 'actions',

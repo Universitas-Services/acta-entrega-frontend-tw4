@@ -96,7 +96,7 @@ const faqDataBySection = [
       {
         question: 'Tengo un problema técnico, ¿a quién acudo?',
         answer:
-          'Puede contactarnos a través de nuestros canales de atención técnica por WhatsApp o correo electrónico de lunes a viernes en horario de oficina.',
+          'Puedes contactarnos directamente a través del canal de soporte habilitado en la plataforma. Nuestro equipo de atención técnica está disponible de lunes a viernes en horario de oficina para ayudarte a resolver cualquier inconveniente.',
       },
       {
         question: '¿El soporte técnico me ayuda con el contenido del acta?',
@@ -174,16 +174,6 @@ export default function FaqPage() {
           ))}
         </Accordion>
       </div>
-
-      <a
-        href="https://api.whatsapp.com/send?phone=+584125253023&text=Hola,%20necesito%20ayuda%20en%20la%20APP%20de%20Actas%20de%20Entrega"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-8 right-8 z-50 text-green-500 hover:text-green-600 transition-transform hover:scale-110"
-        aria-label="Contactar por WhatsApp"
-      >
-        <IoLogoWhatsapp className="h-14 w-14 drop-shadow-lg" />
-      </a>
     </>
   );
 }

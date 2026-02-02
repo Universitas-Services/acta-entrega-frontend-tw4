@@ -137,15 +137,18 @@ export default function ActasPage() {
           refreshData();
 
           // Mostrar Toast personalizado con código de acta
-          toast.success(`Observaciones listas para el Acta ${numeroActa}`, {
-            action: {
-              label: 'OK',
-              onClick: () => {
-                refreshData(); // Refrescar para actualizar tieneObservaciones
+          toast.success(
+            `Ya están disponibles las observaciones para el acta ${numeroActa}`,
+            {
+              action: {
+                label: 'OK',
+                onClick: () => {
+                  refreshData(); // Refrescar para actualizar tieneObservaciones
+                },
               },
-            },
-            duration: Infinity, // No se cierra automáticamente
-          });
+              duration: Infinity, // No se cierra automáticamente
+            }
+          );
         } catch (error) {
           // Continuar polling si aún no están listas
         }
@@ -272,11 +275,11 @@ export default function ActasPage() {
           <Alert className="border-blue-200 bg-blue-50">
             <AiOutlineInfoCircle className="h-4 w-4 text-blue-600" />
             <AlertTitle className="text-blue-900 font-semibold">
-              Actas Finalizadas Detectadas
+              Hemos detectado nuevas actas
             </AlertTitle>
             <AlertDescription className="text-blue-800 text-sm">
-              Debes revisar las actas que estén Finalizadas, ya que puedes
-              obtener observaciones.
+              Revisa las nuevas actas completadas. Ya puedes generar las
+              observaciones
             </AlertDescription>
           </Alert>
         </div>

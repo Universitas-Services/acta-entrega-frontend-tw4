@@ -80,7 +80,7 @@ export function ElaboracionObsSheet({
 
     // Mostrar Toast
     toast.success(
-      'Generación iniciada. Te notificaremos cuando esté lista (2-5 min).'
+      'Te notificaremos cuando este lista las observaciones (2-5 min).'
     );
 
     // Cambiar badge a amarillo (generando)
@@ -122,10 +122,10 @@ export function ElaboracionObsSheet({
           </div>
           <div className="space-y-2 max-w-xs px-4">
             <p className="text-sm text-muted-foreground">
-              Esta acta está lista para generar observaciones.
+              Ya puedes generar las observaciones del acta.
             </p>
             <Button onClick={handleGenerate} className="mt-4 cursor-pointer">
-              Generar Observaciones
+              Generar observaciones
             </Button>
           </div>
         </div>
@@ -145,10 +145,12 @@ export function ElaboracionObsSheet({
           </div>
           <div className="space-y-2 max-w-xs px-4">
             <p className="text-lg font-semibold text-green-700">
-              ¡Acta Perfecta!
+              El acta está lista para su impresión.
             </p>
             <p className="text-sm text-muted-foreground">
-              Su acta está perfecta, por lo que no tiene observaciones.
+              El documento ya incluye todos los anexos necesarios. Por favor,
+              proceda a imprimirlo, realizar la entrega física y marcar como{' '}
+              <strong>&quot;Entregado&quot;</strong> en su panel de control.
             </p>
           </div>
         </div>
@@ -176,16 +178,6 @@ export function ElaboracionObsSheet({
               key={index}
               className="bg-white border rounded-lg p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow"
             >
-              {/* Criterio */}
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
-                  Criterio
-                </p>
-                <p className="text-sm text-gray-800 wrap-break-word">
-                  {obs.criterio}
-                </p>
-              </div>
-
               {/* Pregunta */}
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
@@ -193,6 +185,33 @@ export function ElaboracionObsSheet({
                 </p>
                 <p className="text-sm text-gray-800 wrap-break-words">
                   {obs.pregunta}
+                </p>
+              </div>
+
+              {/* Respuesta y Dato Faltante */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                    Respuesta
+                  </p>
+                  <Badge
+                    variant={
+                      obs.respuesta === 'N/A' ? 'secondary' : 'destructive'
+                    }
+                    className="text-xs"
+                  >
+                    {obs.respuesta}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Criterio */}
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                  Criterio
+                </p>
+                <p className="text-sm text-gray-800 wrap-break-word">
+                  {obs.criterio}
                 </p>
               </div>
 
@@ -215,23 +234,6 @@ export function ElaboracionObsSheet({
                   {obs.observacion_legal}
                 </p>
               </div>
-
-              {/* Respuesta y Dato Faltante */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
-                    Respuesta
-                  </p>
-                  <Badge
-                    variant={
-                      obs.respuesta === 'N/A' ? 'secondary' : 'destructive'
-                    }
-                    className="text-xs"
-                  >
-                    {obs.respuesta}
-                  </Badge>
-                </div>
-              </div>
             </div>
           ))}
         </div>
@@ -249,7 +251,7 @@ export function ElaboracionObsSheet({
           <div className="flex items-center gap-2 text-primary">
             <AiOutlineEye className="w-5 h-5" />
             <SheetTitle className="text-lg font-bold">
-              Observaciones de Elaboración
+              Observaciones del acta
             </SheetTitle>
           </div>
 
@@ -294,18 +296,21 @@ export function ElaboracionObsSheet({
         </div>
 
         {/* FOOTER con botón Actualizar Observación */}
-        {observaciones && !isLoading && (
-          <SheetFooter className="border-t pt-4 px-6 pb-6 shrink-0">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleRegenerate}
-              className="w-full cursor-pointer"
-            >
-              Actualizar Observación
-            </Button>
-          </SheetFooter>
-        )}
+        {observaciones &&
+          !isLoading &&
+          observaciones.analisis &&
+          observaciones.analisis.length > 0 && (
+            <SheetFooter className="border-t pt-4 px-6 pb-6 shrink-0">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleRegenerate}
+                className="w-full cursor-pointer"
+              >
+                Actualizar observaciones
+              </Button>
+            </SheetFooter>
+          )}
       </SheetContent>
     </Sheet>
   );

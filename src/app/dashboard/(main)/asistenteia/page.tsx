@@ -8,6 +8,8 @@ import apiClient from '@/lib/axios';
 import { useHeader } from '@/context/HeaderContext';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   text: string;
@@ -100,7 +102,15 @@ export default function AsistenteVirtualPage() {
                     : 'bg-white text-gray-800 rounded-bl-none'
                 )}
               >
-                <p className="text-sm">{msg.text}</p>
+                {msg.isUser ? (
+                  <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+                ) : (
+                  <div className="text-sm whitespace-pre-wrap break-words [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-2 [&_li]:mb-1 [&_strong]:font-semibold">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {msg.text}
+                    </ReactMarkdown>
+                  </div>
+                )}
               </div>
             </div>
           ))}

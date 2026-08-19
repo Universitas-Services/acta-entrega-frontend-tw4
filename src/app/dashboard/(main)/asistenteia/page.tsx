@@ -16,6 +16,18 @@ interface Message {
   isUser: boolean;
 }
 
+const normalizeBotMarkdown = (text: string): string => {
+  return (
+    text
+      // Limita múltiples líneas en blanco consecutivas.
+      .replace(/\n{3,}/g, '\n\n')
+      // Compacta listas con guiones cuando vienen separadas por líneas vacías.
+      .replace(/(\n\s*[-*] .+)\n\n(?=\s*[-*] )/g, '$1\n')
+      // Compacta listas numeradas cuando vienen separadas por líneas vacías.
+      .replace(/(\n\s*\d+\. .+)\n\n(?=\s*\d+\. )/g, '$1\n')
+  );
+};
+
 export default function AsistenteVirtualPage() {
   const { setTitle } = useHeader();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -105,9 +117,9 @@ export default function AsistenteVirtualPage() {
                 {msg.isUser ? (
                   <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                 ) : (
-                  <div className="text-sm whitespace-pre-wrap break-words [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-2 [&_li]:mb-1 [&_strong]:font-semibold">
+                  <div className="text-sm break-words [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-1 [&_li]:my-0 [&_li_p]:my-0 [&_strong]:font-semibold">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {msg.text}
+                      {normalizeBotMarkdown(msg.text)}
                     </ReactMarkdown>
                   </div>
                 )}
